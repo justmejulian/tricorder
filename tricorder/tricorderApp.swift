@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct tricorderApp: App {
+    
+    private let workoutManager = WorkoutManager.shared
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(workoutManager)
         }
     }
 }

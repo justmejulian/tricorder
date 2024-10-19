@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import HealthKit
+@preconcurrency import HealthKit
 import os
 
 @MainActor
@@ -15,7 +15,6 @@ class WorkoutManager: NSObject, ObservableObject {
      WorkoutManager is a singleton.
      */
     static let shared = WorkoutManager()
-
 
     struct SessionSateChange {
         let newState: HKWorkoutSessionState
@@ -43,7 +42,7 @@ class WorkoutManager: NSObject, ObservableObject {
 
     let healthStore = HKHealthStore()
     var session: HKWorkoutSession?
-    
+
     #if os(watchOS)
         /**
      The live workout builder that is only available on watchOS.
@@ -55,14 +54,13 @@ class WorkoutManager: NSObject, ObservableObject {
      */
         var contextDate: Date?
     #endif
-    
+
     /**
      Creates an async stream that buffers a single newest element, and the stream's continuation to yield new elements synchronously to the stream.
      The Swift actors don't handle tasks in a first-in-first-out way. Use AsyncStream to make sure that the app presents the latest state.
      */
     let asynStreamTuple = AsyncStream.makeStream(
         of: SessionSateChange.self, bufferingPolicy: .bufferingNewest(1))
-    
 
     /**
      Kick off a task to consume the async stream. The next value in the stream can't start processing
@@ -122,7 +120,7 @@ extension WorkoutManager {
         #if os(watchOS)
             builder = nil
         #endif
-        
+
         workout = nil
         session = nil
         heartRate = 0
@@ -141,12 +139,42 @@ extension WorkoutManager {
 // MARK: - Workout statistics
 //
 extension WorkoutManager {
-    func updateForStatistics(_ statistics: HKStatistics) {
+    enum HKStatisticsStructError: Error {
+        case invalidType(quantityType: HKQuantityType)
+    }
+
+    // Create Struct so Thread Safe
+    struct HKStatisticsStruct {
+        let quantityType: HKQuantityTypeIdentifier
+        let mostRecentQuantity: HKQuantity?
+
+        init(statistics: HKStatistics) throws {
+            
+            // todo move this out
+            func getQuantityTypeIdentifier(statistics: HKStatistics) throws
+                -> HKQuantityTypeIdentifier
+            {
+                switch statistics.quantityType {
+                case HKQuantityType.quantityType(forIdentifier: .heartRate):
+                    return HKQuantityTypeIdentifier.heartRate
+                default:
+                    throw HKStatisticsStructError.invalidType(
+                        quantityType: statistics.quantityType)
+                }
+            }
+            
+            quantityType = try getQuantityTypeIdentifier(
+                statistics: statistics)
+            mostRecentQuantity = statistics.mostRecentQuantity()
+        }
+    }
+
+    func updateForStatistics(_ statistics: HKStatisticsStruct) {
         switch statistics.quantityType {
-        case HKQuantityType.quantityType(forIdentifier: .heartRate):
+        case HKQuantityTypeIdentifier.heartRate:
             let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
             heartRate =
-                statistics.mostRecentQuantity()?.doubleValue(for: heartRateUnit)
+                statistics.mostRecentQuantity?.doubleValue(for: heartRateUnit)
                 ?? 0
         default:
             return
@@ -220,7 +248,7 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
     }
 }
 extension WorkoutManager {
-    func getHKWorkoutConfiguration() -> HKWorkoutConfiguration {
+    nonisolated func getHKWorkoutConfiguration() -> HKWorkoutConfiguration {
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .cycling
         configuration.locationType = .outdoor

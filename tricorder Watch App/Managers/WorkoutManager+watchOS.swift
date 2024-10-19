@@ -32,6 +32,7 @@ extension WorkoutManager {
         session?.delegate = self
         builder?.delegate = self
         builder?.dataSource = HKLiveWorkoutDataSource(healthStore: healthStore, workoutConfiguration: workoutConfiguration)
+        
         /**
           Start mirroring the session to the companion device.
          */
@@ -63,12 +64,22 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
           HealthKit calls this method on an anonymous serial background queue.
           Use Task to provide an asynchronous context so MainActor can come to play.
          */
-        Task { @MainActor in
             var allStatistics: [HKStatistics] = []
             
             for type in collectedTypes {
                 if let quantityType = type as? HKQuantityType, let statistics = workoutBuilder.statistics(for: quantityType) {
-                    updateForStatistics(statistics)
+                    
+                    
+                    do {
+                        let statisticsStruct = try HKStatisticsStruct(statistics: statistics)
+                        
+                        Task { @MainActor in
+                            updateForStatistics(statisticsStruct)
+                        }
+                    } catch {
+                        Logger.shared.log("Failed to update statistics: \(error)")
+                    }
+                    
                     allStatistics.append(statistics)
                 }
             }
@@ -82,6 +93,7 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
             /**
               Send a Data object to the connected remote workout session.
              */
+        Task{
             await sendData(archivedData)
         }
     }

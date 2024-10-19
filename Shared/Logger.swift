@@ -9,10 +9,10 @@ import Foundation
 import os
 
 extension Logger {
-    private static let subsystem = Bundle.main.bundleIdentifier!
-    #if os(watchOS)
+  private static let subsystem = Bundle.main.bundleIdentifier!
+  #if os(watchOS)
     static let shared = Logger(subsystem: subsystem, category: "MirroringWorkoutsSampleForWatch")
-    #else
+  #else
     static let shared = Logger(subsystem: subsystem, category: "MirroringWorkoutsSample")
-    #endif
+  #endif
 }

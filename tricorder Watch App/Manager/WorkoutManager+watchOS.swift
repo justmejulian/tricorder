@@ -81,7 +81,7 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
             /**
               Send a Data object to the connected remote workout session.
              */
-            await sendData(archivedData)
+            await sendData(archivedData, retryCount: 5)
         }
     }
     

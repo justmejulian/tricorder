@@ -17,7 +17,8 @@ struct tricorderApp: App {
                 StartView()
                     .environmentObject(workoutManager)
             } else {
-                WorkoutListView()
+                // todo maybe show list
+                Text("Cannot Start Workouts from iPad")
             }
         }
     }

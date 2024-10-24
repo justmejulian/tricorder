@@ -60,18 +60,6 @@ struct StartView: View {
            }
            .navigationBarTitle("Mirroring Workout")
            .navigationBarTitleDisplayMode(.inline)
-           .toolbar {
-               ToolbarItem(placement: .automatic) {
-                   Button {
-                       isFullScreenCoverActive = true
-                   } label: {
-                       Label("Workout list", systemImage: "list.bullet")
-                   }
-               }
-           }
-           .fullScreenCover(isPresented: $isFullScreenCoverActive) {
-               WorkoutListView()
-           }
         }
     }
         

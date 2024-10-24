@@ -93,7 +93,7 @@ class WorkoutManager: NSObject, ObservableObject {
         let elapsedTimeInterval = session?.associatedWorkoutBuilder().elapsedTime(at: change.date) ?? 0
         let elapsedTime = WorkoutElapsedTime(timeInterval: elapsedTimeInterval, date: change.date)
         if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime) {
-            await sendData(elapsedTimeData)
+            await sendData(elapsedTimeData, retryCount: 3)
         }
 
         guard change.newState == .stopped, let builder else {
@@ -127,10 +127,19 @@ extension WorkoutManager {
         sessionState = .notStarted
     }
     
-    func sendData(_ data: Data) async {
+    func sendData(_ data: Data, retryCount: Int = 0) async {
+        
+        Logger.shared.info("\(#function) received data: \(data) retry count: \(retryCount)")
+        
         do {
             try await session?.sendToRemoteWorkoutSession(data: data)
         } catch {
+            // todo make a retry wrapper function
+            if retryCount > 0 {
+                Logger.shared.log("Failed to send data, retrying: \(retryCount)")
+                await sendData(data, retryCount: retryCount - 1);
+                return
+            }
             Logger.shared.log("Failed to send data: \(error)")
         }
     }

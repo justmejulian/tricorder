@@ -15,4 +15,14 @@ extension Logger {
     #else
     static let shared = Logger(subsystem: subsystem, category: "MirroringWorkoutsSample")
     #endif
+    
+    /// Log calling Function name to shared Logger info
+    /// ```
+    /// func testFunction() {
+    ///   Logger.function(); // "testFunction"
+    /// }
+    /// ```
+    static func function() {
+        self.shared.info("\(#function)")
+    }
 }

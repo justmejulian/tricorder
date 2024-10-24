@@ -39,16 +39,6 @@
 		749276C42CAC263B004315FD /* tricorder Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "tricorder Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		749192AC2CCA7D6900AAC143 /* Exceptions for "tricorder" folder in "tricorder" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 749276B32CAC263A004315FD /* tricorder */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		749192822CCA7C7100AAC143 /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -57,9 +47,6 @@
 		};
 		749276B62CAC263A004315FD /* tricorder */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				749192AC2CCA7D6900AAC143 /* Exceptions for "tricorder" folder in "tricorder" target */,
-			);
 			path = tricorder;
 			sourceTree = "<group>";
 		};
@@ -436,7 +423,6 @@
 				DEVELOPMENT_TEAM = PQ9M73T7N8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = tricorder/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your workout related data will be used to display your saved workouts in MyWorkouts.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Workouts tracked by MyWorkouts on Apple Watch will be saved to HealthKit.";
@@ -472,7 +458,6 @@
 				DEVELOPMENT_TEAM = PQ9M73T7N8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = tricorder/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your workout related data will be used to display your saved workouts in MyWorkouts.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Workouts tracked by MyWorkouts on Apple Watch will be saved to HealthKit.";

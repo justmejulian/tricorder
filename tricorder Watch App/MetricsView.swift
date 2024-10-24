@@ -17,10 +17,7 @@ struct MetricsView: View {
             VStack(alignment: .leading) {
                 ElapsedTimeView(elapsedTime: elapsedTime(with: context.date), showSubseconds: context.cadence == .live)
                     .foregroundStyle(.yellow)
-                Text(workoutManager.speed.formatted(.number.precision(.fractionLength(0))) + " mph")
-                Text(workoutManager.cadence.formatted(.number.precision(.fractionLength(0))) + " rpm")
-                Text(workoutManager.power.formatted(.number.precision(.fractionLength(0))) + " w")
-                Text(workoutManager.water.formatted(.number.precision(.fractionLength(0))) + " oz")
+                Text(workoutManager.heartRate.formatted(.number.precision(.fractionLength(0))) + " bpm")
             }
             .font(.system(.title, design: .rounded).monospacedDigit().lowercaseSmallCaps())
             .frame(maxWidth: .infinity, alignment: .leading)

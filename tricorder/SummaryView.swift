@@ -17,19 +17,7 @@ struct SummaryView: View {
                 GridItemView(title: "Total Time", value: workout.totalTime)
                     .foregroundStyle(.yellow)
                 
-                GridItemView(title: "Total Distance", value: workout.totalCyclingDistance)
-                    .foregroundStyle(.orange)
-                
-                GridItemView(title: "Total Energy", value: workout.totalEnergy)
-                    .foregroundStyle(.pink)
-                
-                GridItemView(title: "Average Speed", value: workout.averageCyclingSpeed)
-                    .foregroundStyle(.green)
-                
-                GridItemView(title: "Average Power", value: workout.averageCyclingPower)
-                    .foregroundStyle(.pink)
-                
-                GridItemView(title: "Average Cadence", value: workout.averageCyclingCadence)
+                GridItemView(title: "Average Heartrate", value: workout.averageHeartRate)
                     .foregroundStyle(.black)
             }
         }

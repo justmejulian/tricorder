@@ -20,12 +20,6 @@ class WorkoutManager: NSObject, ObservableObject {
      */
     @Published var sessionState: HKWorkoutSessionState = .notStarted
     @Published var heartRate: Double = 0
-    @Published var activeEnergy: Double = 0
-    @Published var speed: Double = 0
-    @Published var power: Double = 0
-    @Published var cadence: Double = 0
-    @Published var distance: Double = 0
-    @Published var water: Double = 0
     @Published var elapsedTimeInterval: TimeInterval = 0
     /**
      SummaryView (watchOS) changes from Saving Workout to the metric summary view when
@@ -129,13 +123,7 @@ extension WorkoutManager {
         #endif
         workout = nil
         session = nil
-        activeEnergy = 0
         heartRate = 0
-        distance = 0
-        water = 0
-        power = 0
-        cadence = 0
-        speed = 0
         sessionState = .notStarted
     }
     
@@ -156,27 +144,6 @@ extension WorkoutManager {
         case HKQuantityType.quantityType(forIdentifier: .heartRate):
             let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
             heartRate = statistics.mostRecentQuantity()?.doubleValue(for: heartRateUnit) ?? 0
-            
-        case HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned):
-            let energyUnit = HKUnit.kilocalorie()
-            activeEnergy = statistics.sumQuantity()?.doubleValue(for: energyUnit) ?? 0
-            
-        case HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning),
-            HKQuantityType.quantityType(forIdentifier: .distanceCycling):
-            let meterUnit = HKUnit.meter()
-            distance = statistics.sumQuantity()?.doubleValue(for: meterUnit) ?? 0
-            
-        case HKQuantityType(.cyclingSpeed):
-            let speedUnit = HKUnit.mile().unitDivided(by: HKUnit.hour())
-            speed = statistics.mostRecentQuantity()?.doubleValue(for: speedUnit) ?? 0
-            
-        case HKQuantityType(.cyclingPower):
-            let powerUnit = HKUnit.watt()
-            power = statistics.mostRecentQuantity()?.doubleValue(for: powerUnit) ?? 0
-            
-        case HKQuantityType(.cyclingCadence):
-            let cadenceUnit = HKUnit.count().unitDivided(by: .minute())
-            cadence = statistics.mostRecentQuantity()?.doubleValue(for: cadenceUnit) ?? 0
             
         default:
             return

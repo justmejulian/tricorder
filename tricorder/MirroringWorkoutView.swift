@@ -70,13 +70,7 @@ extension MirroringWorkoutView {
     @ViewBuilder
     private func metricsView() -> some View {
         Group {
-            LabeledContent("Speed", value: workoutManager.speed, format: .number.precision(.fractionLength(0)))
-            LabeledContent("Cadence", value: workoutManager.cadence, format: .number.precision(.fractionLength(0)))
-            LabeledContent("Power", value: workoutManager.power, format: .number.precision(.fractionLength(0)))
-            LabeledContent("Water", value: workoutManager.water, format: .number.precision(.fractionLength(0)))
-            LabeledContent("Active Energy", value: workoutManager.activeEnergy, format: .number.precision(.fractionLength(0)))
             LabeledContent("Heart Rate", value: workoutManager.heartRate, format: .number.precision(.fractionLength(0)))
-            LabeledContent("Distance", value: workoutManager.distance, format: .number.precision(.fractionLength(0)))
         }
         .font(.system(.title2, design: .rounded).monospacedDigit().lowercaseSmallCaps())
     }
@@ -124,7 +118,6 @@ extension MirroringWorkoutView {
             let waterQuantity = HKQuantity(unit: HKUnit.fluidOunceUS(), doubleValue: 1.0)
             if let data = try? NSKeyedArchiver.archivedData(withRootObject: waterQuantity, requiringSecureCoding: true) {
                 await workoutManager.sendData(data)
-                workoutManager.water += 1
             }
         }
     }

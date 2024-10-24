@@ -46,15 +46,10 @@ extension WorkoutManager {
     
     func handleReceivedData(_ data: Data) throws {
         guard let decodedQuantity = try NSKeyedUnarchiver.unarchivedObject(ofClass: HKQuantity.self, from: data) else {
+            Logger.shared.info("Failed to decode data: \(data)")
             return
         }
-        water += decodedQuantity.doubleValue(for: HKUnit.fluidOunceUS())
-
-        let sampleDate = Date()
-        Task {
-            let waterSample = [HKQuantitySample(type: HKQuantityType(.dietaryWater), quantity: decodedQuantity, start: sampleDate, end: sampleDate)]
-            try await builder?.addSamples(waterSample)
-        }
+        Logger.shared.info("Received data: \(decodedQuantity)")
     }
 }
 

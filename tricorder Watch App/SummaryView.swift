@@ -33,38 +33,8 @@ struct SummaryView: View {
             SummaryMetricView(title: "Total Time", value: workout.totalTime)
                 .foregroundStyle(.yellow)
             
-            SummaryMetricView(title: "Avg. Speed", value: workout.averageCyclingSpeed)
-                .foregroundStyle(.green)
-            
-            SummaryMetricView(title: "Avg. Power", value: workout.averageCyclingPower)
-                .foregroundStyle(.pink)
-            
-            SummaryMetricView(title: "Avg. Cadence", value: workout.averageCyclingCadence)
-                .foregroundStyle(.white)
-            
-            SummaryMetricView(title: "Total Distance", value: workout.totalCyclingDistance)
-                .foregroundStyle(.orange)
-            
-            let water = workoutManager.water.formatted(.number.precision(.fractionLength(0))) + " oz"
-            SummaryMetricView(title: "Total Water", value: water)
-                .foregroundStyle(.blue)
-            
-            SummaryMetricView(title: "Total Energy", value: workout.totalEnergy)
-                .foregroundStyle(.pink)
-            
             SummaryMetricView(title: "Avg. Heart Rate", value: workout.averageHeartRate)
                 .foregroundStyle(.red)
-            
-            Group {
-                Text("Activity Rings")
-                ActivityRingsView(healthStore: workoutManager.healthStore)
-                    .frame(width: 50, height: 50)
-                Button {
-                    dismiss()
-                } label: {
-                    Text("Done")
-                }
-            }
         }
     }
 }

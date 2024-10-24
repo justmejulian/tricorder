@@ -98,27 +98,9 @@ extension MirroringWorkoutView {
                 }
                 .tint(.green)
                 .disabled(!workoutManager.sessionState.isActive)
-
-                Spacer()
                 
-                Button {
-                    recordWaterIntake()
-                } label: {
-                    ButtonLabel(title: "Water", systemImage: "drop.fill")
-                }
-                .tint(.blue)
-                .disabled(!workoutManager.sessionState.isActive)
             }
             .buttonStyle(.bordered)
-        }
-    }
-    
-    private func recordWaterIntake() {
-        Task {
-            let waterQuantity = HKQuantity(unit: HKUnit.fluidOunceUS(), doubleValue: 1.0)
-            if let data = try? NSKeyedArchiver.archivedData(withRootObject: waterQuantity, requiringSecureCoding: true) {
-                await workoutManager.sendData(data)
-            }
         }
     }
 }

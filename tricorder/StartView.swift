@@ -17,57 +17,51 @@ struct StartView: View {
     @State private var triggerAuthorization = false
 
     var body: some View {
-        NavigationStack {
-            VStack {
-                Button {
-                    if !workoutManager.sessionState.isActive {
-                        startCyclingOnWatch()
-                    }
-                    didStartWorkout = true
-                } label: {
-                    let title =
-                        workoutManager.sessionState.isActive
-                        ? "View ongoing cycling" : "Start cycling on watch"
-                    ButtonLabel(
-                        title: title, systemImage: "figure.outdoor.cycle"
-                    )
-                    .frame(width: 150, height: 150)
-                    .fontWeight(.medium)
+        VStack {
+            MirroringWorkoutView()
+            Button {
+                if !workoutManager.sessionState.isActive {
+                    startCyclingOnWatch()
                 }
-                .clipShape(Circle())
-                .overlay {
-                    Circle().stroke(.white, lineWidth: 4)
-                }
-                .shadow(radius: 7)
-                .buttonStyle(.bordered)
-                .tint(.green)
-                .foregroundColor(.black)
-                .frame(width: 400, height: 400)
+                didStartWorkout = true
+            } label: {
+                let title =
+                    workoutManager.sessionState.isActive
+                    ? "View ongoing cycling" : "Start cycling on watch"
+                ButtonLabel(
+                    title: title, systemImage: "figure.outdoor.cycle"
+                )
+                .frame(width: 150, height: 150)
+                .fontWeight(.medium)
             }
-            .onAppear {
-                triggerAuthorization.toggle()
-                workoutManager.retrieveRemoteSession()
+            .clipShape(Circle())
+            .overlay {
+                Circle().stroke(.white, lineWidth: 4)
             }
-            .healthDataAccessRequest(
-                store: workoutManager.healthStore,
-                shareTypes: workoutManager.typesToShare,
-                readTypes: workoutManager.typesToRead,
-                trigger: triggerAuthorization,
-                completion: { result in
-                    switch result {
-                    case .success(let success):
-                        print("\(success) for authorization")
-                    case .failure(let error):
-                        print("\(error) for authorization")
-                    }
-                }
-            )
-            .navigationDestination(isPresented: $didStartWorkout) {
-                MirroringWorkoutView()
-            }
-            .navigationBarTitle("Mirroring Workout")
-            .navigationBarTitleDisplayMode(.inline)
+            .shadow(radius: 7)
+            .buttonStyle(.bordered)
+            .tint(.green)
+            .foregroundColor(.black)
+            .frame(width: 400, height: 400)
         }
+        .onAppear {
+            triggerAuthorization.toggle()
+            workoutManager.retrieveRemoteSession()
+        }
+        .healthDataAccessRequest(
+            store: workoutManager.healthStore,
+            shareTypes: workoutManager.typesToShare,
+            readTypes: workoutManager.typesToRead,
+            trigger: triggerAuthorization,
+            completion: { result in
+                switch result {
+                case .success(let success):
+                    print("\(success) for authorization")
+                case .failure(let error):
+                    print("\(error) for authorization")
+                }
+            }
+        )
     }
 
     private func startCyclingOnWatch() {

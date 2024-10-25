@@ -13,24 +13,20 @@ struct MirroringWorkoutView: View {
     @EnvironmentObject var workoutManager: WorkoutManager
 
     var body: some View {
-        NavigationStack {
-            let fromDate = workoutManager.session?.startDate ?? Date()
-            let schedule = MetricsTimelineSchedule(
-                from: fromDate, isPaused: workoutManager.sessionState == .paused
-            )
-            TimelineView(schedule) { context in
-                List {
-                    Section {
-                        metricsView()
-                    } header: {
-                        headerView(context: context)
-                    } footer: {
-                        footerView()
-                    }
+        let fromDate = workoutManager.session?.startDate ?? Date()
+        let schedule = MetricsTimelineSchedule(
+            from: fromDate, isPaused: workoutManager.sessionState == .paused
+        )
+        TimelineView(schedule) { context in
+            List {
+                Section {
+                    metricsView()
+                } header: {
+                    headerView(context: context)
+                } footer: {
+                    footerView()
                 }
             }
-            .navigationBarTitle("Mirroring Workout")
-            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

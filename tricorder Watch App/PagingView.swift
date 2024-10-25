@@ -28,27 +28,15 @@ struct PagingView: View {
         .onChange(of: isLuminanceReduced) {
             displayMetricsView()
         }
-        .onChange(of: workoutManager.sessionState) { _, newValue in
-            if newValue == .ended {
-                isSheetActive = true
-            } else if newValue == .running || newValue == .paused {
-                displayMetricsView()
-            }
-        }
         .onAppear {
             workoutManager.requestAuthorization()
             selection = .metrics
         }
-        .sheet(isPresented: $isSheetActive) {
-            workoutManager.resetWorkout()
-        } content: {
-            SummaryView()
-        }
     }
 
     private func displayMetricsView() {
-        //withAnimation {
+        withAnimation {
             selection = .metrics
-        //}
+        }
     }
 }

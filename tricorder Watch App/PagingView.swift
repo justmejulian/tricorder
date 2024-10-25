@@ -6,10 +6,12 @@ A SwiftUI view that shows the workout metric and controls as two pages.
 */
 
 import SwiftUI
+import os
 
 struct PagingView: View {
     @EnvironmentObject var workoutManager: WorkoutManager
     @Environment(\.isLuminanceReduced) var isLuminanceReduced
+
     @State private var selection: Tab = .metrics
     @State private var isSheetActive = false
 
@@ -24,7 +26,10 @@ struct PagingView: View {
         }
         .navigationTitle("Cycling")
         .navigationBarBackButtonHidden(true)
-        .tabViewStyle(PageTabViewStyle(indexDisplayMode: isLuminanceReduced ? .never : .automatic))
+        .tabViewStyle(
+            PageTabViewStyle(
+                indexDisplayMode: isLuminanceReduced ? .never : .automatic)
+        )
         .onChange(of: isLuminanceReduced) {
             displayMetricsView()
         }

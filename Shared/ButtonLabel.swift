@@ -7,9 +7,7 @@ A SwiftUI view that provides a button label that aligns its icon and title.
 
 import SwiftUI
 
-/**
- A menu button label that aligns its icon and title.
- */
+/// A menu button label that aligns its icon and title.
 struct ButtonLabel: View {
     struct WatchMenuLabelStyle: LabelStyle {
         func makeBody(configuration: Configuration) -> some View {
@@ -21,7 +19,7 @@ struct ButtonLabel: View {
             }
         }
     }
-    
+
     struct VerticalIconTitleLabelStyle: LabelStyle {
         func makeBody(configuration: Configuration) -> some View {
             VStack {
@@ -34,17 +32,17 @@ struct ButtonLabel: View {
             }
         }
     }
-    
+
     let title: String
     let systemImage: String
-    
+
     var body: some View {
         #if os(watchOS)
-        Label(title, systemImage: systemImage)
-            .labelStyle(WatchMenuLabelStyle())
+            Label(title, systemImage: systemImage)
+                .labelStyle(WatchMenuLabelStyle())
         #else
-        Label(title, systemImage: systemImage)
-            .labelStyle(VerticalIconTitleLabelStyle())
+            Label(title, systemImage: systemImage)
+                .labelStyle(VerticalIconTitleLabelStyle())
         #endif
     }
 }

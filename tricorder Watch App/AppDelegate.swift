@@ -5,10 +5,10 @@ Abstract:
 The app delegate that receives and handles the workout configuration.
 */
 
-import os
-import WatchKit
 import HealthKit
 import SwiftUI
+import WatchKit
+import os
 
 class AppDelegate: NSObject, WKApplicationDelegate {
 
@@ -16,7 +16,8 @@ class AppDelegate: NSObject, WKApplicationDelegate {
         Task {
             do {
                 WorkoutManager.shared.resetWorkout()
-                try await WorkoutManager.shared.startWorkout(workoutConfiguration: workoutConfiguration)
+                try await WorkoutManager.shared.startWorkout(
+                    workoutConfiguration: workoutConfiguration)
                 Logger.shared.log("Successfully started workout")
             } catch {
                 Logger.shared.log("Failed started workout")

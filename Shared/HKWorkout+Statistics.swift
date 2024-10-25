@@ -17,11 +17,12 @@ extension HKWorkout {
         formatter.zeroFormattingBehavior = .pad
         return formatter.string(from: duration) ?? ""
     }
-    
+
     var averageHeartRate: String {
         var value: Double = 0
         if let statistics = statistics(for: HKQuantityType(.heartRate)),
-           let average = statistics.averageQuantity() {
+            let average = statistics.averageQuantity()
+        {
             let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
             value = average.doubleValue(for: heartRateUnit)
         }

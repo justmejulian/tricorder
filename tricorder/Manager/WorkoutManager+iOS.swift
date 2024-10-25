@@ -13,6 +13,9 @@ import os
 //
 extension WorkoutManager {
     func startWatchWorkout(workoutType: HKWorkoutActivityType) async throws {
+        
+        Logger.shared.info("\(#function) called")
+        
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = workoutType
         configuration.locationType = .outdoor
@@ -20,6 +23,9 @@ extension WorkoutManager {
     }
 
     func retrieveRemoteSession() {
+        
+        Logger.shared.info("\(#function) called")
+        
         /**
          HealthKit calls this handler when a session starts mirroring.
          */
@@ -35,6 +41,9 @@ extension WorkoutManager {
     }
 
     func handleReceivedData(_ data: Data) throws {
+        
+        Logger.shared.info("\(#function) called")
+        
         if let elapsedTime = try? JSONDecoder().decode(
             WorkoutElapsedTime.self, from: data)
         {

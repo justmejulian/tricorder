@@ -17,6 +17,9 @@ extension WorkoutManager {
      healthDataAccessRequest isn't available yet.
      */
     func requestAuthorization() {
+        
+        Logger.shared.info("\(#function) called")
+        
         Task {
             do {
                 try await healthStore.requestAuthorization(
@@ -29,7 +32,7 @@ extension WorkoutManager {
 
     func startWorkout(workoutConfiguration: HKWorkoutConfiguration) async throws
     {
-        Logger.shared.info("\(#function)")
+        Logger.shared.info("\(#function) called")
 
         session = try HKWorkoutSession(
             healthStore: healthStore, configuration: workoutConfiguration)
@@ -67,6 +70,9 @@ extension WorkoutManager {
     }
 
     func handleReceivedData(_ data: Data) throws {
+        
+        Logger.shared.info("\(#function) called")
+        
         guard
             let decodedQuantity = try NSKeyedUnarchiver.unarchivedObject(
                 ofClass: HKQuantity.self, from: data)
@@ -87,6 +93,9 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
         _ workoutBuilder: HKLiveWorkoutBuilder,
         didCollectDataOf collectedTypes: Set<HKSampleType>
     ) {
+        
+        Logger.shared.info("\(#function) called")
+        
         /**
           HealthKit calls this method on an anonymous serial background queue.
           Use Task to provide an asynchronous context so MainActor can come to play.
@@ -120,5 +129,6 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
     nonisolated func workoutBuilderDidCollectEvent(
         _ workoutBuilder: HKLiveWorkoutBuilder
     ) {
+        Logger.shared.info("\(#function) called")
     }
 }

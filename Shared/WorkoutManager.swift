@@ -128,7 +128,7 @@ extension WorkoutManager {
     func sendData(_ data: Data, retryCount: Int = 0) async {
 
         Logger.shared.info(
-            "\(#function) received data: \(data) retry count: \(retryCount)")
+            "\(#function) data: \(data.debugDescription) retry count: \(retryCount)")
 
         do {
             try await session?.sendToRemoteWorkoutSession(data: data)
@@ -159,6 +159,9 @@ extension WorkoutManager {
 //
 extension WorkoutManager {
     func updateForStatistics(_ statistics: HKStatistics) {
+        
+        Logger.shared.log("\(#function): \(statistics.debugDescription)")
+
         switch statistics.quantityType {
         case HKQuantityType.quantityType(forIdentifier: .heartRate):
             let heartRateUnit = HKUnit.count().unitDivided(by: .minute())

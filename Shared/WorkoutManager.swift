@@ -31,17 +31,9 @@ class WorkoutManager: NSObject, ObservableObject {
      */
     let typesToShare: Set = [
         HKQuantityType.workoutType(),
-        HKQuantityType(.dietaryWater),
     ]
     let typesToRead: Set = [
         HKQuantityType(.heartRate),
-        HKQuantityType(.activeEnergyBurned),
-        HKQuantityType(.distanceWalkingRunning),
-        HKQuantityType(.cyclingSpeed),
-        HKQuantityType(.cyclingPower),
-        HKQuantityType(.cyclingCadence),
-        HKQuantityType(.distanceCycling),
-        HKQuantityType(.dietaryWater),
         HKQuantityType.workoutType(),
         HKObjectType.activitySummaryType(),
     ]

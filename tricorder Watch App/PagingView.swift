@@ -33,7 +33,11 @@ struct PagingView: View {
         .onChange(of: isLuminanceReduced) {
             displayMetricsView()
         }
-        .onAppear {
+        .onChange(of: workoutManager.sessionState) { _, newValue in
+            if newValue == .running || newValue == .paused {
+                displayMetricsView()
+            }
+        }.onAppear {
             workoutManager.requestAuthorization()
             selection = .metrics
         }

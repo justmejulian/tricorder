@@ -230,3 +230,12 @@ extension HKWorkoutSessionState {
         self != .notStarted && self != .ended
     }
 }
+
+// MARK: - WorkoutManager Error
+//
+enum WorkoutManagerError: Error {
+    case noWorkoutSession
+    case workoutSessionNotStarted
+    case workoutSessionAlreadyStarted
+    case workoutSessionEnded
+}

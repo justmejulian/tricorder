@@ -28,19 +28,33 @@ extension WorkoutManager {
     
     func startWorkout(workoutConfiguration: HKWorkoutConfiguration) async throws {
         session = try HKWorkoutSession(healthStore: healthStore, configuration: workoutConfiguration)
-        builder = session?.associatedWorkoutBuilder()
-        session?.delegate = self
+        
+        guard let session else {
+            throw WorkoutManagerError.noWorkoutSession
+        }
+        
+        builder = session.associatedWorkoutBuilder()
+        session.delegate = self
         builder?.delegate = self
         builder?.dataSource = HKLiveWorkoutDataSource(healthStore: healthStore, workoutConfiguration: workoutConfiguration)
+        
+        // Make sure the session is ready to send data
+        session.prepare()
+        
         /**
           Start mirroring the session to the companion device.
          */
-        try await session?.startMirroringToCompanionDevice()
+        do {
+            try await session.startMirroringToCompanionDevice()
+        }
+        catch {
+            fatalError("Unable to start the mirrored workout: \(error.localizedDescription)")
+        }
         /**
           Start the workout session activity.
          */
         let startDate = Date()
-        session?.startActivity(with: startDate)
+        session.startActivity(with: startDate)
         try await builder?.beginCollection(at: startDate)
     }
     

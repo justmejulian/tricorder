@@ -66,8 +66,7 @@ struct StartView: View {
     private func startCyclingOnWatch() {
         Task {
             do {
-                try await workoutManager.startWatchWorkout(
-                    workoutType: .cycling)
+                try await workoutManager.startWatchWorkout()
             } catch {
                 Logger.shared.log(
                     "Failed to start cycling on the paired watch.")

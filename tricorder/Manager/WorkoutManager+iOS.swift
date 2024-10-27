@@ -12,13 +12,13 @@ import os
 // MARK: - Workout session management
 //
 extension WorkoutManager {
-    func startWatchWorkout(workoutType: HKWorkoutActivityType) async throws {
+    func startWatchWorkout() async throws {
 
         Logger.shared.info("\(#function) called")
 
         let configuration = HKWorkoutConfiguration()
-        configuration.activityType = workoutType
-        configuration.locationType = .outdoor
+        configuration.activityType = .functionalStrengthTraining
+        configuration.locationType = .indoor
         try await healthStore.startWatchApp(toHandle: configuration)
     }
 

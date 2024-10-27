@@ -50,8 +50,8 @@ struct ControlsView: View {
         Task {
             do {
                 let configuration = HKWorkoutConfiguration()
-                configuration.activityType = .cycling
-                configuration.locationType = .outdoor
+                configuration.activityType = .functionalStrengthTraining
+                configuration.locationType = .indoor
                 try await workoutManager.startWorkout(
                     workoutConfiguration: configuration)
             } catch {

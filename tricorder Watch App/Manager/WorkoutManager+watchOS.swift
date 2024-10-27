@@ -36,6 +36,10 @@ extension WorkoutManager {
 
         session = try HKWorkoutSession(
             healthStore: healthStore, configuration: workoutConfiguration)
+        
+        try await MotionManager().startUpdates { timestamp, sensor_id, values in
+            Logger.shared.debug("Handle motion update: \(timestamp), \(sensor_id), \(values.debugDescription)")
+        }
 
         guard let session else {
             throw WorkoutManagerError.noWorkoutSession

@@ -85,11 +85,7 @@ actor MotionManager {
 
         batchedData.forEach { data in
             let dataDate = Date(
-                timeIntervalSince1970: data.timestamp)
-            Logger.shared.info("\(dataDate)")
-            // todo
-//            let dataDate = Date(
-//                timeIntervalSince1970: data.timestamp.timeIntervalSince1970)
+                timeIntervalSince1970: data.timestamp.timeIntervalSince1970)
             rotationRateValues.append(
                 Value(
                     x: data.rotationRate.x, y: data.rotationRate.y,
@@ -138,9 +134,8 @@ actor MotionManager {
                 Value(
                     x: data.acceleration.x, y: data.acceleration.y,
                     z: data.acceleration.z,
-                    // todo: correct?
                     timestamp: Date(
-                        timeIntervalSince1970: data.timestamp)))
+                        timeIntervalSince1970: data.timestamp.timeIntervalSince1970)))
         }
 
         // all have differnt timestamps

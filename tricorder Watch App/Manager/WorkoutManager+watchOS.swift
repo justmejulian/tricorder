@@ -6,7 +6,7 @@ Extensions that wrap workout operations specific to watchOS.
 */
 
 import Foundation
-import HealthKit
+@preconcurrency import HealthKit
 import os
 
 // MARK: - Workout session management
@@ -134,13 +134,13 @@ extension WorkoutManager {
     }
 
     func finishedWorkout(date: Date) async throws -> HKWorkout? {
-        guard let builder else {
+        if builder == nil {
             throw WorkoutManagerError.noLiveWorkoutBuilder
         }
         
         do {
-            try await builder.endCollection(at: date)
-            return try await builder.finishWorkout()
+            try await builder?.endCollection(at: date)
+            return try await builder?.finishWorkout()
         } catch {
             throw error
         }

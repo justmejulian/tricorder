@@ -17,9 +17,9 @@ extension WorkoutManager {
      healthDataAccessRequest isn't available yet.
      */
     func requestAuthorization() {
-        
+
         Logger.shared.info("\(#function) called")
-        
+
         Task {
             do {
                 try await healthStore.requestAuthorization(
@@ -70,9 +70,9 @@ extension WorkoutManager {
     }
 
     func handleReceivedData(_ data: Data) throws {
-        
+
         Logger.shared.info("\(#function) called")
-        
+
         guard
             let decodedQuantity = try NSKeyedUnarchiver.unarchivedObject(
                 ofClass: HKQuantity.self, from: data)
@@ -81,6 +81,63 @@ extension WorkoutManager {
             return
         }
         Logger.shared.info("Received data: \(decodedQuantity)")
+    }
+
+    /**
+     Consume the session state change from the async stream to update sessionState and finish the workout.
+     */
+    func consumeSessionStateChange(_ change: SessionSateChange) async {
+        sessionState = change.newState
+        /**
+          Wait for the session to transition states before ending the builder.
+         */
+
+        /**
+         Send the elapsed time to the iOS side.
+         */
+        let elapsedTimeInterval =
+            session?.associatedWorkoutBuilder().elapsedTime(at: change.date)
+            ?? 0
+        let elapsedTime = WorkoutElapsedTime(
+            timeInterval: elapsedTimeInterval, date: change.date)
+
+        if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime) {
+                await sendData(elapsedTimeData, retryCount: 1)
+        }
+
+
+        if change.newState == .stopped {
+            Logger.shared.info("\(#function): Session stopped")
+
+            do {
+                workout = try await finishedWorkout(date: change.date)
+            } catch {
+                Logger.shared.log("Failed to end workout: \(error))")
+                return
+            }
+            
+            guard let session else {
+                Logger.shared.error("No session to end")
+                
+                return
+            }
+            
+            session.end()
+        }
+    }
+
+    func finishedWorkout(date: Date) async throws -> HKWorkout? {
+        guard let builder else {
+            throw WorkoutManagerError.noLiveWorkoutBuilder
+        }
+        
+        do {
+            try await builder.endCollection(at: date)
+            return try await builder.finishWorkout()
+        } catch {
+            throw error
+        }
+
     }
 }
 
@@ -93,9 +150,9 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
         _ workoutBuilder: HKLiveWorkoutBuilder,
         didCollectDataOf collectedTypes: Set<HKSampleType>
     ) {
-        
+
         Logger.shared.info("\(#function) called")
-        
+
         /**
           HealthKit calls this method on an anonymous serial background queue.
           Use Task to provide an asynchronous context so MainActor can come to play.

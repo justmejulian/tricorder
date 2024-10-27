@@ -30,7 +30,7 @@ class WorkoutManager: NSObject, ObservableObject {
      HealthKit data types to share and read.
      */
     let typesToShare: Set = [
-        HKQuantityType.workoutType(),
+        HKQuantityType.workoutType()
     ]
     let typesToRead: Set = [
         HKQuantityType(.heartRate),
@@ -73,43 +73,7 @@ class WorkoutManager: NSObject, ObservableObject {
             }
         }
     }
-    /**
-     Consume the session state change from the async stream to update sessionState and finish the workout.
-     */
-    private func consumeSessionStateChange(_ change: SessionSateChange) async {
-        sessionState = change.newState
-        /**
-          Wait for the session to transition states before ending the builder.
-         */
-        #if os(watchOS)
-            /**
-         Send the elapsed time to the iOS side.
-         */
-            let elapsedTimeInterval =
-                session?.associatedWorkoutBuilder().elapsedTime(at: change.date)
-                ?? 0
-            let elapsedTime = WorkoutElapsedTime(
-                timeInterval: elapsedTimeInterval, date: change.date)
-            if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime) {
-                await sendData(elapsedTimeData, retryCount: 3)
-            }
-
-            guard change.newState == .stopped, let builder else {
-                return
-            }
-
-            let finishedWorkout: HKWorkout?
-            do {
-                try await builder.endCollection(at: change.date)
-                finishedWorkout = try await builder.finishWorkout()
-                session?.end()
-            } catch {
-                Logger.shared.log("Failed to end workout: \(error))")
-                return
-            }
-            workout = finishedWorkout
-        #endif
-    }
+    
 }
 
 // MARK: - Workout session management
@@ -128,7 +92,8 @@ extension WorkoutManager {
     func sendData(_ data: Data, retryCount: Int = 0) async {
 
         Logger.shared.info(
-            "\(#function) data: \(data.debugDescription) retry count: \(retryCount)")
+            "\(#function) data: \(data.debugDescription) retry count: \(retryCount)"
+        )
 
         do {
             try await session?.sendToRemoteWorkoutSession(data: data)
@@ -159,7 +124,7 @@ extension WorkoutManager {
 //
 extension WorkoutManager {
     func updateForStatistics(_ statistics: HKStatistics) {
-        
+
         Logger.shared.log("\(#function): \(statistics.debugDescription)")
 
         switch statistics.quantityType {

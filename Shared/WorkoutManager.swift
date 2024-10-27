@@ -225,6 +225,9 @@ extension HKWorkoutSessionState {
 //
 enum WorkoutManagerError: Error {
     case noWorkoutSession
+    case noLiveWorkoutBuilder
+    case failedToStartWorkout
+    case failedToEndWorkout
     case workoutSessionNotStarted
     case workoutSessionAlreadyStarted
     case workoutSessionEnded

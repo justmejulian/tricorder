@@ -13,7 +13,6 @@ import os
 struct StartView: View {
     @EnvironmentObject var workoutManager: WorkoutManager
     @State private var isFullScreenCoverActive = false
-    @State private var didStartWorkout = false
     @State private var triggerAuthorization = false
 
     var body: some View {
@@ -23,7 +22,6 @@ struct StartView: View {
                 if !workoutManager.sessionState.isActive {
                     startCyclingOnWatch()
                 }
-                didStartWorkout = true
             } label: {
                 let title =
                     workoutManager.sessionState.isActive
@@ -43,6 +41,7 @@ struct StartView: View {
             .tint(.green)
             .foregroundColor(.black)
             .frame(width: 400, height: 400)
+            .disabled(workoutManager.sessionState.isActive)
         }
         .onAppear {
             triggerAuthorization.toggle()

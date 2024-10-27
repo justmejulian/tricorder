@@ -111,6 +111,7 @@ actor MotionManager {
         let date = Date(
             timeIntervalSince1970: firstValue.timestamp.timeIntervalSince1970)
 
+        // todo store these keys in enum
         handleUpdate(date, "rotationRate", rotationRateValues)
 
         handleUpdate(date, "userAcceleration", userAccelerationValues)

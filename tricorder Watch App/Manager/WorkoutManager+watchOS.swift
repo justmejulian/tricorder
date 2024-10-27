@@ -102,7 +102,10 @@ extension WorkoutManager {
             timeInterval: elapsedTimeInterval, date: change.date)
 
         if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime) {
+            // Only send elapsedTimeData when running
+            if change.newState == .running {
                 await sendData(elapsedTimeData, retryCount: 1)
+            }
         }
 
 

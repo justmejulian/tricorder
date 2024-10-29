@@ -153,6 +153,8 @@ extension WorkoutManager {
 // so the methods need to be nonisolated explicitly.
 //
 extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
+    
+    // todo: is this used?
     nonisolated func workoutBuilder(
         _ workoutBuilder: HKLiveWorkoutBuilder,
         didCollectDataOf collectedTypes: Set<HKSampleType>

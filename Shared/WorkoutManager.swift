@@ -89,14 +89,22 @@ extension WorkoutManager {
         sessionState = .notStarted
     }
 
-    func sendData(_ data: Data, retryCount: Int = 0) async {
+    func sendData(key: String, data: Data, retryCount: Int = 0) async {
 
         Logger.shared.info(
             "\(#function) data: \(data.debugDescription) retry count: \(retryCount)"
         )
+        
+            
 
         do {
-            try await session?.sendToRemoteWorkoutSession(data: data)
+            // todo: we can do better than this
+            let dataObject = DataObject(key: key, data: data)
+            guard let encodedData = try? JSONEncoder().encode(dataObject) else {
+                Logger.shared.error("Cound not encode data for key: \(key)")
+                return
+            }
+            try await session?.sendToRemoteWorkoutSession(data: encodedData)
         } catch {
             // todo make a retry wrapper function
             if retryCount > 0 {
@@ -112,7 +120,7 @@ extension WorkoutManager {
                     Logger.shared.error("Failed to sleep: \(error)")
                 }
 
-                await sendData(data, retryCount: retryCount - 1)
+                await sendData(key: key, data: data, retryCount: retryCount - 1)
                 return
             }
             Logger.shared.log("Failed to send data: \(error)")
@@ -204,6 +212,13 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
             }
         }
     }
+}
+
+// MARK: - A structure for synchronizing data
+//
+struct DataObject: Codable {
+    var key: String
+    var data: Data
 }
 
 // MARK: - A structure for synchronizing the elapsed time.

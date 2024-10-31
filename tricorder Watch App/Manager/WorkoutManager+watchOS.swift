@@ -70,21 +70,46 @@ extension WorkoutManager {
          */
         let startDate = Date()
         session.startActivity(with: startDate)
+
         try await builder?.beginCollection(at: startDate)
+
+        // todo: pass this stuff on init of WorkoutManager, pass sendData
+        // todo move def of MotionManager into tricorder_Watch_AppApp
+        try await MotionManager().startUpdates { timestamp, sensor_id, values in
+            //            Logger.shared.debug("Handle motion update: \(timestamp), \(sensor_id), \(values.debugDescription)")
+        }
+
+        let nearbyInteractionManager = NearbyInteractionManager()
+        nearbyInteractionManager.start()
+        if let data = nearbyInteractionManager.getTokenData() {
+            await sendData(key: "token", data: data)
+        }
+
     }
 
     func handleReceivedData(_ data: Data) throws {
 
-        Logger.shared.info("\(#function) called")
+        Logger.shared.info("\(#function) called: \(data.debugDescription)")
 
         guard
-            let decodedQuantity = try NSKeyedUnarchiver.unarchivedObject(
-                ofClass: HKQuantity.self, from: data)
+            let dataObject = try? JSONDecoder().decode(
+                DataObject.self, from: data)
         else {
-            Logger.shared.info("Failed to decode data: \(data)")
+
+            Logger.shared.error("Could not decode reciedved data.")
             return
         }
-        Logger.shared.info("Received data: \(decodedQuantity)")
+        
+        // todo need to beable to dynamiclay add to this
+        switch dataObject.key {
+        case "token":
+            Logger.shared.info(
+                "received NIDiscoveryToken \(data) from counterpart")
+            NearbyInteractionManager().didReceiveDiscoveryToken(dataObject.data)
+
+        default:
+            Logger.shared.error("unknown message key: \(dataObject.key)")
+        }
     }
 
     /**
@@ -108,10 +133,10 @@ extension WorkoutManager {
         if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime) {
             // Only send elapsedTimeData when running
             if change.newState == .running {
-                await sendData(elapsedTimeData, retryCount: 1)
+                await sendData(
+                    key: "elapsedTime", data: elapsedTimeData, retryCount: 1)
             }
         }
-
 
         if change.newState == .stopped {
             Logger.shared.info("\(#function): Session stopped")
@@ -188,7 +213,8 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
             /**
               Send a Data object to the connected remote workout session.
              */
-            await sendData(archivedData, retryCount: 5)
+            await sendData(
+                key: "statisticsArray", data: archivedData, retryCount: 5)
         }
     }
 

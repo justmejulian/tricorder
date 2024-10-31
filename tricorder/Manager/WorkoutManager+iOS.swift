@@ -41,42 +41,62 @@ extension WorkoutManager {
     }
 
     func handleReceivedData(_ data: Data) throws {
-
         Logger.shared.info("\(#function) called: \(data.debugDescription)")
 
-        if let elapsedTime = try? JSONDecoder().decode(
-            WorkoutElapsedTime.self, from: data)
-        {
-            Logger.shared.info("elapsedTime: \(elapsedTime.timeInterval)")
+        guard
+            let dataObject = try? JSONDecoder().decode(
+                DataObject.self, from: data)
+        else {
 
-            var currentElapsedTime: TimeInterval = 0
-            if session?.state == .running {
-                currentElapsedTime =
-                    elapsedTime.timeInterval
-                    + Date().timeIntervalSince(elapsedTime.date)
-            } else {
-                currentElapsedTime = elapsedTime.timeInterval
-            }
-
-            elapsedTimeInterval = currentElapsedTime
-
+            Logger.shared.error("Could not decode reciedved data.")
             return
         }
 
-        if let statisticsArray =
-            try NSKeyedUnarchiver.unarchivedArrayOfObjects(
-                ofClass: HKStatistics.self, from: data)
-        {
-            Logger.shared.info("statisticsArray: \(statisticsArray.debugDescription)")
-            
-            for statistics in statisticsArray {
-                updateForStatistics(statistics)
-            }
+        switch dataObject.key {
+        case "elapsedTime":
+            if let elapsedTime = try? JSONDecoder().decode(
+                WorkoutElapsedTime.self, from: dataObject.data)
+            {
+                Logger.shared.info("elapsedTime: \(elapsedTime.timeInterval)")
 
-            return
+                var currentElapsedTime: TimeInterval = 0
+                if session?.state == .running {
+                    currentElapsedTime =
+                        elapsedTime.timeInterval
+                        + Date().timeIntervalSince(elapsedTime.date)
+                } else {
+                    currentElapsedTime = elapsedTime.timeInterval
+                }
+
+                elapsedTimeInterval = currentElapsedTime
+
+                return
+            }
+        case "statisticsArray":
+            if let statisticsArray =
+                try NSKeyedUnarchiver.unarchivedArrayOfObjects(
+                    ofClass: HKStatistics.self, from: dataObject.data)
+            {
+                Logger.shared.info(
+                    "statisticsArray: \(statisticsArray.debugDescription)")
+
+                for statistics in statisticsArray {
+                    updateForStatistics(statistics)
+                }
+
+                return
+            }
+        case "token":
+            Logger.shared.info(
+                "received NIDiscoveryToken \(data) from counterpart")
+            NearbyInteractionManager().didReceiveDiscoveryToken(dataObject.data)
+
+        default:
+            Logger.shared.error("unknown message key: \(dataObject.key)")
         }
+
     }
-    
+
     /**
      Consume the session state change from the async stream to update sessionState and finish the workout.
      */

@@ -44,39 +44,49 @@ extension WorkoutManager {
 
         Logger.shared.info("\(#function) called: \(data.debugDescription)")
 
-        if let elapsedTime = try? JSONDecoder().decode(
-            WorkoutElapsedTime.self, from: data)
-        {
-            Logger.shared.info("elapsedTime: \(elapsedTime.timeInterval)")
+        let dataObject = try DataObjectManager().decode(data)
 
-            var currentElapsedTime: TimeInterval = 0
-            if session?.state == .running {
-                currentElapsedTime =
-                    elapsedTime.timeInterval
-                    + Date().timeIntervalSince(elapsedTime.date)
-            } else {
-                currentElapsedTime = elapsedTime.timeInterval
+        switch dataObject.key {
+        case "elapsedTime":
+            if let elapsedTime = try? JSONDecoder().decode(
+                WorkoutElapsedTime.self, from: dataObject.data)
+            {
+                Logger.shared.info("elapsedTime: \(elapsedTime.timeInterval)")
+
+                var currentElapsedTime: TimeInterval = 0
+                if session?.state == .running {
+                    currentElapsedTime =
+                        elapsedTime.timeInterval
+                        + Date().timeIntervalSince(elapsedTime.date)
+                } else {
+                    currentElapsedTime = elapsedTime.timeInterval
+                }
+
+                elapsedTimeInterval = currentElapsedTime
+
+                return
+            }
+        case "statisticsArray":
+            if let statisticsArray =
+                try NSKeyedUnarchiver.unarchivedArrayOfObjects(
+                    ofClass: HKStatistics.self, from: dataObject.data)
+            {
+                Logger.shared.info(
+                    "statisticsArray: \(statisticsArray.debugDescription)")
+
+                for statistics in statisticsArray {
+                    updateForStatistics(statistics)
+                }
+
+                return
             }
 
-            elapsedTimeInterval = currentElapsedTime
-
-            return
+        default:
+            Logger.shared.error("unknown dataObject key: \(dataObject.key)")
         }
 
-        if let statisticsArray =
-            try NSKeyedUnarchiver.unarchivedArrayOfObjects(
-                ofClass: HKStatistics.self, from: data)
-        {
-            Logger.shared.info("statisticsArray: \(statisticsArray.debugDescription)")
-            
-            for statistics in statisticsArray {
-                updateForStatistics(statistics)
-            }
-
-            return
-        }
     }
-    
+
     /**
      Consume the session state change from the async stream to update sessionState and finish the workout.
      */

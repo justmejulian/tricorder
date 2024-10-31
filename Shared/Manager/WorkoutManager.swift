@@ -76,19 +76,9 @@ class WorkoutManager: NSObject, ObservableObject {
     
 }
 
-// MARK: - Workout session management
+// MARK: - Private Workout session management
 //
-extension WorkoutManager {
-    func resetWorkout() {
-        #if os(watchOS)
-            builder = nil
-        #endif
-        workout = nil
-        session = nil
-        heartRate = 0
-        sessionState = .notStarted
-    }
-
+private extension WorkoutManager {
     func sendData(_ data: Data, retryCount: Int = 0) async {
 
         Logger.shared.info(
@@ -118,6 +108,30 @@ extension WorkoutManager {
             Logger.shared.log("Failed to send data: \(error)")
         }
     }
+}
+
+// MARK: - Workout session management
+//
+extension WorkoutManager {
+    func resetWorkout() {
+        #if os(watchOS)
+            builder = nil
+        #endif
+        workout = nil
+        session = nil
+        heartRate = 0
+        sessionState = .notStarted
+    }
+    
+    func sendData(key: String, data: Data) async {
+        do {
+            let dataObject = try DataObjectManager().encode(key: key, data: data)
+            await sendData(dataObject)
+        } catch {
+            Logger.shared.error("Could not encode data for key : \(key)")
+        }
+    }
+
 }
 
 // MARK: - Workout statistics

@@ -77,14 +77,9 @@ extension WorkoutManager {
 
         Logger.shared.info("\(#function) called")
 
-        guard
-            let decodedQuantity = try NSKeyedUnarchiver.unarchivedObject(
-                ofClass: HKQuantity.self, from: data)
-        else {
-            Logger.shared.info("Failed to decode data: \(data)")
-            return
-        }
-        Logger.shared.info("Received data: \(decodedQuantity)")
+        let dataObject = try DataObjectManager().decode(data)
+
+        Logger.shared.info("Received data: \(dataObject.key)")
     }
 
     /**
@@ -108,7 +103,7 @@ extension WorkoutManager {
         if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime) {
             // Only send elapsedTimeData when running
             if change.newState == .running {
-                await sendData(elapsedTimeData, retryCount: 1)
+                await sendData(key: "elapsedTime", data: elapsedTimeData)
             }
         }
 
@@ -186,7 +181,7 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
             /**
               Send a Data object to the connected remote workout session.
              */
-            await sendData(archivedData, retryCount: 5)
+            await sendData(key: "archived", data: archivedData)
         }
     }
 

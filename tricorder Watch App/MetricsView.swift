@@ -10,6 +10,8 @@ import SwiftUI
 
 struct MetricsView: View {
     @EnvironmentObject var workoutManager: WorkoutManager
+    
+    var nearbyInteractionManager = NearbyInteractionManager()
 
     var body: some View {
         TimelineView(
@@ -26,6 +28,12 @@ struct MetricsView: View {
                 Text(
                     workoutManager.heartRate.formatted(
                         .number.precision(.fractionLength(0))) + " bpm")
+                
+                if let distance = nearbyInteractionManager.distance?.converted(to: .centimeters) {
+                    Text(distance.value.formatted(.number.precision(.fractionLength(2))))
+                } else {
+                    Text("-")
+                }
             }
             .font(
                 .system(.title, design: .rounded).monospacedDigit()

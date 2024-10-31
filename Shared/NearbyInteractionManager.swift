@@ -14,6 +14,8 @@ import os
 // todo: can this be done in the backround?
 //@MainActor
 class NearbyInteractionManager: NSObject, ObservableObject {
+    
+    // todo: should this be shared?
 
     /// The distance to the nearby object (the paired device) in meters.
     @Published var distance: Measurement<UnitLength>?
@@ -21,8 +23,8 @@ class NearbyInteractionManager: NSObject, ObservableObject {
     private var didSendDiscoveryToken: Bool = false
 
     private var session: NISession?
-
-    // todo: I guess this should be init
+    
+    //todo move this into init
     func start() {
         initializeNISession()
     }
@@ -34,6 +36,7 @@ class NearbyInteractionManager: NSObject, ObservableObject {
 
     private func reset() {
         distance = nil
+        // todo dedeinitialize
     }
 
     private func initializeNISession() {
@@ -47,8 +50,6 @@ class NearbyInteractionManager: NSObject, ObservableObject {
                 "precise distance measurement is not supported")
             return
         }
-
-        // todo: check if supported and
 
         session = NISession()
         session?.delegate = self
@@ -71,6 +72,10 @@ class NearbyInteractionManager: NSObject, ObservableObject {
 
     /// Send the local discovery token to the paired device
     private func sendDiscoveryToken() {
+        
+        Logger.shared.info("\(#function)")
+        // todo: make sure initialized
+        
         guard let token = session?.discoveryToken else {
             Logger.shared.info("NIDiscoveryToken not available")
             return

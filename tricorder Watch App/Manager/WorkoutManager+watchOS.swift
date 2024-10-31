@@ -103,7 +103,10 @@ extension WorkoutManager {
         case "token":
             Logger.shared.info(
                 "received NIDiscoveryToken \(data) from counterpart")
-            NearbyInteractionManager().didReceiveDiscoveryToken(dataObject.data)
+            
+            let nearbyInteractionManager = NearbyInteractionManager()
+            nearbyInteractionManager.start()
+            nearbyInteractionManager.didReceiveDiscoveryToken(dataObject.data)
 
         default:
             Logger.shared.error("unknown message key: \(dataObject.key)")

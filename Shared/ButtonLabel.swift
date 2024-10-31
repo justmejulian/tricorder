@@ -3,6 +3,8 @@ See the LICENSE.txt file for this sample’s licensing information.
 
 Abstract:
 A SwiftUI view that provides a button label that aligns its icon and title.
+
+// todo: clean up these comments
 */
 
 import SwiftUI

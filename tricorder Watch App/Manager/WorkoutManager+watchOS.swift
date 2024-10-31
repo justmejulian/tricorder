@@ -36,15 +36,13 @@ extension WorkoutManager {
 
         session = try HKWorkoutSession(
             healthStore: healthStore, configuration: workoutConfiguration)
-        
-        try await MotionManager().startUpdates { timestamp, sensor_id, values in
-            Logger.shared.debug("Handle motion update: \(timestamp), \(sensor_id), \(values.debugDescription)")
-        }
 
+        // todo: does this work?
         guard let session else {
             throw WorkoutManagerError.noWorkoutSession
         }
 
+        // todo: can builder be moved into own file?
         builder = session.associatedWorkoutBuilder()
         session.delegate = self
         builder?.delegate = self
@@ -147,13 +145,14 @@ extension WorkoutManager {
                 Logger.shared.log("Failed to end workout: \(error))")
                 return
             }
-            
+
+            // todo: does this work? should it be an if?
             guard let session else {
                 Logger.shared.error("No session to end")
-                
+
                 return
             }
-            
+
             session.end()
         }
     }
@@ -162,8 +161,9 @@ extension WorkoutManager {
         guard let builder else {
             throw WorkoutManagerError.noLiveWorkoutBuilder
         }
-        
+
         do {
+            // todo replace with session?.associatedWorkoutBuilder()
             try await builder.endCollection(at: date)
             return try await builder.finishWorkout()
         } catch {
@@ -178,7 +178,7 @@ extension WorkoutManager {
 // so the methods need to be nonisolated explicitly.
 //
 extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
-    
+
     // todo: is this used?
     nonisolated func workoutBuilder(
         _ workoutBuilder: HKLiveWorkoutBuilder,
@@ -191,6 +191,7 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
           HealthKit calls this method on an anonymous serial background queue.
           Use Task to provide an asynchronous context so MainActor can come to play.
          */
+        // todo: move this into StatisticsManager
         Task { @MainActor in
             var allStatistics: [HKStatistics] = []
 

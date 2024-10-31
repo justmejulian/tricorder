@@ -25,6 +25,7 @@ class WorkoutManager: NSObject, ObservableObject {
      SummaryView (watchOS) changes from Saving Workout to the metric summary view when
      a workout changes from nil to a valid value.
      */
+    // todo: can this be removed?
     @Published var workout: HKWorkout?
     /**
      HealthKit data types to share and read.
@@ -48,6 +49,7 @@ class WorkoutManager: NSObject, ObservableObject {
         /**
      A date for synchronizing the elapsed time between iOS and watchOS.
      */
+        // todo: should this be stored here?
         var contextDate: Date?
     #endif
     /**
@@ -138,6 +140,7 @@ extension WorkoutManager {
         switch statistics.quantityType {
         case HKQuantityType.quantityType(forIdentifier: .heartRate):
             let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
+            // todo I guess I need to send here.
             heartRate =
                 statistics.mostRecentQuantity()?.doubleValue(for: heartRateUnit)
                 ?? 0

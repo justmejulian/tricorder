@@ -1,5 +1,5 @@
 //
-//  vt1
+//  tricoder
 //
 //  Created by Julian Visser on 14.01.2024.
 //

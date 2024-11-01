@@ -13,7 +13,7 @@ actor MotionManager {
     let eventManager = EventManager.shared
 
     let motionManager = CMBatchedSensorManager()
-    
+
     // todo should this be observable?
 }
 extension MotionManager {

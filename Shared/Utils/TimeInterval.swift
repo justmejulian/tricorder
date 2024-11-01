@@ -7,8 +7,9 @@
 import Foundation
 
 extension TimeInterval {
-    static let bootTime = Date().timeIntervalSince1970 - ProcessInfo.processInfo.systemUptime
-    
+    static let bootTime =
+        Date().timeIntervalSince1970 - ProcessInfo.processInfo.systemUptime
+
     var timeIntervalSince1970: TimeInterval {
         return (TimeInterval.bootTime + self)
     }

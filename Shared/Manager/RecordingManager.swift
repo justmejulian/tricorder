@@ -6,20 +6,20 @@
 //
 
 import Foundation
-import os
 import SwiftUICore
+import os
 
 actor RecordingManager: ObservableObject {
     let eventManager = EventManager.shared
 
     @MainActor
-    @ObservedObject // To Propagate changes
+    @ObservedObject  // To Propagate changes
     var workoutManager = WorkoutManager()
 
     #if os(watchOS)
-    var motionManager = MotionManager()
+        var motionManager = MotionManager()
     #endif
-    
+
     init() {
         Task {
             await registerListeners()

@@ -35,7 +35,7 @@ extension RecordingManager {
         do {
             try await workoutManager.startWorkout(
                 workoutConfiguration: workoutConfiguration)
-            
+
             try await motionManager.startUpdates()
         } catch {
             Logger.shared.error("\(#function) failed : \(error)")

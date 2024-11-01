@@ -60,7 +60,9 @@ extension MirroringWorkoutView {
     private func workoutTimeInterval(_ contextDate: Date) -> TimeInterval {
         var timeInterval = recordingManager.workoutManager.elapsedTimeInterval
         if recordingManager.workoutManager.sessionState == .running {
-            if let referenceContextDate = recordingManager.workoutManager.contextDate {
+            if let referenceContextDate = recordingManager.workoutManager
+                .contextDate
+            {
                 timeInterval +=
                     (contextDate.timeIntervalSinceReferenceDate
                         - referenceContextDate.timeIntervalSinceReferenceDate)

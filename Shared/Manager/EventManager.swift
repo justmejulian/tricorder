@@ -18,6 +18,7 @@ actor EventManager {
         handleData: @escaping @Sendable (_ data: Sendable) throws -> Void
     ) {
 
+        // todo: check if already exists
         EventManager.listeners[key] = handleData
 
         Logger.shared.debug("Added EventListener for \(key.rawValue)")

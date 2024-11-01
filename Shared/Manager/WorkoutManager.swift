@@ -78,11 +78,11 @@ extension WorkoutManager {
         Logger.shared.debug("\(#function) newState: \(newState.rawValue)")
         sessionState = newState
     }
-    
+
     func setElapsedTime(_ elapsedTime: TimeInterval) {
         self.elapsedTimeInterval = elapsedTime
     }
-    
+
     func resetWorkout() {
         #if os(watchOS)
             builder = nil
@@ -206,7 +206,7 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
         didReceiveDataFromRemoteWorkoutSession data: [Data]
     ) {
         Logger.shared.log("\(#function): \(data.debugDescription)")
-        
+
         // todo: is main needed?
         Task { @MainActor in
             for anElement in data {

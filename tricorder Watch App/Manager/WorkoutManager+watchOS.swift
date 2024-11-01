@@ -37,7 +37,6 @@ extension WorkoutManager {
         session = try HKWorkoutSession(
             healthStore: healthStore, configuration: workoutConfiguration)
 
-
         guard let session else {
             throw WorkoutManagerError.noWorkoutSession
         }
@@ -135,7 +134,8 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
                     let statistics = workoutBuilder.statistics(
                         for: quantityType)
                 {
-                    await eventManager.trigger(key: .collectedStatistics, data: statistics)
+                    await eventManager.trigger(
+                        key: .collectedStatistics, data: statistics)
                 }
             }
         }

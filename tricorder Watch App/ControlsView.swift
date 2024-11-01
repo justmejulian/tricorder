@@ -10,7 +10,7 @@ import SwiftUI
 import os
 
 struct ControlsView: View {
-    @EnvironmentObject var workoutManager: WorkoutManager
+    @EnvironmentObject var recordingManager: RecordingManager
 
     var body: some View {
         VStack {
@@ -19,44 +19,43 @@ struct ControlsView: View {
             } label: {
                 ButtonLabel(title: "Start", systemImage: "figure.outdoor.cycle")
             }
-            .disabled(workoutManager.sessionState.isActive)
+            .disabled(recordingManager.workoutManager.sessionState.isActive)
             .tint(.green)
 
             Button {
-                workoutManager.sessionState == .running
-                    ? workoutManager.session?.pause()
-                    : workoutManager.session?.resume()
+                recordingManager.workoutManager.sessionState == .running
+                    ? recordingManager.workoutManager.session?.pause()
+                    : recordingManager.workoutManager.session?.resume()
             } label: {
                 let title =
-                    workoutManager.sessionState == .running ? "Pause" : "Resume"
+                    recordingManager.workoutManager.sessionState == .running
+                    ? "Pause" : "Resume"
                 let systemImage =
-                    workoutManager.sessionState == .running ? "pause" : "play"
+                    recordingManager.workoutManager.sessionState == .running
+                    ? "pause" : "play"
                 ButtonLabel(title: title, systemImage: systemImage)
             }
-            .disabled(!workoutManager.sessionState.isActive)
+            .disabled(!recordingManager.workoutManager.sessionState.isActive)
             .tint(.blue)
 
             Button {
-                workoutManager.session?.stopActivity(with: .now)
+                recordingManager.workoutManager.session?.stopActivity(
+                    with: .now)
             } label: {
                 ButtonLabel(title: "End", systemImage: "xmark")
             }
             .tint(.red)
-            .disabled(!workoutManager.sessionState.isActive)
+            .disabled(!recordingManager.workoutManager.sessionState.isActive)
         }
     }
 
     private func startWorkout() {
         Task {
-            do {
-                let configuration = HKWorkoutConfiguration()
-                configuration.activityType = .functionalStrengthTraining
-                configuration.locationType = .indoor
-                try await workoutManager.startWorkout(
-                    workoutConfiguration: configuration)
-            } catch {
-                Logger.shared.log("Failed to start workout \(error))")
-            }
+            let configuration = HKWorkoutConfiguration()
+            configuration.activityType = .functionalStrengthTraining
+            configuration.locationType = .indoor
+            await recordingManager.startRecording(
+                workoutConfiguration: configuration)
         }
     }
 }

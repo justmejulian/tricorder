@@ -9,13 +9,15 @@ import HealthKit
 import SwiftUI
 
 struct MetricsView: View {
-    @EnvironmentObject var workoutManager: WorkoutManager
+    @EnvironmentObject var recordingManager: RecordingManager
 
     var body: some View {
         TimelineView(
             MetricsTimelineSchedule(
-                from: workoutManager.session?.startDate ?? Date(),
-                isPaused: workoutManager.sessionState == .paused)
+                from: recordingManager.workoutManager.session?.startDate
+                    ?? Date(),
+                isPaused: recordingManager.workoutManager.sessionState
+                    == .paused)
         ) { context in
             VStack(alignment: .leading) {
                 ElapsedTimeView(
@@ -24,7 +26,7 @@ struct MetricsView: View {
                 )
                 .foregroundStyle(.yellow)
                 Text(
-                    workoutManager.heartRate.formatted(
+                    recordingManager.workoutManager.heartRate.formatted(
                         .number.precision(.fractionLength(0))) + " bpm")
             }
             .font(
@@ -39,6 +41,7 @@ struct MetricsView: View {
     }
 
     func elapsedTime(with contextDate: Date) -> TimeInterval {
-        return workoutManager.builder?.elapsedTime(at: contextDate) ?? 0
+        return recordingManager.workoutManager.builder?.elapsedTime(
+            at: contextDate) ?? 0
     }
 }

@@ -7,11 +7,13 @@
 
 import Foundation
 import os
+import SwiftUICore
 
 actor RecordingManager: ObservableObject {
     let eventManager = EventManager.shared
 
     @MainActor
+    @ObservedObject // To Propagate changes
     var workoutManager = WorkoutManager()
 
     #if os(watchOS)

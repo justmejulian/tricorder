@@ -47,6 +47,8 @@ enum EventListenerKey: String, CaseIterable {
     case companionStartedRecording
 
     case sessionStateChanged
+    case collectedStatistics
+    case receivedData
 }
 
 typealias EventHandler = (_ data: Sendable) throws -> Void

@@ -37,11 +37,6 @@ extension WorkoutManager {
         session = try HKWorkoutSession(
             healthStore: healthStore, configuration: workoutConfiguration)
 
-        try await MotionManager().startUpdates { timestamp, sensor_id, values in
-            Logger.shared.debug(
-                "Handle motion update: \(timestamp), \(sensor_id), \(values.debugDescription)"
-            )
-        }
 
         guard let session else {
             throw WorkoutManagerError.noWorkoutSession
@@ -135,28 +130,14 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
           Use Task to provide an asynchronous context so MainActor can come to play.
          */
         Task { @MainActor in
-            var allStatistics: [HKStatistics] = []
-
             for type in collectedTypes {
                 if let quantityType = type as? HKQuantityType,
                     let statistics = workoutBuilder.statistics(
                         for: quantityType)
                 {
-                    updateForStatistics(statistics)
-                    allStatistics.append(statistics)
+                    await eventManager.trigger(key: .collectedStatistics, data: statistics)
                 }
             }
-
-            let archivedData = try? NSKeyedArchiver.archivedData(
-                withRootObject: allStatistics, requiringSecureCoding: true)
-            guard let archivedData = archivedData, !archivedData.isEmpty else {
-                Logger.shared.log("Encoded cycling data is empty")
-                return
-            }
-            /**
-              Send a Data object to the connected remote workout session.
-             */
-//            await sendData(key: "archived", data: archivedData)
         }
     }
 

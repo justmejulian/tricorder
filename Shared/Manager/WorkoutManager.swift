@@ -35,9 +35,9 @@ class WorkoutManager: NSObject, ObservableObject {
     ]
     let healthStore = HKHealthStore()
     var session: HKWorkoutSession?
-    
+
     var eventManager = EventManager.shared
-    
+
     #if os(watchOS)
         /**
      The live workout builder that is only available on watchOS.
@@ -68,14 +68,19 @@ class WorkoutManager: NSObject, ObservableObject {
             }
         }
     }
-    
+
 }
 
 // MARK: - Workout session management
 //
 extension WorkoutManager {
     func setSessionSate(newState: HKWorkoutSessionState) {
+        Logger.shared.debug("\(#function) newState: \(newState.rawValue)")
         sessionState = newState
+    }
+    
+    func setElapsedTime(_ elapsedTime: TimeInterval) {
+        self.elapsedTimeInterval = elapsedTime
     }
     
     func resetWorkout() {
@@ -137,7 +142,7 @@ extension WorkoutManager {
             return
         }
     }
-    
+
     /**
      Consume the session state change from the async stream to update sessionState and finish the workout.
      */
@@ -164,7 +169,8 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
          Yield the new state change to the async stream synchronously.
          asynStreamTuple is a constant, so it's nonisolated.
          */
-        let sessionSateChange = SessionStateChange(newState: toState, date: date)
+        let sessionSateChange = SessionStateChange(
+            newState: toState, date: date)
         asynStreamTuple.continuation.yield(sessionSateChange)
     }
 
@@ -200,13 +206,11 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
         didReceiveDataFromRemoteWorkoutSession data: [Data]
     ) {
         Logger.shared.log("\(#function): \(data.debugDescription)")
+        
+        // todo: is main needed?
         Task { @MainActor in
-            do {
-                for anElement in data {
-                    try handleReceivedData(anElement)
-                }
-            } catch {
-                Logger.shared.log("Failed to handle received data: \(error))")
+            for anElement in data {
+                await eventManager.trigger(key: .receivedData, data: anElement)
             }
         }
     }

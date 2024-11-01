@@ -9,7 +9,7 @@ import SwiftUI
 import os
 
 struct PagingView: View {
-    @EnvironmentObject var workoutManager: WorkoutManager
+    @EnvironmentObject var recordingManager: RecordingManager
     @Environment(\.isLuminanceReduced) var isLuminanceReduced
 
     @State private var selection: Tab = .metrics
@@ -33,12 +33,14 @@ struct PagingView: View {
         .onChange(of: isLuminanceReduced) {
             displayMetricsView()
         }
-        .onChange(of: workoutManager.sessionState) { _, newValue in
+        .onChange(of: recordingManager.workoutManager.sessionState) { _, newValue in
+            Logger.shared.debug("PagingView.onChange: Session state changed to \(newValue.rawValue)")
+            
             if newValue == .running || newValue == .paused {
                 displayMetricsView()
             }
         }.onAppear {
-            workoutManager.requestAuthorization()
+            recordingManager.workoutManager.requestAuthorization()
             selection = .metrics
         }
     }

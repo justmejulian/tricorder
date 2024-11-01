@@ -31,11 +31,7 @@ extension WorkoutManager {
          */
         healthStore.workoutSessionMirroringStartHandler = { mirroredSession in
             Task { @MainActor in
-                self.resetWorkout()
-                self.session = mirroredSession
-                self.session?.delegate = self
-                Logger.shared.log(
-                    "Start mirroring remote session: \(mirroredSession)")
+                await self.workoutSessionMirroringStartHandler(mirroredSession)
             }
         }
     }
@@ -87,10 +83,4 @@ extension WorkoutManager {
 
     }
 
-    /**
-     Consume the session state change from the async stream to update sessionState and finish the workout.
-     */
-    func consumeSessionStateChange(_ change: SessionSateChange) async {
-        sessionState = change.newState
-    }
 }

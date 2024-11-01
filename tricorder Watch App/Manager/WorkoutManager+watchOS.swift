@@ -82,51 +82,7 @@ extension WorkoutManager {
         Logger.shared.info("Received data: \(dataObject.key)")
     }
 
-    /**
-     Consume the session state change from the async stream to update sessionState and finish the workout.
-     */
-    func consumeSessionStateChange(_ change: SessionSateChange) async {
-        sessionState = change.newState
-        /**
-          Wait for the session to transition states before ending the builder.
-         */
 
-        /**
-         Send the elapsed time to the iOS side.
-         */
-        let elapsedTimeInterval =
-            session?.associatedWorkoutBuilder().elapsedTime(at: change.date)
-            ?? 0
-        let elapsedTime = WorkoutElapsedTime(
-            timeInterval: elapsedTimeInterval, date: change.date)
-
-        if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime) {
-            // Only send elapsedTimeData when running
-            if change.newState == .running {
-                await sendData(key: "elapsedTime", data: elapsedTimeData)
-            }
-        }
-
-
-        if change.newState == .stopped {
-            Logger.shared.info("\(#function): Session stopped")
-
-            do {
-                workout = try await finishedWorkout(date: change.date)
-            } catch {
-                Logger.shared.log("Failed to end workout: \(error))")
-                return
-            }
-            
-            guard let session else {
-                Logger.shared.error("No session to end")
-                
-                return
-            }
-            
-            session.end()
-        }
-    }
 
     func finishedWorkout(date: Date) async throws -> HKWorkout? {
         guard let builder else {
@@ -160,13 +116,17 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
           Use Task to provide an asynchronous context so MainActor can come to play.
          */
         Task { @MainActor in
+            Logger.shared.info("Task in \(#function) called")
             var allStatistics: [HKStatistics] = []
 
             for type in collectedTypes {
                 if let quantityType = type as? HKQuantityType,
+                    // todo: can this be moved to a getStatistics ?
+                    // HK statistics to struct
                     let statistics = workoutBuilder.statistics(
                         for: quantityType)
                 {
+                    //  asynStreamTuple.continuation.yield(sessionSateChange)
                     updateForStatistics(statistics)
                     allStatistics.append(statistics)
                 }
@@ -181,7 +141,7 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
             /**
               Send a Data object to the connected remote workout session.
              */
-            await sendData(key: "archived", data: archivedData)
+            await sendData("archived", archivedData)
         }
     }
 

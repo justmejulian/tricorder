@@ -86,11 +86,4 @@ extension WorkoutManager {
         }
 
     }
-
-    /**
-     Consume the session state change from the async stream to update sessionState and finish the workout.
-     */
-    func consumeSessionStateChange(_ change: SessionSateChange) async {
-        sessionState = change.newState
-    }
 }

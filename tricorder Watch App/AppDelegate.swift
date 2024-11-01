@@ -14,14 +14,9 @@ class AppDelegate: NSObject, WKApplicationDelegate {
 
     func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
         Task {
-            do {
-                WorkoutManager.shared.resetWorkout()
-                try await WorkoutManager.shared.startWorkout(
-                    workoutConfiguration: workoutConfiguration)
-                Logger.shared.log("Successfully started workout")
-            } catch {
-                Logger.shared.log("Failed started workout")
-            }
+            Logger.shared.log("AppDelegate: received workout configuration")
+            await EventManager.shared.trigger(
+                key: .companionStartedRecording, data: workoutConfiguration)
         }
     }
 }

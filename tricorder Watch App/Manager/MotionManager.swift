@@ -10,18 +10,30 @@ import Foundation
 import os
 
 actor MotionManager {
-    let motionManager = CMBatchedSensorManager()
+    let eventManager = EventManager.shared
 
+    let motionManager = CMBatchedSensorManager()
+    
+    // todo should this be observable?
+}
+extension MotionManager {
+    private func handleUpdate(
+        _ timestamp: Date, _ sensor_id: String, _ values: [Value]
+    ) {
+        // todo: hanlde updates
+        //        Logger.shared.debug(
+        //            "Handle motion update: \(timestamp), \(sensor_id), \(values.debugDescription)"
+        //        )
+    }
+}
+
+extension MotionManager {
     func stopUpdates() {
         motionManager.stopAccelerometerUpdates()
         motionManager.stopDeviceMotionUpdates()
     }
 
-    func startUpdates(
-        handleUpdate: @escaping @Sendable (
-            _ timestamp: Date, _ sensor_id: String, _ values: [Value]
-        ) -> Void
-    ) throws {
+    func startUpdates() throws {
         guard
             CMBatchedSensorManager.isAccelerometerSupported
                 && CMBatchedSensorManager.isDeviceMotionSupported
@@ -44,8 +56,7 @@ actor MotionManager {
                 )
                 return
             }
-            self.consumeAccelerometerUpdates(
-                batchedData: batchedData, handleUpdate: handleUpdate)
+            self.consumeAccelerometerUpdates(batchedData: batchedData)
         })
 
         motionManager.startDeviceMotionUpdates(handler: {
@@ -63,17 +74,11 @@ actor MotionManager {
                 )
                 return
             }
-            self.consumeDeviceMotionUpdates(
-                batchedData: batchedData, handleUpdate: handleUpdate)
+            self.consumeDeviceMotionUpdates(batchedData: batchedData)
         })
     }
 
-    func consumeDeviceMotionUpdates(
-        batchedData: [CMDeviceMotion],
-        handleUpdate: @escaping @Sendable (
-            _ timestamp: Date, _ sensor_id: String, _ values: [Value]
-        ) -> Void
-    ) {
+    func consumeDeviceMotionUpdates(batchedData: [CMDeviceMotion]) {
         Logger.shared.debug("DeviceMotionUpdate")
 
         // todo make this more reusable
@@ -121,12 +126,7 @@ actor MotionManager {
         handleUpdate(date, "quaternion", quaternionValues)
     }
 
-    func consumeAccelerometerUpdates(
-        batchedData: [CMAccelerometerData],
-        handleUpdate: @escaping @Sendable (
-            _ timestamp: Date, _ sensor_id: String, _ values: [Value]
-        ) -> Void
-    ) {
+    func consumeAccelerometerUpdates(batchedData: [CMAccelerometerData]) {
         Logger.shared.debug("AccelerometerUpdate")
         var values: [Value] = []
 
@@ -136,7 +136,8 @@ actor MotionManager {
                     x: data.acceleration.x, y: data.acceleration.y,
                     z: data.acceleration.z,
                     timestamp: Date(
-                        timeIntervalSince1970: data.timestamp.timeIntervalSince1970)))
+                        timeIntervalSince1970: data.timestamp
+                            .timeIntervalSince1970)))
         }
 
         // all have differnt timestamps

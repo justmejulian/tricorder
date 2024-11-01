@@ -10,12 +10,13 @@ import SwiftUI
 @main
 struct tricorder_Watch_AppApp: App {
     @WKApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    private let workoutManager = WorkoutManager.shared
+    private let eventManager = EventManager.shared
+    private let recordingManager = RecordingManager()
 
     @SceneBuilder var body: some Scene {
         WindowGroup {
             PagingView()
-                .environmentObject(workoutManager)
+                .environmentObject(recordingManager)
         }
     }
 }

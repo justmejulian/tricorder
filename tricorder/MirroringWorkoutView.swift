@@ -10,12 +10,14 @@ import SwiftUI
 import os
 
 struct MirroringWorkoutView: View {
-    @EnvironmentObject var workoutManager: WorkoutManager
+    @EnvironmentObject var recordingManager: RecordingManager
 
     var body: some View {
-        let fromDate = workoutManager.session?.startDate ?? Date()
+        let fromDate =
+            recordingManager.workoutManager.session?.startDate ?? Date()
         let schedule = MetricsTimelineSchedule(
-            from: fromDate, isPaused: workoutManager.sessionState == .paused
+            from: fromDate,
+            isPaused: recordingManager.workoutManager.sessionState == .paused
         )
         TimelineView(schedule) { context in
             List {
@@ -56,22 +58,23 @@ extension MirroringWorkoutView {
     }
 
     private func workoutTimeInterval(_ contextDate: Date) -> TimeInterval {
-        var timeInterval = workoutManager.elapsedTimeInterval
-        if workoutManager.sessionState == .running {
-            if let referenceContextDate = workoutManager.contextDate {
+        var timeInterval = recordingManager.workoutManager.elapsedTimeInterval
+        if recordingManager.workoutManager.sessionState == .running {
+            if let referenceContextDate = recordingManager.workoutManager.contextDate {
                 timeInterval +=
                     (contextDate.timeIntervalSinceReferenceDate
                         - referenceContextDate.timeIntervalSinceReferenceDate)
             } else {
-                workoutManager.contextDate = contextDate
+                recordingManager.workoutManager.contextDate = contextDate
             }
         } else {
             var date = contextDate
-            date.addTimeInterval(workoutManager.elapsedTimeInterval)
+            date.addTimeInterval(
+                recordingManager.workoutManager.elapsedTimeInterval)
             timeInterval =
                 date.timeIntervalSinceReferenceDate
                 - contextDate.timeIntervalSinceReferenceDate
-            workoutManager.contextDate = nil
+            recordingManager.workoutManager.contextDate = nil
         }
         return timeInterval
     }
@@ -80,7 +83,7 @@ extension MirroringWorkoutView {
     private func metricsView() -> some View {
         Group {
             LabeledContent(
-                "Heart Rate", value: workoutManager.heartRate,
+                "Heart Rate", value: recordingManager.workoutManager.heartRate,
                 format: .number.precision(.fractionLength(0)))
         }
         .font(
@@ -94,28 +97,31 @@ extension MirroringWorkoutView {
             Spacer(minLength: 40)
             HStack {
                 Button {
-                    if let session = workoutManager.session {
-                        workoutManager.sessionState == .running
+                    if let session = recordingManager.workoutManager.session {
+                        recordingManager.workoutManager.sessionState == .running
                             ? session.pause() : session.resume()
                     }
                 } label: {
                     let title =
-                        workoutManager.sessionState == .running
+                        recordingManager.workoutManager.sessionState == .running
                         ? "Pause" : "Resume"
                     let systemImage =
-                        workoutManager.sessionState == .running
+                        recordingManager.workoutManager.sessionState == .running
                         ? "pause" : "play"
                     ButtonLabel(title: title, systemImage: systemImage)
                 }
-                .disabled(!workoutManager.sessionState.isActive)
+                .disabled(
+                    !recordingManager.workoutManager.sessionState.isActive)
 
                 Button {
-                    workoutManager.session?.stopActivity(with: .now)
+                    recordingManager.workoutManager.session?.stopActivity(
+                        with: .now)
                 } label: {
                     ButtonLabel(title: "End", systemImage: "xmark")
                 }
                 .tint(.green)
-                .disabled(!workoutManager.sessionState.isActive)
+                .disabled(
+                    !recordingManager.workoutManager.sessionState.isActive)
 
             }
             .buttonStyle(.bordered)

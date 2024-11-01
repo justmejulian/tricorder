@@ -11,7 +11,7 @@ import SwiftUI
 import os
 
 struct StartView: View {
-    @EnvironmentObject var workoutManager: WorkoutManager
+    @EnvironmentObject var recordingManager: RecordingManager
     @State private var isFullScreenCoverActive = false
     @State private var triggerAuthorization = false
 
@@ -19,12 +19,12 @@ struct StartView: View {
         VStack {
             MirroringWorkoutView()
             Button {
-                if !workoutManager.sessionState.isActive {
+                if !recordingManager.workoutManager.sessionState.isActive {
                     startCyclingOnWatch()
                 }
             } label: {
                 let title =
-                    workoutManager.sessionState.isActive
+                    recordingManager.workoutManager.sessionState.isActive
                     ? "View ongoing cycling" : "Start cycling on watch"
                 ButtonLabel(
                     title: title, systemImage: "figure.outdoor.cycle"
@@ -41,16 +41,16 @@ struct StartView: View {
             .tint(.green)
             .foregroundColor(.black)
             .frame(width: 400, height: 400)
-            .disabled(workoutManager.sessionState.isActive)
+            .disabled(recordingManager.workoutManager.sessionState.isActive)
         }
         .onAppear {
             triggerAuthorization.toggle()
-            workoutManager.retrieveRemoteSession()
+            recordingManager.workoutManager.retrieveRemoteSession()
         }
         .healthDataAccessRequest(
-            store: workoutManager.healthStore,
-            shareTypes: workoutManager.typesToShare,
-            readTypes: workoutManager.typesToRead,
+            store: recordingManager.workoutManager.healthStore,
+            shareTypes: recordingManager.workoutManager.typesToShare,
+            readTypes: recordingManager.workoutManager.typesToRead,
             trigger: triggerAuthorization,
             completion: { result in
                 switch result {
@@ -65,12 +65,7 @@ struct StartView: View {
 
     private func startCyclingOnWatch() {
         Task {
-            do {
-                try await workoutManager.startWatchWorkout()
-            } catch {
-                Logger.shared.log(
-                    "Failed to start cycling on the paired watch.")
-            }
+            await recordingManager.startRecording()
         }
     }
 }

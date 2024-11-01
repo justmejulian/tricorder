@@ -11,10 +11,6 @@ import os
 
 @MainActor
 class WorkoutManager: NSObject, ObservableObject {
-    struct SessionSateChange {
-        let newState: HKWorkoutSessionState
-        let date: Date
-    }
     /**
      The workout session live states that the UI observes.
      */
@@ -39,6 +35,9 @@ class WorkoutManager: NSObject, ObservableObject {
     ]
     let healthStore = HKHealthStore()
     var session: HKWorkoutSession?
+
+    var eventManager = EventManager.shared
+
     #if os(watchOS)
         /**
      The live workout builder that is only available on watchOS.
@@ -55,17 +54,13 @@ class WorkoutManager: NSObject, ObservableObject {
      The Swift actors don't handle tasks in a first-in-first-out way. Use AsyncStream to make sure that the app presents the latest state.
      */
     let asynStreamTuple = AsyncStream.makeStream(
-        of: SessionSateChange.self, bufferingPolicy: .bufferingNewest(1))
-    /**
-     WorkoutManager is a singleton.
-     */
-    static let shared = WorkoutManager()
+        of: SessionStateChange.self, bufferingPolicy: .bufferingNewest(1))
 
     /**
      Kick off a task to consume the async stream. The next value in the stream can't start processing
      until "await consumeSessionStateChange(value)" returns and the loop enters the next iteration, which serializes the asynchronous operations.
      */
-    private override init() {
+    override init() {
         super.init()
         Task {
             for await value in asynStreamTuple.stream {
@@ -73,12 +68,21 @@ class WorkoutManager: NSObject, ObservableObject {
             }
         }
     }
-    
+
 }
 
 // MARK: - Workout session management
 //
 extension WorkoutManager {
+    func setSessionSate(newState: HKWorkoutSessionState) {
+        Logger.shared.debug("\(#function) newState: \(newState.rawValue)")
+        sessionState = newState
+    }
+    
+    func setElapsedTime(_ elapsedTime: TimeInterval) {
+        self.elapsedTimeInterval = elapsedTime
+    }
+    
     func resetWorkout() {
         #if os(watchOS)
             builder = nil
@@ -138,6 +142,13 @@ extension WorkoutManager {
             return
         }
     }
+
+    /**
+     Consume the session state change from the async stream to update sessionState and finish the workout.
+     */
+    func consumeSessionStateChange(_ change: SessionStateChange) async {
+        await eventManager.trigger(key: .sessionStateChanged, data: change)
+    }
 }
 
 // MARK: - HKWorkoutSessionDelegate
@@ -158,7 +169,8 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
          Yield the new state change to the async stream synchronously.
          asynStreamTuple is a constant, so it's nonisolated.
          */
-        let sessionSateChange = SessionSateChange(newState: toState, date: date)
+        let sessionSateChange = SessionStateChange(
+            newState: toState, date: date)
         asynStreamTuple.continuation.yield(sessionSateChange)
     }
 
@@ -194,13 +206,11 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
         didReceiveDataFromRemoteWorkoutSession data: [Data]
     ) {
         Logger.shared.log("\(#function): \(data.debugDescription)")
+        
+        // todo: is main needed?
         Task { @MainActor in
-            do {
-                for anElement in data {
-                    try handleReceivedData(anElement)
-                }
-            } catch {
-                Logger.shared.log("Failed to handle received data: \(error))")
+            for anElement in data {
+                await eventManager.trigger(key: .receivedData, data: anElement)
             }
         }
     }
@@ -231,4 +241,11 @@ enum WorkoutManagerError: Error {
     case workoutSessionNotStarted
     case workoutSessionAlreadyStarted
     case workoutSessionEnded
+}
+
+// MARK: - SessionSateChange
+//
+struct SessionStateChange: Sendable {
+    let newState: HKWorkoutSessionState
+    let date: Date
 }

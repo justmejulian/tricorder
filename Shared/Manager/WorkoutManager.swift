@@ -119,6 +119,8 @@ extension WorkoutManager {
                 await sendData(data, retryCount: retryCount - 1)
                 return
             }
+
+            // todo throw
             Logger.shared.log("Failed to send data: \(error)")
         }
     }

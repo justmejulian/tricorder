@@ -20,14 +20,20 @@ extension RecordingManager {
             handleData: self.handleCompanionStartedRecording
         )
 
-        await eventManager.register(
-            key: .collectedStatistics,
-            handleData: self.handleCollectedData
-        )
+        func registerListeners() async {
+            await eventManager.register(
+                key: .collectedStatistics,
+                handleData: self.handleCollectedData
+            )
+        }
 
         await eventManager.register(
             key: .receivedData, handleData: self.handleReceivedData
         )
+    }
+
+    func resetRest() {
+
     }
 }
 
@@ -40,12 +46,20 @@ extension RecordingManager {
             try await workoutManager.startWorkout(
                 workoutConfiguration: workoutConfiguration)
 
-            await sendNIDiscoveryToken()
+        } catch {
+            Logger.shared.error("Failed to start startWorkout: \(error)")
+        }
 
+        // todo move the sending into init of RecordingManager
+        // then start from here and resend if fails
+        await sendNIDiscoveryToken()
+
+        do {
             try await motionManager.startUpdates()
         } catch {
-            Logger.shared.error("\(#function) failed : \(error)")
+            Logger.shared.error("Failed to start Motion Updates: \(error)")
         }
+
     }
 }
 
@@ -67,29 +81,6 @@ extension RecordingManager {
     }
 
     @Sendable
-    nonisolated func handleCollectedData(_ data: Sendable) throws {
-        Logger.shared.info("\(#function)")
-
-        guard let statistics = data as? HKStatistics else {
-            Logger.shared.error("\(#function): Invalid data type")
-            return
-        }
-
-        Task {
-            await workoutManager.updateForStatistics(statistics)
-        }
-
-        // todo send to iphone
-        //            let archivedData = try? NSKeyedArchiver.archivedData(
-        //                withRootObject: allStatistics, requiringSecureCoding: true)
-        //            guard let archivedData = archivedData, !archivedData.isEmpty else {
-        //                Logger.shared.log("Encoded cycling data is empty")
-        //                return
-        //            }
-
-    }
-
-    @Sendable
     nonisolated func handleSessionStateChange(_ data: Sendable) throws {
         Logger.shared.info("\(#function)")
 
@@ -102,7 +93,7 @@ extension RecordingManager {
             "Session state changed to \(change.newState.rawValue)")
 
         Task {
-            await workoutManager.setSessionSate(newState: change.newState)
+            await setRecordingState(newState: change.newState)
         }
 
         if change.newState == .running {
@@ -120,11 +111,11 @@ extension RecordingManager {
         if change.newState == .stopped {
             Logger.shared.info("\(#function): Session stopped")
 
-            // todo stop motion recording
-
             Task {
                 do {
                     try await workoutManager.endWorkout(date: change.date)
+                    await motionManager.stopUpdates()
+                    await nearbyInteractionManager.stop()
                 } catch {
                     Logger.shared.error(
                         "\(#function): Error ending workout: \(error)")
@@ -156,4 +147,32 @@ extension RecordingManager {
         }
 
     }
+
+    @Sendable
+    nonisolated func handleCollectedData(_ data: Sendable) throws {
+        Logger.shared.info("\(#function)")
+
+        guard let statistics = data as? HKStatistics else {
+            Logger.shared.error("\(#function): Invalid data type")
+            return
+        }
+
+        Task {
+            let mostRecentStatistic =
+                await statisticsManager.updateForStatistics(statistics)
+
+            let newHeartRate = mostRecentStatistic[.heartRate] ?? 0
+            await setHeartRate(heartRate: newHeartRate)
+        }
+
+        // todo send to iphone
+        //            let archivedData = try? NSKeyedArchiver.archivedData(
+        //                withRootObject: allStatistics, requiringSecureCoding: true)
+        //            guard let archivedData = archivedData, !archivedData.isEmpty else {
+        //                Logger.shared.log("Encoded cycling data is empty")
+        //                return
+        //            }
+
+    }
 }
+

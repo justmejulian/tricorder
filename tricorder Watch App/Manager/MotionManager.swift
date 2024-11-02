@@ -29,11 +29,15 @@ extension MotionManager {
 
 extension MotionManager {
     func stopUpdates() {
+        Logger.shared.debug("MotinManager: stopUpdates called")
+        
         motionManager.stopAccelerometerUpdates()
         motionManager.stopDeviceMotionUpdates()
     }
 
     func startUpdates() throws {
+        Logger.shared.debug("MotinManager: startUpdates called")
+        
         guard
             CMBatchedSensorManager.isAccelerometerSupported
                 && CMBatchedSensorManager.isDeviceMotionSupported
@@ -160,6 +164,10 @@ enum MotionManagerError: Error {
 // MARK: - Value
 //
 extension MotionManager {
+    // LogItem
+    // todo: CMAcceleration or CMRotationRate CMQuaternion
+    // LogItem with timestamp
+
     struct Value: Codable {
         var x: Double
         var y: Double

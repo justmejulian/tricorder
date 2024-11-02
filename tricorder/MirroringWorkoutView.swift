@@ -17,7 +17,7 @@ struct MirroringWorkoutView: View {
             recordingManager.workoutManager.session?.startDate ?? Date()
         let schedule = MetricsTimelineSchedule(
             from: fromDate,
-            isPaused: recordingManager.workoutManager.sessionState == .paused
+            isPaused: recordingManager.recordingState == .paused
         )
         TimelineView(schedule) { context in
             List {
@@ -58,8 +58,8 @@ extension MirroringWorkoutView {
     }
 
     private func workoutTimeInterval(_ contextDate: Date) -> TimeInterval {
-        var timeInterval = recordingManager.workoutManager.elapsedTimeInterval
-        if recordingManager.workoutManager.sessionState == .running {
+        var timeInterval = recordingManager.elapsedTimeInterval
+        if recordingManager.recordingState == .running {
             if let referenceContextDate = recordingManager.workoutManager
                 .contextDate
             {
@@ -72,7 +72,7 @@ extension MirroringWorkoutView {
         } else {
             var date = contextDate
             date.addTimeInterval(
-                recordingManager.workoutManager.elapsedTimeInterval)
+                recordingManager.elapsedTimeInterval)
             timeInterval =
                 date.timeIntervalSinceReferenceDate
                 - contextDate.timeIntervalSinceReferenceDate
@@ -85,7 +85,7 @@ extension MirroringWorkoutView {
     private func metricsView() -> some View {
         Group {
             LabeledContent(
-                "Heart Rate", value: recordingManager.workoutManager.heartRate,
+                "Heart Rate", value: recordingManager.heartRate,
                 format: .number.precision(.fractionLength(0)))
         }
         .font(
@@ -99,31 +99,15 @@ extension MirroringWorkoutView {
             Spacer(minLength: 40)
             HStack {
                 Button {
-                    if let session = recordingManager.workoutManager.session {
-                        recordingManager.workoutManager.sessionState == .running
-                            ? session.pause() : session.resume()
+                    Task {
+                        await recordingManager.stopRecording()
                     }
-                } label: {
-                    let title =
-                        recordingManager.workoutManager.sessionState == .running
-                        ? "Pause" : "Resume"
-                    let systemImage =
-                        recordingManager.workoutManager.sessionState == .running
-                        ? "pause" : "play"
-                    ButtonLabel(title: title, systemImage: systemImage)
-                }
-                .disabled(
-                    !recordingManager.workoutManager.sessionState.isActive)
-
-                Button {
-                    recordingManager.workoutManager.session?.stopActivity(
-                        with: .now)
                 } label: {
                     ButtonLabel(title: "End", systemImage: "xmark")
                 }
                 .tint(.green)
                 .disabled(
-                    !recordingManager.workoutManager.sessionState.isActive)
+                    !recordingManager.recordingState.isActive)
 
             }
             .buttonStyle(.bordered)

@@ -20,6 +20,9 @@ extension RecordingManager {
         )
     }
 
+    func resetRest() {
+        
+    }
 }
 
 // MARK: -  RecordingManager functions
@@ -32,6 +35,10 @@ extension RecordingManager {
             Logger.shared.log(
                 "Failed to start cycling on the paired watch.")
         }
+    }
+
+    func stopRecording() async {
+        workoutManager.session?.stopActivity(with: .now)
     }
 }
 
@@ -49,7 +56,7 @@ extension RecordingManager {
             "Session state changed to \(change.newState.rawValue)")
 
         Task {
-            await workoutManager.setSessionSate(newState: change.newState)
+            await setRecordingState(newState: change.newState)
         }
     }
 
@@ -73,20 +80,8 @@ extension RecordingManager {
             {
                 Logger.shared.info("elapsedTime: \(elapsedTime.timeInterval)")
 
-                // todo move this into workoutManager
-
                 Task {
-                    var currentElapsedTime: TimeInterval = 0
-
-                    if await workoutManager.sessionState == .running {
-                        currentElapsedTime =
-                            elapsedTime.timeInterval
-                            + Date().timeIntervalSince(elapsedTime.date)
-                    } else {
-                        currentElapsedTime = elapsedTime.timeInterval
-                    }
-
-                    await workoutManager.setElapsedTime(currentElapsedTime)
+                    await setElapsedTimeInterval(elapsedTime: elapsedTime)
                 }
             }
         case "statisticsArray":
@@ -99,7 +94,10 @@ extension RecordingManager {
 
                 Task {
                     for statistics in statisticsArray {
-                        await workoutManager.updateForStatistics(statistics)
+                        let mostRecentStatistic = await statisticsManager.updateForStatistics(statistics)
+                        
+                        let newHeartRate = mostRecentStatistic[.heartRate] ?? 0
+                        await setHeartRate(heartRate: newHeartRate)
                     }
                 }
             }

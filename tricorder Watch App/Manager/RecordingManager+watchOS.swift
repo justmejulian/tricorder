@@ -24,6 +24,10 @@ extension RecordingManager {
             key: .collectedStatistics,
             handleData: self.handleCollectedData
         )
+
+        await eventManager.register(
+            key: .receivedData, handleData: self.handleReceivedData
+        )
     }
 }
 
@@ -35,6 +39,8 @@ extension RecordingManager {
         do {
             try await workoutManager.startWorkout(
                 workoutConfiguration: workoutConfiguration)
+
+            await sendNIDiscoveryToken()
 
             try await motionManager.startUpdates()
         } catch {
@@ -127,4 +133,27 @@ extension RecordingManager {
         }
     }
 
+    @Sendable
+    nonisolated func handleReceivedData(_ data: Sendable) throws {
+        Logger.shared.info("\(#function) called")
+
+        guard let data = data as? Data else {
+            Logger.shared.error("\(#function): Invalid data type")
+            return
+        }
+
+        let dataObject = try DataObjectManager().decode(data)
+
+        // todo move these keys into and enum, so I know what is possible
+        switch dataObject.key {
+        case "discoveryToken":
+            Task {
+                await handleNIReceiveDiscoveryToken(dataObject.data)
+            }
+
+        default:
+            Logger.shared.error("unknown dataObject key: \(dataObject.key)")
+        }
+
+    }
 }

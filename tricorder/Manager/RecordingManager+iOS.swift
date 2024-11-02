@@ -64,12 +64,16 @@ extension RecordingManager {
 
         let dataObject = try DataObjectManager().decode(data)
 
+        // todo move these keys into and enum, so I know what is possible
+
         switch dataObject.key {
         case "elapsedTime":
             if let elapsedTime = try? JSONDecoder().decode(
                 WorkoutElapsedTime.self, from: dataObject.data)
             {
                 Logger.shared.info("elapsedTime: \(elapsedTime.timeInterval)")
+
+                // todo move this into workoutManager
 
                 Task {
                     var currentElapsedTime: TimeInterval = 0
@@ -98,6 +102,11 @@ extension RecordingManager {
                         await workoutManager.updateForStatistics(statistics)
                     }
                 }
+            }
+
+        case "discoveryToken":
+            Task {
+                await handleNIReceiveDiscoveryToken(dataObject.data)
             }
 
         default:

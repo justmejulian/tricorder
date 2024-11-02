@@ -16,6 +16,8 @@ actor RecordingManager: ObservableObject {
     @ObservedObject  // To Propagate changes
     var workoutManager = WorkoutManager()
 
+    var nearbyInteractionManager = NearbyInteractionManager()
+
     #if os(watchOS)
         var motionManager = MotionManager()
     #endif
@@ -36,4 +38,30 @@ actor RecordingManager: ObservableObject {
         }
     }
 
+}
+
+extension RecordingManager {
+    func sendNIDiscoveryToken() async {
+        if nearbyInteractionManager.didSendDiscoveryToken {
+            return
+        }
+        
+        do {
+            let discoveryToken =
+                try nearbyInteractionManager.getDiscoveryToken()
+                await sendData(key: "discoveryToken", data: discoveryToken)
+
+                // todo: use setter
+                nearbyInteractionManager.didSendDiscoveryToken = true
+        } catch {
+            Logger.shared.error("Could not send discovery token: \(error)")
+        }
+    }
+    
+    func handleNIReceiveDiscoveryToken(_ data: Data) {
+        Task {
+            await sendNIDiscoveryToken()
+            nearbyInteractionManager.didReceiveDiscoveryToken(data)
+        }
+    }
 }

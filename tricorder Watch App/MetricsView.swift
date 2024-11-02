@@ -25,12 +25,14 @@ struct MetricsView: View {
                     showSubseconds: context.cadence == .live
                 )
                 .foregroundStyle(.yellow)
-                
+
                 Text(
                     recordingManager.workoutManager.heartRate.formatted(
                         .number.precision(.fractionLength(0))) + " bpm")
-                
-                if let distance = recordingManager.nearbyInteractionManager.distance?.converted(to: .meters) {
+
+                if let distance = recordingManager.nearbyInteractionManager
+                    .distance?.converted(to: .meters)
+                {
                     Text(localFormatter.string(from: distance)).font(.title)
                 } else {
                     Text("-")
@@ -51,7 +53,7 @@ struct MetricsView: View {
         return recordingManager.workoutManager.builder?.elapsedTime(
             at: contextDate) ?? 0
     }
-    
+
     var localFormatter: MeasurementFormatter = {
         let formatter = MeasurementFormatter()
         formatter.unitStyle = .medium

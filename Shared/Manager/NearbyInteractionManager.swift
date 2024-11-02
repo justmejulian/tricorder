@@ -17,28 +17,28 @@ class NearbyInteractionManager: NSObject, ObservableObject {
     @Published var distance: Measurement<UnitLength>?
     var didSendDiscoveryToken: Bool = false
     private var session: NISession?
-    
+
     override init() {
         super.init()
-        
+
         initializeNISession()
     }
-    
+
     // todo: I guess this should be init
     func start() {
         restartNISession()
     }
-    
+
     func stop() {
         // todo: maybe deinitializeNISession?
         session?.pause()
         reset()
     }
-    
+
     private func reset() {
         distance = nil
     }
-    
+
     private func initializeNISession() {
         Logger.shared.info("initializing the NISession")
         let isSupported = NISession.deviceCapabilities
@@ -54,21 +54,21 @@ class NearbyInteractionManager: NSObject, ObservableObject {
         session?.delegate = self
         session?.delegateQueue = DispatchQueue.main
     }
-    
+
     private func deinitializeNISession() {
         Logger.shared.info("invalidating and deinitializing the NISession")
         session?.invalidate()
         session = nil
         didSendDiscoveryToken = false
     }
-    
+
     private func restartNISession() {
         Logger.shared.info("restarting the NISession")
         if let config = session?.configuration {
             session?.run(config)
         }
     }
-    
+
     func getDiscoveryToken() throws -> Data {
         guard let token = session?.discoveryToken else {
             throw NearbyInteractionManagerError.noDiscoveryTokenAvailable
@@ -79,10 +79,10 @@ class NearbyInteractionManager: NSObject, ObservableObject {
         else {
             throw NearbyInteractionManagerError.encodingError
         }
-        
+
         return tokenData
     }
-    
+
     /// When a discovery token is received, run the session
     func didReceiveDiscoveryToken(_ tokenData: Data) {
         Logger.shared.info("\(#function): \(tokenData.debugDescription)")

@@ -45,19 +45,19 @@ extension RecordingManager {
         if nearbyInteractionManager.didSendDiscoveryToken {
             return
         }
-        
+
         do {
             let discoveryToken =
                 try nearbyInteractionManager.getDiscoveryToken()
-                await sendData(key: "discoveryToken", data: discoveryToken)
+            await sendData(key: "discoveryToken", data: discoveryToken)
 
-                // todo: use setter
-                nearbyInteractionManager.didSendDiscoveryToken = true
+            // todo: use setter
+            nearbyInteractionManager.didSendDiscoveryToken = true
         } catch {
             Logger.shared.error("Could not send discovery token: \(error)")
         }
     }
-    
+
     func handleNIReceiveDiscoveryToken(_ data: Data) {
         Task {
             await sendNIDiscoveryToken()

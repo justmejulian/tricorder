@@ -164,6 +164,10 @@ enum MotionManagerError: Error {
 // MARK: - Value
 //
 extension MotionManager {
+    // LogItem
+    // todo: CMAcceleration or CMRotationRate CMQuaternion
+    // LogItem with timestamp
+
     struct Value: Codable {
         var x: Double
         var y: Double

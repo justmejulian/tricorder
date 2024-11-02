@@ -19,11 +19,13 @@ extension RecordingManager {
             key: .companionStartedRecording,
             handleData: self.handleCompanionStartedRecording
         )
-
-        await eventManager.register(
-            key: .collectedStatistics,
-            handleData: self.handleCollectedData
-        )
+        
+        func registerListeners() async {
+            await eventManager.register(
+                key: .collectedStatistics,
+                handleData: self.handleCollectedData
+            )
+        }
 
         await eventManager.register(
             key: .receivedData, handleData: self.handleReceivedData
@@ -67,29 +69,6 @@ extension RecordingManager {
     }
 
     @Sendable
-    nonisolated func handleCollectedData(_ data: Sendable) throws {
-        Logger.shared.info("\(#function)")
-
-        guard let statistics = data as? HKStatistics else {
-            Logger.shared.error("\(#function): Invalid data type")
-            return
-        }
-
-        Task {
-            await workoutManager.updateForStatistics(statistics)
-        }
-
-        // todo send to iphone
-        //            let archivedData = try? NSKeyedArchiver.archivedData(
-        //                withRootObject: allStatistics, requiringSecureCoding: true)
-        //            guard let archivedData = archivedData, !archivedData.isEmpty else {
-        //                Logger.shared.log("Encoded cycling data is empty")
-        //                return
-        //            }
-
-    }
-
-    @Sendable
     nonisolated func handleSessionStateChange(_ data: Sendable) throws {
         Logger.shared.info("\(#function)")
 
@@ -120,11 +99,11 @@ extension RecordingManager {
         if change.newState == .stopped {
             Logger.shared.info("\(#function): Session stopped")
 
-            // todo stop motion recording
-
             Task {
                 do {
                     try await workoutManager.endWorkout(date: change.date)
+                    await motionManager.stopUpdates()
+                    await nearbyInteractionManager.stop()
                 } catch {
                     Logger.shared.error(
                         "\(#function): Error ending workout: \(error)")
@@ -154,6 +133,29 @@ extension RecordingManager {
         default:
             Logger.shared.error("unknown dataObject key: \(dataObject.key)")
         }
+
+    }
+    
+    @Sendable
+    nonisolated func handleCollectedData(_ data: Sendable) throws {
+        Logger.shared.info("\(#function)")
+
+        guard let statistics = data as? HKStatistics else {
+            Logger.shared.error("\(#function): Invalid data type")
+            return
+        }
+
+        Task {
+            await statisticsManager.updateForStatistics(statistics)
+        }
+
+        // todo send to iphone
+        //            let archivedData = try? NSKeyedArchiver.archivedData(
+        //                withRootObject: allStatistics, requiringSecureCoding: true)
+        //            guard let archivedData = archivedData, !archivedData.isEmpty else {
+        //                Logger.shared.log("Encoded cycling data is empty")
+        //                return
+        //            }
 
     }
 }

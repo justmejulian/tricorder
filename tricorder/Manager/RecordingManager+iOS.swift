@@ -33,6 +33,10 @@ extension RecordingManager {
                 "Failed to start cycling on the paired watch.")
         }
     }
+
+    func stopRecording() async {
+        await workoutManager.session?.stopActivity(with: .now)
+    }
 }
 
 extension RecordingManager {
@@ -99,7 +103,7 @@ extension RecordingManager {
 
                 Task {
                     for statistics in statisticsArray {
-                        await workoutManager.updateForStatistics(statistics)
+                        await statisticsManager.updateForStatistics(statistics)
                     }
                 }
             }

@@ -27,7 +27,7 @@ struct MetricsView: View {
                 .foregroundStyle(.yellow)
 
                 Text(
-                    recordingManager.workoutManager.heartRate.formatted(
+                    recordingManager.statisticsManager.heartRate.formatted(
                         .number.precision(.fractionLength(0))) + " bpm")
 
                 if let distance = recordingManager.nearbyInteractionManager

@@ -85,7 +85,7 @@ extension MirroringWorkoutView {
     private func metricsView() -> some View {
         Group {
             LabeledContent(
-                "Heart Rate", value: recordingManager.workoutManager.heartRate,
+                "Heart Rate", value: recordingManager.statisticsManager.heartRate,
                 format: .number.precision(.fractionLength(0)))
         }
         .font(
@@ -116,8 +116,9 @@ extension MirroringWorkoutView {
                     !recordingManager.workoutManager.sessionState.isActive)
 
                 Button {
-                    recordingManager.workoutManager.session?.stopActivity(
-                        with: .now)
+                    Task {
+                        await recordingManager.stopRecording()
+                    }
                 } label: {
                     ButtonLabel(title: "End", systemImage: "xmark")
                 }

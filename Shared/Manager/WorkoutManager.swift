@@ -15,7 +15,6 @@ class WorkoutManager: NSObject, ObservableObject {
      The workout session live states that the UI observes.
      */
     @Published var sessionState: HKWorkoutSessionState = .notStarted
-    @Published var heartRate: Double = 0
     @Published var elapsedTimeInterval: TimeInterval = 0
     /**
      SummaryView (watchOS) changes from Saving Workout to the metric summary view when
@@ -80,6 +79,7 @@ extension WorkoutManager {
     }
 
     func setElapsedTime(_ elapsedTime: TimeInterval) {
+        // todo move into recording?
         self.elapsedTimeInterval = elapsedTime
     }
 
@@ -89,12 +89,10 @@ extension WorkoutManager {
         #endif
         workout = nil
         session = nil
-        heartRate = 0
         sessionState = .notStarted
     }
 
     func sendData(_ data: Data, retryCount: Int = 0) async {
-
         Logger.shared.info(
             "\(#function) data: \(data.debugDescription) retry count: \(retryCount)"
         )
@@ -129,22 +127,6 @@ extension WorkoutManager {
 // MARK: - Workout statistics
 //
 extension WorkoutManager {
-    func updateForStatistics(_ statistics: HKStatistics) {
-
-        Logger.shared.log("\(#function): \(statistics.debugDescription)")
-
-        switch statistics.quantityType {
-        case HKQuantityType.quantityType(forIdentifier: .heartRate):
-            let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
-            heartRate =
-                statistics.mostRecentQuantity()?.doubleValue(for: heartRateUnit)
-                ?? 0
-
-        default:
-            return
-        }
-    }
-
     /**
      Consume the session state change from the async stream to update sessionState and finish the workout.
      */

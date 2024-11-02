@@ -17,6 +17,7 @@ actor RecordingManager: ObservableObject {
     var workoutManager = WorkoutManager()
 
     var nearbyInteractionManager = NearbyInteractionManager()
+    var statisticsManager = StatisticsManager()
 
     #if os(watchOS)
         var motionManager = MotionManager()

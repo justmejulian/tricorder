@@ -33,7 +33,7 @@ struct PagingView: View {
         .onChange(of: isLuminanceReduced) {
             displayMetricsView()
         }
-        .onChange(of: recordingManager.workoutManager.sessionState) {
+        .onChange(of: recordingManager.recordingState) {
             _, newValue in
             Logger.shared.debug(
                 "PagingView.onChange: Session state changed to \(newValue.rawValue)"

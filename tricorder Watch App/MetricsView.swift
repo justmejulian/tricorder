@@ -16,7 +16,7 @@ struct MetricsView: View {
             MetricsTimelineSchedule(
                 from: recordingManager.workoutManager.session?.startDate
                     ?? Date(),
-                isPaused: recordingManager.workoutManager.sessionState
+                isPaused: recordingManager.recordingState
                     == .paused)
         ) { context in
             VStack(alignment: .leading) {
@@ -27,7 +27,7 @@ struct MetricsView: View {
                 .foregroundStyle(.yellow)
 
                 Text(
-                    recordingManager.statisticsManager.heartRate.formatted(
+                    recordingManager.heartRate.formatted(
                         .number.precision(.fractionLength(0))) + " bpm")
 
                 if let distance = recordingManager.nearbyInteractionManager

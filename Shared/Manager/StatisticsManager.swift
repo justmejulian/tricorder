@@ -11,27 +11,35 @@ import os
 
 actor StatisticsManager: ObservableObject {
     var statistics: [HKStatistics] = []
-    @Published var heartRate: Double = 0
+    // todo store and stuff
 }
 
 extension StatisticsManager {
     func reset() {
-        heartRate = 0
         statistics = []
     }
-    
-    func updateForStatistics(_ statistics: HKStatistics) {
+
+    func updateForStatistics(_ statistics: HKStatistics) -> [StatisticsKey: Double] {
         Logger.shared.log("\(#function): \(statistics.debugDescription)")
+
+        var mostRecentStatistic: [StatisticsKey: Double] = [:]
 
         switch statistics.quantityType {
         case HKQuantityType.quantityType(forIdentifier: .heartRate):
             let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
-            heartRate =
+
+            mostRecentStatistic[.heartRate] =
                 statistics.mostRecentQuantity()?.doubleValue(for: heartRateUnit)
                 ?? 0
 
         default:
-            return
+            Logger.shared.error("No case found for \(statistics.quantityType)")
         }
+        
+        return mostRecentStatistic
     }
+}
+
+enum StatisticsKey {
+    case heartRate
 }

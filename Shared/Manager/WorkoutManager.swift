@@ -12,11 +12,6 @@ import os
 @MainActor
 class WorkoutManager: NSObject, ObservableObject {
     /**
-     The workout session live states that the UI observes.
-     */
-    @Published var sessionState: HKWorkoutSessionState = .notStarted
-    @Published var elapsedTimeInterval: TimeInterval = 0
-    /**
      SummaryView (watchOS) changes from Saving Workout to the metric summary view when
      a workout changes from nil to a valid value.
      */
@@ -73,23 +68,13 @@ class WorkoutManager: NSObject, ObservableObject {
 // MARK: - Workout session management
 //
 extension WorkoutManager {
-    func setSessionSate(newState: HKWorkoutSessionState) {
-        Logger.shared.debug("\(#function) newState: \(newState.rawValue)")
-        sessionState = newState
-    }
-
-    func setElapsedTime(_ elapsedTime: TimeInterval) {
-        // todo move into recording?
-        self.elapsedTimeInterval = elapsedTime
-    }
-
     func resetWorkout() {
         #if os(watchOS)
             builder = nil
         #endif
         workout = nil
         session = nil
-        sessionState = .notStarted
+
     }
 
     func sendData(_ data: Data, retryCount: Int = 0) async {

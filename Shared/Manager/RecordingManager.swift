@@ -6,18 +6,23 @@
 //
 
 import Foundation
+import HealthKit
 import SwiftUICore
 import os
 
-actor RecordingManager: ObservableObject {
+@MainActor
+class RecordingManager: ObservableObject {
     let eventManager = EventManager.shared
 
     @MainActor
-    @ObservedObject  // To Propagate changes
     var workoutManager = WorkoutManager()
 
     var nearbyInteractionManager = NearbyInteractionManager()
     var statisticsManager = StatisticsManager()
+
+    @Published var heartRate: Double = 0
+    @Published var elapsedTimeInterval: TimeInterval = 0
+    @Published var recordingState: HKWorkoutSessionState = .notStarted
 
     #if os(watchOS)
         var motionManager = MotionManager()
@@ -29,6 +34,40 @@ actor RecordingManager: ObservableObject {
         }
     }
 
+    func setElapsedTimeInterval(elapsedTime: WorkoutElapsedTime) {
+        
+        if recordingState == .running {
+            
+            let currentElapsedTime =
+            elapsedTime.timeInterval
+            + Date().timeIntervalSince(elapsedTime.date)
+            
+            self.elapsedTimeInterval = currentElapsedTime
+
+            return
+        }
+        
+        self.elapsedTimeInterval = 0
+    }
+   
+    func setHeartRate(heartRate: Double) {
+        self.heartRate = heartRate
+    }
+    
+    func setRecordingState(newState: HKWorkoutSessionState) {
+        self.recordingState = newState
+    }
+    
+    func reset() {
+        recordingState = .notStarted
+        heartRate = 0
+        elapsedTimeInterval = 0
+        
+        resetRest()
+    }
+}
+
+extension RecordingManager {
     func sendData(key: String, data: Data) async {
         do {
             let dataObject = try DataObjectManager().encode(
@@ -38,10 +77,7 @@ actor RecordingManager: ObservableObject {
             Logger.shared.error("Could not encode data for key : \(key)")
         }
     }
-
-}
-
-extension RecordingManager {
+    
     func sendNIDiscoveryToken() async {
         if nearbyInteractionManager.didSendDiscoveryToken {
             return

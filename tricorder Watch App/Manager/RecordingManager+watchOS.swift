@@ -19,7 +19,7 @@ extension RecordingManager {
             key: .companionStartedRecording,
             handleData: self.handleCompanionStartedRecording
         )
-        
+
         func registerListeners() async {
             await eventManager.register(
                 key: .collectedStatistics,
@@ -30,6 +30,10 @@ extension RecordingManager {
         await eventManager.register(
             key: .receivedData, handleData: self.handleReceivedData
         )
+    }
+
+    func resetRest() {
+
     }
 }
 
@@ -42,12 +46,20 @@ extension RecordingManager {
             try await workoutManager.startWorkout(
                 workoutConfiguration: workoutConfiguration)
 
-            await sendNIDiscoveryToken()
+        } catch {
+            Logger.shared.error("Failed to start startWorkout: \(error)")
+        }
 
+        // todo move the sending into init of RecordingManager
+        // then start from here and resend if fails
+        await sendNIDiscoveryToken()
+
+        do {
             try await motionManager.startUpdates()
         } catch {
-            Logger.shared.error("\(#function) failed : \(error)")
+            Logger.shared.error("Failed to start Motion Updates: \(error)")
         }
+
     }
 }
 
@@ -81,7 +93,7 @@ extension RecordingManager {
             "Session state changed to \(change.newState.rawValue)")
 
         Task {
-            await workoutManager.setSessionSate(newState: change.newState)
+            await setRecordingState(newState: change.newState)
         }
 
         if change.newState == .running {
@@ -135,7 +147,7 @@ extension RecordingManager {
         }
 
     }
-    
+
     @Sendable
     nonisolated func handleCollectedData(_ data: Sendable) throws {
         Logger.shared.info("\(#function)")
@@ -146,7 +158,11 @@ extension RecordingManager {
         }
 
         Task {
-            await statisticsManager.updateForStatistics(statistics)
+            let mostRecentStatistic =
+                await statisticsManager.updateForStatistics(statistics)
+
+            let newHeartRate = mostRecentStatistic[.heartRate] ?? 0
+            await setHeartRate(heartRate: newHeartRate)
         }
 
         // todo send to iphone
@@ -159,3 +175,4 @@ extension RecordingManager {
 
     }
 }
+

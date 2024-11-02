@@ -19,23 +19,23 @@ struct ControlsView: View {
             } label: {
                 ButtonLabel(title: "Start", systemImage: "figure.outdoor.cycle")
             }
-            .disabled(recordingManager.workoutManager.sessionState.isActive)
+            .disabled(recordingManager.recordingState.isActive)
             .tint(.green)
 
             Button {
-                recordingManager.workoutManager.sessionState == .running
+                recordingManager.recordingState == .running
                     ? recordingManager.workoutManager.session?.pause()
                     : recordingManager.workoutManager.session?.resume()
             } label: {
                 let title =
-                    recordingManager.workoutManager.sessionState == .running
+                    recordingManager.recordingState == .running
                     ? "Pause" : "Resume"
                 let systemImage =
-                    recordingManager.workoutManager.sessionState == .running
+                    recordingManager.recordingState == .running
                     ? "pause" : "play"
                 ButtonLabel(title: title, systemImage: systemImage)
             }
-            .disabled(!recordingManager.workoutManager.sessionState.isActive)
+            .disabled(!recordingManager.recordingState.isActive)
             .tint(.blue)
 
             Button {
@@ -45,7 +45,7 @@ struct ControlsView: View {
                 ButtonLabel(title: "End", systemImage: "xmark")
             }
             .tint(.red)
-            .disabled(!recordingManager.workoutManager.sessionState.isActive)
+            .disabled(!recordingManager.recordingState.isActive)
         }
     }
 

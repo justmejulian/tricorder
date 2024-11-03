@@ -32,9 +32,9 @@ struct StartView: View {
             completion: { result in
                 switch result {
                 case .success(let success):
-                    print("\(success) for authorization")
+                    print("StartView: \(success) for authorization")
                 case .failure(let error):
-                    print("\(error) for authorization")
+                    print("StartView: \(error) for authorization")
                 }
             }
         )

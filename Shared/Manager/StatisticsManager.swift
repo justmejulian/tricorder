@@ -35,7 +35,7 @@ extension StatisticsManager {
         default:
             Logger.shared.error("No case found for \(statistics.quantityType)")
         }
-        
+
         return mostRecentStatistic
     }
 }

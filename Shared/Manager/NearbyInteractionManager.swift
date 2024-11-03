@@ -27,13 +27,13 @@ class NearbyInteractionManager: NSObject, ObservableObject {
     // todo: I guess this should be init
     func start() {
         Logger.shared.debug("NearbyInteractionManager start called")
-        
+
         restartNISession()
     }
 
     func stop() {
         Logger.shared.debug("NearbyInteractionManager stop called")
-        
+
         // todo: maybe deinitializeNISession?
         session?.pause()
         reset()

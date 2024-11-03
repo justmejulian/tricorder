@@ -101,8 +101,7 @@ extension RecordingManager {
                 let elapsedTime = await workoutManager.getWorkoutElapsedTime(
                     date: change.date)
 
-                if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime)
-                {
+                if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime) {
                     await sendData(key: "elapsedTime", data: elapsedTimeData)
                 }
             }
@@ -175,4 +174,3 @@ extension RecordingManager {
 
     }
 }
-

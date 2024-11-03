@@ -24,7 +24,7 @@ struct StartView: View {
                 }
             } label: {
                 let title =
-                recordingManager.recordingState.isActive
+                    recordingManager.recordingState.isActive
                     ? "View ongoing cycling" : "Start cycling on watch"
                 ButtonLabel(
                     title: title, systemImage: "figure.outdoor.cycle"

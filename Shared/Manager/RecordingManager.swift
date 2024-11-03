@@ -35,34 +35,34 @@ class RecordingManager: ObservableObject {
     }
 
     func setElapsedTimeInterval(elapsedTime: WorkoutElapsedTime) {
-        
+
         if recordingState == .running {
-            
+
             let currentElapsedTime =
-            elapsedTime.timeInterval
-            + Date().timeIntervalSince(elapsedTime.date)
-            
+                elapsedTime.timeInterval
+                + Date().timeIntervalSince(elapsedTime.date)
+
             self.elapsedTimeInterval = currentElapsedTime
 
             return
         }
-        
+
         self.elapsedTimeInterval = 0
     }
-   
+
     func setHeartRate(heartRate: Double) {
         self.heartRate = heartRate
     }
-    
+
     func setRecordingState(newState: HKWorkoutSessionState) {
         self.recordingState = newState
     }
-    
+
     func reset() {
         recordingState = .notStarted
         heartRate = 0
         elapsedTimeInterval = 0
-        
+
         resetRest()
     }
 }
@@ -77,7 +77,7 @@ extension RecordingManager {
             Logger.shared.error("Could not encode data for key : \(key)")
         }
     }
-    
+
     func sendNIDiscoveryToken() async {
         if nearbyInteractionManager.didSendDiscoveryToken {
             return

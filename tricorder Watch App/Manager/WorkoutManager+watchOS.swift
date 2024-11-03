@@ -30,8 +30,7 @@ extension WorkoutManager {
         }
     }
 
-    func startWorkout(workoutConfiguration: HKWorkoutConfiguration) async throws
-    {
+    func startWorkout(workoutConfiguration: HKWorkoutConfiguration) async throws {
         Logger.shared.info("\(#function) called")
 
         session = try HKWorkoutSession(

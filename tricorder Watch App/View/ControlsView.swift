@@ -23,22 +23,6 @@ struct ControlsView: View {
             .tint(.green)
 
             Button {
-                recordingManager.recordingState == .running
-                    ? recordingManager.workoutManager.session?.pause()
-                    : recordingManager.workoutManager.session?.resume()
-            } label: {
-                let title =
-                    recordingManager.recordingState == .running
-                    ? "Pause" : "Resume"
-                let systemImage =
-                    recordingManager.recordingState == .running
-                    ? "pause" : "play"
-                ButtonLabel(title: title, systemImage: systemImage)
-            }
-            .disabled(!recordingManager.recordingState.isActive)
-            .tint(.blue)
-
-            Button {
                 recordingManager.workoutManager.session?.stopActivity(
                     with: .now
                 )

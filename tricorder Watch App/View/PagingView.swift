@@ -22,7 +22,7 @@ struct PagingView: View {
     var body: some View {
         TabView(selection: $selection) {
             ControlsView().tag(Tab.controls)
-            MetricsView().tag(Tab.metrics)
+            RecodingTimelineView().tag(Tab.metrics)
         }
         .navigationTitle("Cycling")
         .navigationBarBackButtonHidden(true)

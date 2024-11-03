@@ -40,7 +40,8 @@ struct ControlsView: View {
 
             Button {
                 recordingManager.workoutManager.session?.stopActivity(
-                    with: .now)
+                    with: .now
+                )
             } label: {
                 ButtonLabel(title: "End", systemImage: "xmark")
             }
@@ -55,7 +56,8 @@ struct ControlsView: View {
             configuration.activityType = .functionalStrengthTraining
             configuration.locationType = .indoor
             await recordingManager.startRecording(
-                workoutConfiguration: configuration)
+                workoutConfiguration: configuration
+            )
         }
     }
 }

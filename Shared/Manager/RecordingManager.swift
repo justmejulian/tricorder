@@ -71,7 +71,9 @@ extension RecordingManager {
     func sendData(key: String, data: Data) async {
         do {
             let dataObject = try DataObjectManager().encode(
-                key: key, data: data)
+                key: key,
+                data: data
+            )
             await workoutManager.sendData(dataObject, retryCount: 0)
         } catch {
             Logger.shared.error("Could not encode data for key : \(key)")

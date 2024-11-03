@@ -17,7 +17,8 @@ struct MetricsView: View {
                 from: recordingManager.workoutManager.session?.startDate
                     ?? Date(),
                 isPaused: recordingManager.recordingState
-                    == .paused)
+                    == .paused
+            )
         ) { context in
             VStack(alignment: .leading) {
                 ElapsedTimeView(
@@ -28,7 +29,9 @@ struct MetricsView: View {
 
                 Text(
                     recordingManager.heartRate.formatted(
-                        .number.precision(.fractionLength(0))) + " bpm")
+                        .number.precision(.fractionLength(0))
+                    ) + " bpm"
+                )
 
                 if let distance = recordingManager.nearbyInteractionManager
                     .distance?.converted(to: .meters)
@@ -51,7 +54,8 @@ struct MetricsView: View {
 
     func elapsedTime(with contextDate: Date) -> TimeInterval {
         return recordingManager.workoutManager.builder?.elapsedTime(
-            at: contextDate) ?? 0
+            at: contextDate
+        ) ?? 0
     }
 
     var localFormatter: MeasurementFormatter = {

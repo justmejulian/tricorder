@@ -12,7 +12,8 @@ import os
 extension RecordingManager {
     func registerListeners() async {
         await eventManager.register(
-            key: .sessionStateChanged, handleData: self.handleSessionStateChange
+            key: .sessionStateChanged,
+            handleData: self.handleSessionStateChange
         )
 
         await eventManager.register(
@@ -28,7 +29,8 @@ extension RecordingManager {
         }
 
         await eventManager.register(
-            key: .receivedData, handleData: self.handleReceivedData
+            key: .receivedData,
+            handleData: self.handleReceivedData
         )
     }
 
@@ -44,7 +46,8 @@ extension RecordingManager {
         Logger.shared.debug("Starting Recording")
         do {
             try await workoutManager.startWorkout(
-                workoutConfiguration: workoutConfiguration)
+                workoutConfiguration: workoutConfiguration
+            )
 
         } catch {
             Logger.shared.error("Failed to start startWorkout: \(error)")
@@ -90,7 +93,8 @@ extension RecordingManager {
         }
 
         Logger.shared.info(
-            "Session state changed to \(change.newState.rawValue)")
+            "Session state changed to \(change.newState.rawValue)"
+        )
 
         Task {
             await setRecordingState(newState: change.newState)
@@ -99,7 +103,8 @@ extension RecordingManager {
         if change.newState == .running {
             Task {
                 let elapsedTime = await workoutManager.getWorkoutElapsedTime(
-                    date: change.date)
+                    date: change.date
+                )
 
                 if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime) {
                     await sendData(key: "elapsedTime", data: elapsedTimeData)
@@ -117,7 +122,8 @@ extension RecordingManager {
                     await nearbyInteractionManager.stop()
                 } catch {
                     Logger.shared.error(
-                        "\(#function): Error ending workout: \(error)")
+                        "\(#function): Error ending workout: \(error)"
+                    )
                 }
             }
         }

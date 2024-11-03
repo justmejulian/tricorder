@@ -8,11 +8,19 @@
 import SwiftUI
 
 struct MetricsView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
+    @EnvironmentObject var recordingManager: RecordingManager
 
-#Preview {
-    MetricsView()
+    var body: some View {
+        Group {
+            LabeledContent(
+                "Heart Rate",
+                value: recordingManager.heartRate,
+                format: .number.precision(.fractionLength(0))
+            )
+        }
+        .font(
+            .system(.title2, design: .rounded).monospacedDigit()
+                .lowercaseSmallCaps()
+        )
+    }
 }

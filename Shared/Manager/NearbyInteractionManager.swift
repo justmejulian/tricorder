@@ -50,7 +50,8 @@ class NearbyInteractionManager: NSObject, ObservableObject {
         guard isSupported else {
             // todo throw error
             Logger.shared.error(
-                "precise distance measurement is not supported")
+                "precise distance measurement is not supported"
+            )
             return
         }
         // todo: check if supported and
@@ -79,7 +80,9 @@ class NearbyInteractionManager: NSObject, ObservableObject {
         }
         guard
             let tokenData = try? NSKeyedArchiver.archivedData(
-                withRootObject: token, requiringSecureCoding: true)
+                withRootObject: token,
+                requiringSecureCoding: true
+            )
         else {
             throw NearbyInteractionManagerError.encodingError
         }
@@ -92,8 +95,9 @@ class NearbyInteractionManager: NSObject, ObservableObject {
         Logger.shared.info("\(#function): \(tokenData.debugDescription)")
 
         if let token = try? NSKeyedUnarchiver.unarchivedObject(
-            ofClass: NIDiscoveryToken.self, from: tokenData)
-        {
+            ofClass: NIDiscoveryToken.self,
+            from: tokenData
+        ) {
             if session == nil { initializeNISession() }
             Logger.shared.info("running NISession with peer token: \(token)")
             let config = NINearbyPeerConfiguration(peerToken: token)
@@ -111,7 +115,9 @@ class NearbyInteractionManager: NSObject, ObservableObject {
 
         guard
             let tokenData = try? NSKeyedArchiver.archivedData(
-                withRootObject: token, requiringSecureCoding: true)
+                withRootObject: token,
+                requiringSecureCoding: true
+            )
         else {
             os_log("failed to encode NIDiscoveryToken")
             return nil
@@ -132,7 +138,8 @@ extension NearbyInteractionManager: NISessionDelegate {
         restartNISession()
     }
     nonisolated func session(
-        _ session: NISession, didInvalidateWith error: Error
+        _ session: NISession,
+        didInvalidateWith error: Error
     ) {
         Logger.shared.error(
             "NISession did invalidate with error: \(error.localizedDescription)"
@@ -140,7 +147,8 @@ extension NearbyInteractionManager: NISessionDelegate {
         distance = nil
     }
     nonisolated func session(
-        _ session: NISession, didUpdate nearbyObjects: [NINearbyObject]
+        _ session: NISession,
+        didUpdate nearbyObjects: [NINearbyObject]
     ) {
         if let object = nearbyObjects.first, let distance = object.distance {
             Logger.shared.info("object distance: \(distance) meters")
@@ -148,7 +156,8 @@ extension NearbyInteractionManager: NISessionDelegate {
         }
     }
     nonisolated func session(
-        _ session: NISession, didRemove nearbyObjects: [NINearbyObject],
+        _ session: NISession,
+        didRemove nearbyObjects: [NINearbyObject],
         reason: NINearbyObject.RemovalReason
     ) {
         switch reason {

@@ -26,7 +26,9 @@ struct DataObjectManager {
     func decode(_ data: Data) throws -> DataObject {
         guard
             let dataObject = try? JSONDecoder().decode(
-                DataObject.self, from: data)
+                DataObject.self,
+                from: data
+            )
         else {
             throw DataObjectManagerError.couldNotDecodeData
         }

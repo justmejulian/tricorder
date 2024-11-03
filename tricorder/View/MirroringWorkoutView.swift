@@ -45,14 +45,16 @@ extension MirroringWorkoutView {
                 )
                 .font(
                     .system(.title, design: .rounded).monospacedDigit()
-                        .lowercaseSmallCaps())
+                        .lowercaseSmallCaps()
+                )
             } label: {
                 Text("Elapsed")
             }
             .foregroundColor(.yellow)
             .font(
                 .system(.title, design: .rounded).monospacedDigit()
-                    .lowercaseSmallCaps())
+                    .lowercaseSmallCaps()
+            )
             Spacer(minLength: 15)
         }
     }
@@ -72,25 +74,14 @@ extension MirroringWorkoutView {
         } else {
             var date = contextDate
             date.addTimeInterval(
-                recordingManager.elapsedTimeInterval)
+                recordingManager.elapsedTimeInterval
+            )
             timeInterval =
                 date.timeIntervalSinceReferenceDate
                 - contextDate.timeIntervalSinceReferenceDate
             recordingManager.workoutManager.contextDate = nil
         }
         return timeInterval
-    }
-
-    @ViewBuilder
-    private func metricsView() -> some View {
-        Group {
-            LabeledContent(
-                "Heart Rate", value: recordingManager.heartRate,
-                format: .number.precision(.fractionLength(0)))
-        }
-        .font(
-            .system(.title2, design: .rounded).monospacedDigit()
-                .lowercaseSmallCaps())
     }
 
     @ViewBuilder
@@ -107,7 +98,8 @@ extension MirroringWorkoutView {
                 }
                 .tint(.green)
                 .disabled(
-                    !recordingManager.recordingState.isActive)
+                    !recordingManager.recordingState.isActive
+                )
 
             }
             .buttonStyle(.bordered)

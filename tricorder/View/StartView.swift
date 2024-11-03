@@ -17,31 +17,7 @@ struct StartView: View {
 
     var body: some View {
         VStack {
-            MirroringWorkoutView()
-            Button {
-                if !recordingManager.recordingState.isActive {
-                    startCyclingOnWatch()
-                }
-            } label: {
-                let title =
-                    recordingManager.recordingState.isActive
-                    ? "View ongoing cycling" : "Start cycling on watch"
-                ButtonLabel(
-                    title: title, systemImage: "figure.outdoor.cycle"
-                )
-                .frame(width: 150, height: 150)
-                .fontWeight(.medium)
-            }
-            .clipShape(Circle())
-            .overlay {
-                Circle().stroke(.white, lineWidth: 4)
-            }
-            .shadow(radius: 7)
-            .buttonStyle(.bordered)
-            .tint(.green)
-            .foregroundColor(.black)
-            .frame(width: 400, height: 400)
-            .disabled(recordingManager.recordingState.isActive)
+            StartStopRecordingButtonView()
         }
         .onAppear {
             triggerAuthorization.toggle()
@@ -61,11 +37,5 @@ struct StartView: View {
                 }
             }
         )
-    }
-
-    private func startCyclingOnWatch() {
-        Task {
-            await recordingManager.startRecording()
-        }
     }
 }

@@ -48,7 +48,9 @@ class WorkoutManager: NSObject, ObservableObject {
      The Swift actors don't handle tasks in a first-in-first-out way. Use AsyncStream to make sure that the app presents the latest state.
      */
     let asynStreamTuple = AsyncStream.makeStream(
-        of: SessionStateChange.self, bufferingPolicy: .bufferingNewest(1))
+        of: SessionStateChange.self,
+        bufferingPolicy: .bufferingNewest(1)
+    )
 
     /**
      Kick off a task to consume the async stream. The next value in the stream can't start processing
@@ -88,7 +90,8 @@ extension WorkoutManager {
             // todo make a retry wrapper function
             if retryCount > 0 {
                 Logger.shared.log(
-                    "Failed to send data, retrying: \(retryCount)")
+                    "Failed to send data, retrying: \(retryCount)"
+                )
 
                 // Todo: maybe restart session?
 
@@ -139,7 +142,9 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
          asynStreamTuple is a constant, so it's nonisolated.
          */
         let sessionSateChange = SessionStateChange(
-            newState: toState, date: date)
+            newState: toState,
+            date: date
+        )
         asynStreamTuple.continuation.yield(sessionSateChange)
     }
 

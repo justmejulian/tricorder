@@ -35,7 +35,8 @@ extension WorkoutManager {
                 self.session = mirroredSession
                 self.session?.delegate = self
                 Logger.shared.log(
-                    "Start mirroring remote session: \(mirroredSession)")
+                    "Start mirroring remote session: \(mirroredSession)"
+                )
             }
         }
     }

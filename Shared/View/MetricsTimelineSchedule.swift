@@ -21,7 +21,8 @@ struct MetricsTimelineSchedule: TimelineSchedule {
     {
         let newMode = (mode == .lowFrequency ? 1.0 : 1.0 / 30.0)
         var baseSchedule = PeriodicTimelineSchedule(
-            from: self.startDate, by: newMode
+            from: self.startDate,
+            by: newMode
         ).entries(from: startDate, mode: mode)
 
         return AnyIterator<Date> {

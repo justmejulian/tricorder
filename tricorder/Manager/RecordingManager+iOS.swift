@@ -12,11 +12,13 @@ import os
 extension RecordingManager {
     func registerListeners() async {
         await eventManager.register(
-            key: .sessionStateChanged, handleData: self.handleSessionStateChange
+            key: .sessionStateChanged,
+            handleData: self.handleSessionStateChange
         )
 
         await eventManager.register(
-            key: .receivedData, handleData: self.handleReceivedData
+            key: .receivedData,
+            handleData: self.handleReceivedData
         )
     }
 
@@ -33,7 +35,8 @@ extension RecordingManager {
             try await workoutManager.startWatchWorkout()
         } catch {
             Logger.shared.log(
-                "Failed to start cycling on the paired watch.")
+                "Failed to start cycling on the paired watch."
+            )
         }
     }
 
@@ -53,7 +56,8 @@ extension RecordingManager {
         }
 
         Logger.shared.info(
-            "Session state changed to \(change.newState.rawValue)")
+            "Session state changed to \(change.newState.rawValue)"
+        )
 
         Task {
             await setRecordingState(newState: change.newState)
@@ -76,8 +80,9 @@ extension RecordingManager {
         switch dataObject.key {
         case "elapsedTime":
             if let elapsedTime = try? JSONDecoder().decode(
-                WorkoutElapsedTime.self, from: dataObject.data)
-            {
+                WorkoutElapsedTime.self,
+                from: dataObject.data
+            ) {
                 Logger.shared.info("elapsedTime: \(elapsedTime.timeInterval)")
 
                 Task {
@@ -87,15 +92,19 @@ extension RecordingManager {
         case "statisticsArray":
             if let statisticsArray =
                 try NSKeyedUnarchiver.unarchivedArrayOfObjects(
-                    ofClass: HKStatistics.self, from: dataObject.data)
+                    ofClass: HKStatistics.self,
+                    from: dataObject.data
+                )
             {
                 Logger.shared.info(
-                    "statisticsArray: \(statisticsArray.debugDescription)")
+                    "statisticsArray: \(statisticsArray.debugDescription)"
+                )
 
                 Task {
                     for statistics in statisticsArray {
                         let mostRecentStatistic = await statisticsManager.updateForStatistics(
-                            statistics)
+                            statistics
+                        )
 
                         let newHeartRate = mostRecentStatistic[.heartRate] ?? 0
                         await setHeartRate(heartRate: newHeartRate)

@@ -28,13 +28,15 @@ struct PagingView: View {
         .navigationBarBackButtonHidden(true)
         .tabViewStyle(
             PageTabViewStyle(
-                indexDisplayMode: isLuminanceReduced ? .never : .automatic)
+                indexDisplayMode: isLuminanceReduced ? .never : .automatic
+            )
         )
         .onChange(of: isLuminanceReduced) {
             displayMetricsView()
         }
         .onChange(of: recordingManager.recordingState) {
-            _, newValue in
+            _,
+            newValue in
             Logger.shared.debug(
                 "PagingView.onChange: Session state changed to \(newValue.rawValue)"
             )

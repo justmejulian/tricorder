@@ -78,15 +78,15 @@ extension RecordingManager {
         // todo move these keys into and enum, so I know what is possible
 
         switch dataObject.key {
-        case "elapsedTime":
-            if let elapsedTime = try? JSONDecoder().decode(
-                WorkoutElapsedTime.self,
+        case "startDate":
+            if let startDate = try? JSONDecoder().decode(
+                Date.self,
                 from: dataObject.data
             ) {
-                Logger.shared.info("elapsedTime: \(elapsedTime.timeInterval)")
+                Logger.shared.info("Recieved startDate: \(startDate)")
 
                 Task {
-                    await setElapsedTimeInterval(elapsedTime: elapsedTime)
+                    await setStartDate(startDate)
                 }
             }
         case "statisticsArray":

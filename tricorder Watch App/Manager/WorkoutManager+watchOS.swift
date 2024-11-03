@@ -93,14 +93,8 @@ extension WorkoutManager {
         Logger.shared.info("Received data: \(dataObject.key)")
     }
 
-    func getWorkoutElapsedTime(date: Date) -> WorkoutElapsedTime {
-        let elapsedTimeInterval =
-            session?.associatedWorkoutBuilder().elapsedTime(at: date)
-            ?? 0
-        return WorkoutElapsedTime(
-            timeInterval: elapsedTimeInterval,
-            date: date
-        )
+    func getStartDate() -> Date? {
+        session?.associatedWorkoutBuilder().startDate
     }
 
     func finishedWorkout(date: Date) async throws -> HKWorkout? {

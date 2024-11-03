@@ -21,8 +21,15 @@ class RecordingManager: ObservableObject {
     var statisticsManager = StatisticsManager()
 
     @Published var heartRate: Double = 0
-    @Published var elapsedTimeInterval: TimeInterval = 0
     @Published var recordingState: HKWorkoutSessionState = .notStarted
+
+    @Published var startDate: Date?
+    //    var elapsedTimeInterval: TimeInterval {
+    //        guard let startDate, let endDate else {
+    //            return 0
+    //        }
+    //        return endDate.timeIntervalSince(startDate)
+    //    }
 
     #if os(watchOS)
         var motionManager = MotionManager()
@@ -34,22 +41,6 @@ class RecordingManager: ObservableObject {
         }
     }
 
-    func setElapsedTimeInterval(elapsedTime: WorkoutElapsedTime) {
-
-        if recordingState == .running {
-
-            let currentElapsedTime =
-                elapsedTime.timeInterval
-                + Date().timeIntervalSince(elapsedTime.date)
-
-            self.elapsedTimeInterval = currentElapsedTime
-
-            return
-        }
-
-        self.elapsedTimeInterval = 0
-    }
-
     func setHeartRate(heartRate: Double) {
         self.heartRate = heartRate
     }
@@ -58,10 +49,14 @@ class RecordingManager: ObservableObject {
         self.recordingState = newState
     }
 
+    func setStartDate(_ date: Date) {
+        self.startDate = date
+    }
+
     func reset() {
         recordingState = .notStarted
         heartRate = 0
-        elapsedTimeInterval = 0
+        startDate = nil
 
         resetRest()
     }

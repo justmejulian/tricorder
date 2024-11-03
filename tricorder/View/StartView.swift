@@ -17,6 +17,7 @@ struct StartView: View {
 
     var body: some View {
         VStack {
+            RecodingTimelineView()
             StartStopRecordingButtonView()
         }
         .onAppear {

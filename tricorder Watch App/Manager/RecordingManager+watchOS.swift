@@ -102,12 +102,10 @@ extension RecordingManager {
 
         if change.newState == .running {
             Task {
-                let elapsedTime = await workoutManager.getWorkoutElapsedTime(
-                    date: change.date
-                )
+                let startDate = await workoutManager.getStartDate()
 
-                if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime) {
-                    await sendData(key: "elapsedTime", data: elapsedTimeData)
+                if let startDateData = try? JSONEncoder().encode(startDate) {
+                    await sendData(key: "startDate", data: startDateData)
                 }
             }
         }
@@ -117,9 +115,12 @@ extension RecordingManager {
 
             Task {
                 do {
-                    try await workoutManager.endWorkout(date: change.date)
                     await motionManager.stopUpdates()
                     await nearbyInteractionManager.stop()
+
+                    // todo finish sync
+
+                    try await workoutManager.endWorkout(date: change.date)
                 } catch {
                     Logger.shared.error(
                         "\(#function): Error ending workout: \(error)"

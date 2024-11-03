@@ -16,14 +16,11 @@ struct RecodingTimelineView: View {
             recordingManager.workoutManager.session?.startDate ?? Date()
         let schedule = MetricsTimelineSchedule(
             from: fromDate,
-            isPaused: recordingManager.recordingState == .paused
+            isPaused: recordingManager.recordingState == .ended
         )
         TimelineView(schedule) { context in
-            List {
-                Section {
-                    MetricsView()
-                }
-            }
+            RecordingElapsedTimeView(context: context)
+            MetricsView()
         }
     }
 }

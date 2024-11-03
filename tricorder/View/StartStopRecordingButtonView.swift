@@ -7,14 +7,12 @@
 
 import SwiftUI
 
-// MARK: - StartStopRecordingButtonView View
-//
 struct StartStopRecordingButtonView: View {
     // todo do I need this or can it be passed down?
     @EnvironmentObject var recordingManager: RecordingManager
 
     var body: some View {
-        var isActive = recordingManager.recordingState.isActive
+        let isActive = recordingManager.recordingState.isActive
 
         StartStopRecordingButton(
             title: isActive ? "Stop Recording" : "Start Recording",

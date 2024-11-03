@@ -33,15 +33,8 @@ class WorkoutManager: NSObject, ObservableObject {
     var eventManager = EventManager.shared
 
     #if os(watchOS)
-        /**
-     The live workout builder that is only available on watchOS.
-     */
         var builder: HKLiveWorkoutBuilder?
     #else
-        /**
-     A date for synchronizing the elapsed time between iOS and watchOS.
-     */
-        var contextDate: Date?
     #endif
     /**
      Creates an async stream that buffers a single newest element, and the stream's continuation to yield new elements synchronously to the stream.
@@ -188,13 +181,6 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
             }
         }
     }
-}
-
-// MARK: - A structure for synchronizing the elapsed time.
-//
-struct WorkoutElapsedTime: Codable {
-    var timeInterval: TimeInterval
-    var date: Date
 }
 
 // MARK: - Convenient workout state

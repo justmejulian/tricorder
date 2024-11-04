@@ -14,26 +14,20 @@ struct RecordingElapsedTimeView: View {
 
     var body: some View {
         VStack {
-            Spacer(minLength: 30)
-            LabeledContent {
-                ElapsedTimeView(
-                    elapsedTime: elapsedTime(with: context.date),
-                    showSubseconds: context.cadence == .live
-                )
-                .font(
-                    .system(.title, design: .rounded).monospacedDigit()
-                        .lowercaseSmallCaps()
-                )
-            } label: {
-                Text("Elapsed")
-            }
-            .foregroundColor(.yellow)
+            Text("Elapsed")
+                .font(.caption)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            ElapsedTimeView(
+                elapsedTime: elapsedTime(with: context.date),
+                showSubseconds: context.cadence == .live
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
             .font(
-                .system(.title, design: .rounded).monospacedDigit()
+                .system(.largeTitle, design: .rounded).monospaced()
                     .lowercaseSmallCaps()
             )
-            Spacer(minLength: 15)
         }
+        .foregroundColor(.yellow)
     }
 }
 

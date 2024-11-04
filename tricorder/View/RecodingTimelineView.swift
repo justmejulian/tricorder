@@ -19,8 +19,21 @@ struct RecodingTimelineView: View {
             isPaused: recordingManager.recordingState == .ended
         )
         TimelineView(schedule) { context in
-            LineChart()
-            RecordingElapsedTimeView(context: context)
+            VStack {
+                RecordingElapsedTimeView(context: context)
+                Spacer()
+                Spacer()
+                LineChart()
+            }
+            .padding()
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(.gray, lineWidth: 1)
+            )
+
+            Spacer()
+            Spacer()
+
             MetricsView()
         }
     }

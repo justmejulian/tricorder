@@ -16,9 +16,27 @@ struct StartView: View {
     @State private var triggerAuthorization = false
 
     var body: some View {
-        VStack {
-            RecodingTimelineView()
-            StartStopRecordingButtonView()
+        NavigationView {
+            VStack {
+                RecodingTimelineView()
+
+                Spacer()
+                Spacer()
+
+                StartStopRecordingButton()
+            }
+            .padding()
+            .navigationBarTitle(Text("Tricoder"), displayMode: .inline)
+            .navigationBarItems(
+                trailing:
+                    HStack {
+                        Button(action: {
+                            print("Info button tapped!")
+                        }) {
+                            Image(systemName: "list.bullet")
+                        }
+                    }
+            )
         }
         .onAppear {
             triggerAuthorization.toggle()

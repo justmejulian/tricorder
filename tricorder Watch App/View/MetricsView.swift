@@ -27,4 +27,3 @@ struct MetricsView: View {
         .padding([.top], 10)
     }
 }
-

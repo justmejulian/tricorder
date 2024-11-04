@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct StartStopRecordingButtonView: View {
+struct StartStopRecordingButton: View {
     // todo do I need this or can it be passed down?
     @EnvironmentObject var recordingManager: RecordingManager
 
@@ -16,6 +16,7 @@ struct StartStopRecordingButtonView: View {
 
         StartStopRecordingButton(
             title: isActive ? "Stop Recording" : "Start Recording",
+            tint: isActive ? .red : .blue,
             action: isActive ? stopRecording : startRecording
         )
     }
@@ -23,31 +24,29 @@ struct StartStopRecordingButtonView: View {
 
 // MARK: - StartStopRecordingButtonView SubViews
 //
-extension StartStopRecordingButtonView {
+extension StartStopRecordingButton {
     struct StartStopRecordingButton: View {
         var title: String
+        var tint: Color
         var action: @MainActor () -> Void
 
         var body: some View {
             Button {
                 action()
             } label: {
-                ButtonLabel(
-                    title: title,
-                    systemImage: "figure.outdoor.cycle"
-                )
+                Text(title)
+                    .frame(maxWidth: .infinity)
             }
-            .padding()
-            .background(Color(red: 0, green: 0, blue: 0.5))
-            .foregroundStyle(.white)
-            .clipShape(Capsule())
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .tint(tint)
         }
     }
 }
 
 // MARK: - StartStopRecordingButtonView functions
 //
-extension StartStopRecordingButtonView {
+extension StartStopRecordingButton {
     func startRecording() {
         // todo error handling
         Task {

@@ -21,7 +21,10 @@ struct RecodingTimelineView: View {
         TimelineView(schedule) { context in
             RecordingElapsedTimeView(context: context)
             DotsView()
-            MetricsView(statisticsManager: recordingManager.statisticsManager, nearbyInteractionManager: recordingManager.nearbyInteractionManager)
+            MetricsView(
+                statisticsManager: recordingManager.statisticsManager,
+                nearbyInteractionManager: recordingManager.nearbyInteractionManager
+            )
         }
         .scenePadding()
     }

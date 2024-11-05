@@ -11,7 +11,7 @@ import SwiftUI
 struct MetricsView: View {
     @ObservedObject
     var statisticsManager: StatisticsManager
-    
+
     @ObservedObject
     var nearbyInteractionManager: NearbyInteractionManager
 

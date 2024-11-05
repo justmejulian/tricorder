@@ -35,7 +35,10 @@ struct RecodingTimelineView: View {
             Spacer()
             Spacer()
 
-            MetricsView(statisticsManager: recordingManager.statisticsManager, nearbyInteractionManager: recordingManager.nearbyInteractionManager)
+            MetricsView(
+                statisticsManager: recordingManager.statisticsManager,
+                nearbyInteractionManager: recordingManager.nearbyInteractionManager
+            )
         }
     }
 }

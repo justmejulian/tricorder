@@ -22,7 +22,7 @@ class RecordingManager: ObservableObject {
     var statisticsManager = StatisticsManager()
 
     @Published var recordingState: HKWorkoutSessionState = .notStarted
-    
+
     @Published var startDate: Date?
 
     #if os(watchOS)

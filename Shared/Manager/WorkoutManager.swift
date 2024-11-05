@@ -50,7 +50,7 @@ extension WorkoutManager {
 
     }
 
-    func sendData(_ data: Data, retryCount: Int = 0) async {
+    func sendData(_ data: Data, retryCount: Int = 0) async throws {
         Logger.shared.info(
             "\(#function) data: \(data.debugDescription) retry count: \(retryCount)"
         )
@@ -73,12 +73,11 @@ extension WorkoutManager {
                     Logger.shared.error("Failed to sleep: \(error)")
                 }
 
-                await sendData(data, retryCount: retryCount - 1)
+                try await sendData(data, retryCount: retryCount - 1)
                 return
             }
 
-            // todo throw
-            Logger.shared.log("Failed to send data: \(error)")
+            throw WorkoutManagerError.failedToSendData
         }
     }
 }
@@ -167,6 +166,7 @@ enum WorkoutManagerError: Error {
     case noLiveWorkoutBuilder
     case failedToStartWorkout
     case failedToEndWorkout
+    case failedToSendData
     case workoutSessionNotStarted
     case workoutSessionAlreadyStarted
     case workoutSessionEnded

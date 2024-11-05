@@ -89,23 +89,19 @@ extension RecordingManager {
                     await setStartDate(startDate)
                 }
             }
-        case "statisticsArray":
-            if let statisticsArray =
-                try NSKeyedUnarchiver.unarchivedArrayOfObjects(
+        case "statistics":
+            if let statistics =
+                try NSKeyedUnarchiver.unarchivedObject(
                     ofClass: HKStatistics.self,
                     from: dataObject.data
                 )
             {
                 Logger.shared.info(
-                    "statisticsArray: \(statisticsArray.debugDescription)"
+                    "statistics: \(statistics.debugDescription)"
                 )
 
                 Task {
-                    for statistics in statisticsArray {
-                        await statisticsManager.updateForStatistics(
-                            statistics
-                        )
-                    }
+                    await statisticsManager.updateForStatistics(statistics)
                 }
             }
 

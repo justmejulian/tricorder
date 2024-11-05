@@ -135,6 +135,7 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
                         for: quantityType
                     )
                 {
+                    Logger.shared.debug("New statistics for \(quantityType): \(statistics)")
                     await eventManager.trigger(
                         key: .collectedStatistics,
                         data: statistics

@@ -9,26 +9,19 @@ import Foundation
 import HealthKit
 import os
 
-actor StatisticsManager: ObservableObject {
+@MainActor
+class StatisticsManager: ObservableObject {
     let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
 
     @Published
     var statistics: [HKStatistics] = []
-    // todo store and stuff
+    @Published
+    var mostRecentHeartRate: Double?
+    @Published
+    var avgHeartRate: Double?
+}
 
-    var mostRecentHeartRate: Double? {
-        guard let lastStatistics = statistics.last else {
-            return nil
-        }
-
-        if let mostRecentHeartRate = lastStatistics.mostRecentQuantity()?.doubleValue(
-            for: heartRateUnit
-        ) {
-            return mostRecentHeartRate
-        }
-
-        return nil
-    }
+extension StatisticsManager {
 }
 
 extension StatisticsManager {
@@ -37,25 +30,24 @@ extension StatisticsManager {
     }
 
     func updateForStatistics(_ lastStatistics: HKStatistics) {
-        Logger.shared.log("\(#function): \(lastStatistics.debugDescription)")
+        Logger.shared.log("\(#function): \(lastStatistics)")
 
         statistics.append(lastStatistics)
+        updateProperties(lastStatistics)
     }
 
-    func getMostReacentValue(for hkUnit: HKUnit) -> Double? {
-        guard let lastStatistics = statistics.last else {
-            return nil
+    func updateProperties(_ lastStatistics: HKStatistics) {
+        switch lastStatistics.quantityType {
+        case HKQuantityType.quantityType(forIdentifier: .heartRate):
+            let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
+            mostRecentHeartRate = lastStatistics.mostRecentQuantity()?.doubleValue(
+                for: heartRateUnit
+            )
+            avgHeartRate = lastStatistics.averageQuantity()?.doubleValue(for: heartRateUnit)
+
+        default:
+            return
         }
-
-        return lastStatistics.mostRecentQuantity()?.doubleValue(for: hkUnit)
-    }
-
-    func getDoubleValue(hkQuantity: HKQuantity?, hkUnit: HKUnit) -> Double? {
-        guard let hkQuantity else {
-            return 0
-        }
-
-        return hkQuantity.doubleValue(for: hkUnit)
     }
 }
 

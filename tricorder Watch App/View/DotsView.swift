@@ -25,12 +25,16 @@ private let data: [Bool] = [
 struct DotsView: View {
 
     var body: some View {
-        HStack(spacing: 4) {
-            ForEach(data, id: \.self) { wasSuccess in
-                Circle()
-                    .fill(wasSuccess ? Color.blue : Color.gray)
-                    .frame(width: 10, height: 10)
+        VStack {
+            HStack(spacing: 4) {
+                ForEach(data, id: \.self) { wasSuccess in
+                    Circle()
+                        .fill(wasSuccess ? Color.blue : Color.gray)
+                        .frame(width: 10, height: 10)
+                }
             }
+            Spacer()
+            Text("# 8 / 10")
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -36,28 +36,6 @@ class WorkoutManager: NSObject, ObservableObject {
         var builder: HKLiveWorkoutBuilder?
     #else
     #endif
-    /**
-     Creates an async stream that buffers a single newest element, and the stream's continuation to yield new elements synchronously to the stream.
-     The Swift actors don't handle tasks in a first-in-first-out way. Use AsyncStream to make sure that the app presents the latest state.
-     */
-    let asynStreamTuple = AsyncStream.makeStream(
-        of: SessionStateChange.self,
-        bufferingPolicy: .bufferingNewest(1)
-    )
-
-    /**
-     Kick off a task to consume the async stream. The next value in the stream can't start processing
-     until "await consumeSessionStateChange(value)" returns and the loop enters the next iteration, which serializes the asynchronous operations.
-     */
-    override init() {
-        super.init()
-        Task {
-            for await value in asynStreamTuple.stream {
-                await consumeSessionStateChange(value)
-            }
-        }
-    }
-
 }
 
 // MARK: - Workout session management
@@ -105,17 +83,6 @@ extension WorkoutManager {
     }
 }
 
-// MARK: - Workout statistics
-//
-extension WorkoutManager {
-    /**
-     Consume the session state change from the async stream to update sessionState and finish the workout.
-     */
-    func consumeSessionStateChange(_ change: SessionStateChange) async {
-        await eventManager.trigger(key: .sessionStateChanged, data: change)
-    }
-}
-
 // MARK: - HKWorkoutSessionDelegate
 // HealthKit calls the delegate methods on an anonymous serial background queue,
 // so the methods need to be nonisolated explicitly.
@@ -138,7 +105,9 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
             newState: toState,
             date: date
         )
-        asynStreamTuple.continuation.yield(sessionSateChange)
+        Task {
+            await eventManager.trigger(key: .sessionStateChanged, data: sessionSateChange)
+        }
     }
 
     nonisolated func workoutSession(

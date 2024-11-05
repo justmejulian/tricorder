@@ -23,7 +23,6 @@ struct MetricsView: View {
         )
         .frame(maxWidth: .infinity, alignment: .leading)
         .ignoresSafeArea(edges: .bottom)
-        .scenePadding()
-        .padding([.top], 10)
+        .padding([.top], 8)
     }
 }

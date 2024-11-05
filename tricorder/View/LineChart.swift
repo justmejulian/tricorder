@@ -8,7 +8,7 @@
 import Charts
 import SwiftUI
 
-private var data: [LineData] = [
+private let data: [LineData] = [
     LineData(time: 0, speed: 0),
     LineData(time: 1, speed: 0),
     LineData(time: 1.5, speed: 100),

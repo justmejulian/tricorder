@@ -16,11 +16,12 @@ struct PagingView: View {
     @State private var isSheetActive = false
 
     private enum Tab {
-        case controls, metrics
+        case controls, metrics, settings
     }
 
     var body: some View {
         TabView(selection: $selection) {
+            SettingsView().tag(Tab.settings)
             ControlsView().tag(Tab.controls)
             RecodingTimelineView().tag(Tab.metrics)
         }

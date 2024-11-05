@@ -38,7 +38,6 @@ extension RecordingElapsedTimeView {
         guard let startDate = recordingManager.startDate else {
             return 0
         }
-
         return contextDate.timeIntervalSince(startDate)
     }
 }

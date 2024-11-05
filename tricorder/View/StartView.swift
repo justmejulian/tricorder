@@ -28,6 +28,14 @@ struct StartView: View {
             .padding()
             .navigationBarTitle(Text("Tricoder"), displayMode: .inline)
             .navigationBarItems(
+                leading:
+                    HStack {
+                        Button(action: {
+                            print("Info button tapped!")
+                        }) {
+                            Image(systemName: "gear")
+                        }
+                    },
                 trailing:
                     HStack {
                         Button(action: {

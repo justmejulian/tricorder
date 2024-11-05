@@ -16,8 +16,9 @@ struct MetricsView: View {
     var nearbyInteractionManager: NearbyInteractionManager
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(formatHeartRate(statisticsManager.mostRecentHeartRate))
+        HStack {
+            Text(formatHeartRate(statisticsManager.avgHeartRate))
+            Spacer()
             Text(formatDistance(nearbyInteractionManager.distance))
         }
         .font(
@@ -27,6 +28,5 @@ struct MetricsView: View {
         )
         .frame(maxWidth: .infinity, alignment: .leading)
         .ignoresSafeArea(edges: .bottom)
-        .padding([.top], 8)
     }
 }

@@ -52,16 +52,13 @@ class RecordingManager: ObservableObject {
 }
 
 extension RecordingManager {
-    func sendData(key: String, data: Data) async {
-        do {
-            let dataObject = try DataObjectManager().encode(
-                key: key,
-                data: data
-            )
-            await workoutManager.sendData(dataObject, retryCount: 0)
-        } catch {
-            Logger.shared.error("Could not encode data for key : \(key)")
-        }
+    func sendData(key: String, data: Data) async throws {
+        let dataObject = try DataObjectManager().encode(
+            key: key,
+            data: data
+        )
+
+        try await workoutManager.sendData(dataObject, retryCount: 0)
     }
 
     func sendNIDiscoveryToken() async {
@@ -72,7 +69,7 @@ extension RecordingManager {
         do {
             let discoveryToken =
                 try nearbyInteractionManager.getDiscoveryToken()
-            await sendData(key: "discoveryToken", data: discoveryToken)
+            try await sendData(key: "discoveryToken", data: discoveryToken)
 
             // todo: use setter
             nearbyInteractionManager.didSendDiscoveryToken = true

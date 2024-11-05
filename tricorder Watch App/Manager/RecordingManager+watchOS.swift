@@ -23,7 +23,7 @@ extension RecordingManager {
 
         await eventManager.register(
             key: .collectedStatistics,
-            handleData: self.handleCollectedData
+            handleData: self.handleCollectedStatistics
         )
 
         await eventManager.register(
@@ -103,7 +103,7 @@ extension RecordingManager {
                 let startDate = await workoutManager.getStartDate()
 
                 if let startDateData = try? JSONEncoder().encode(startDate) {
-                    await sendData(key: "startDate", data: startDateData)
+                    try await sendData(key: "startDate", data: startDateData)
                 }
             }
         }
@@ -153,7 +153,7 @@ extension RecordingManager {
     }
 
     @Sendable
-    nonisolated func handleCollectedData(_ data: Sendable) throws {
+    nonisolated func handleCollectedStatistics(_ data: Sendable) throws {
         Logger.shared.info("\(#function)")
 
         guard let statistics = data as? HKStatistics else {
@@ -163,15 +163,20 @@ extension RecordingManager {
 
         Task {
             await statisticsManager.updateForStatistics(statistics)
+            do {
+                let archivedStatistics = try archiveData(statistics)
+                try await sendData(key: "statistics", data: archivedStatistics)
+            } catch {
+                
+            }
         }
 
-        // todo send to iphone
-        //            let archivedData = try? NSKeyedArchiver.archivedData(
-        //                withRootObject: allStatistics, requiringSecureCoding: true)
-        //            guard let archivedData = archivedData, !archivedData.isEmpty else {
-        //                Logger.shared.log("Encoded cycling data is empty")
-        //                return
-        //            }
-
+    }
+    
+    nonisolated func archiveData(_ data: NSObject) throws -> Data{
+        return try NSKeyedArchiver.archivedData(
+            withRootObject: data,
+            requiringSecureCoding: true
+        )
     }
 }

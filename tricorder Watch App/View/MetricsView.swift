@@ -17,7 +17,7 @@ struct MetricsView: View {
 
     var body: some View {
         HStack {
-            Text(formatHeartRate(statisticsManager.avgHeartRate))
+            Text(formatHeartRate(statisticsManager.mostRecentHeartRate))
             Spacer()
             Text(formatDistance(nearbyInteractionManager.distance))
         }

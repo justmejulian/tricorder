@@ -24,7 +24,7 @@ struct MetricsView: View {
                 // todo avg
                 MetricsBox(
                     title: "Avg Heart Rate",
-                    value: formatHeartRate(statisticsManager.mostRecentHeartRate)
+                    value: formatHeartRate(statisticsManager.avgHeartRate)
                 )
             }
             HStack {

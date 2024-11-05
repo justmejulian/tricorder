@@ -24,6 +24,7 @@ struct RecodingTimelineView: View {
                 Spacer()
                 Spacer()
                 LineChart()
+                Spacer()
             }
             .padding()
             .overlay(

@@ -22,14 +22,9 @@ class RecordingManager: ObservableObject {
 
     @Published var heartRate: Double = 0
     @Published var recordingState: HKWorkoutSessionState = .notStarted
-
+    @Published var distance: Measurement<UnitLength> = .init(value: 0, unit: .meters)
+    
     @Published var startDate: Date?
-    //    var elapsedTimeInterval: TimeInterval {
-    //        guard let startDate, let endDate else {
-    //            return 0
-    //        }
-    //        return endDate.timeIntervalSince(startDate)
-    //    }
 
     #if os(watchOS)
         var motionManager = MotionManager()

@@ -26,16 +26,36 @@ private let data: [LineData] = [
 
 struct LineChart: View {
     var body: some View {
+        let curColor = Color.blue
+        let curGradient = LinearGradient(
+            gradient: Gradient(
+                colors: [
+                    curColor.opacity(0.5),
+                    curColor.opacity(0.2),
+                    curColor.opacity(0.05),
+                ]
+            ),
+            startPoint: .top,
+            endPoint: .bottom
+        )
+
         Chart(data) {
             LineMark(
                 x: .value("Time", $0.time),
                 y: .value("Speed", $0.speed)
             )
+            .lineStyle(.init(lineWidth: 2))
+            .interpolationMethod(.cardinal)
+
+            AreaMark(
+                x: .value("Time", $0.time),
+                y: .value("Speed", $0.speed)
+            )
+            .interpolationMethod(.cardinal)
+            .foregroundStyle(curGradient)
         }
         .chartYAxis(.hidden)
-        .chartXAxis {
-            AxisMarks(stroke: StrokeStyle(lineWidth: 0))
-        }
+        .chartXAxis(.hidden)
     }
 }
 

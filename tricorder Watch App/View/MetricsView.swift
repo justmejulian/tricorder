@@ -15,6 +15,7 @@ struct MetricsView: View {
         VStack(alignment: .leading) {
             HeartRateMetricsView()
             NearbyInteractionMetricsView()
+            Text(formatDistance(recordingManager.distance))
         }
         .font(
             .system(.title2, design: .rounded)

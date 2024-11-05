@@ -31,12 +31,12 @@ extension WorkoutManager {
     func retrieveRemoteSession() {
         Logger.shared.info("\(#function) called")
 
-        // todo when called?
-
         /**
          HealthKit calls this handler when a session starts mirroring.
          */
         healthStore.workoutSessionMirroringStartHandler = { mirroredSession in
+            Logger.shared.debug("workoutSessionMirroringStartHandler called")
+
             Task { @MainActor in
                 self.resetWorkout()
                 self.session = mirroredSession

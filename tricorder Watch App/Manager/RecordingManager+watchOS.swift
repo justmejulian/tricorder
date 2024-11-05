@@ -21,12 +21,10 @@ extension RecordingManager {
             handleData: self.handleCompanionStartedRecording
         )
 
-        func registerListeners() async {
-            await eventManager.register(
-                key: .collectedStatistics,
-                handleData: self.handleCollectedData
-            )
-        }
+        await eventManager.register(
+            key: .collectedStatistics,
+            handleData: self.handleCollectedData
+        )
 
         await eventManager.register(
             key: .receivedData,

@@ -9,7 +9,8 @@ import CoreMotion
 import Foundation
 import os
 
-actor MotionManager {
+@MainActor
+class MotionManager: ObservableObject {
     let eventManager = EventManager.shared
 
     let motionManager = CMBatchedSensorManager()

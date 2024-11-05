@@ -10,11 +10,12 @@ import NearbyInteraction
 import WatchConnectivity
 import os
 
-// todo: can this be done in the backround?
 //@MainActor
 class NearbyInteractionManager: NSObject, ObservableObject {
     /// The distance to the nearby object (the paired device) in meters.
-    @Published var distance: Measurement<UnitLength>?
+    @Published
+    var distance: Measurement<UnitLength>?
+
     var didSendDiscoveryToken: Bool = false
     private var session: NISession?
 

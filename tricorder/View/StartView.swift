@@ -47,8 +47,13 @@ struct StartView: View {
             )
         }
         .onAppear {
+            recordingManager.reset()
+
             triggerAuthorization.toggle()
+
             recordingManager.workoutManager.retrieveRemoteSession()
+
+            // todo ask for recording state and get infos (count, ...)
         }
         .healthDataAccessRequest(
             store: recordingManager.workoutManager.healthStore,

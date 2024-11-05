@@ -33,36 +33,9 @@ class WorkoutManager: NSObject, ObservableObject {
     var eventManager = EventManager.shared
 
     #if os(watchOS)
-        /**
-     The live workout builder that is only available on watchOS.
-     */
         var builder: HKLiveWorkoutBuilder?
     #else
-        /**
-     A date for synchronizing the elapsed time between iOS and watchOS.
-     */
-        var contextDate: Date?
     #endif
-    /**
-     Creates an async stream that buffers a single newest element, and the stream's continuation to yield new elements synchronously to the stream.
-     The Swift actors don't handle tasks in a first-in-first-out way. Use AsyncStream to make sure that the app presents the latest state.
-     */
-    let asynStreamTuple = AsyncStream.makeStream(
-        of: SessionStateChange.self, bufferingPolicy: .bufferingNewest(1))
-
-    /**
-     Kick off a task to consume the async stream. The next value in the stream can't start processing
-     until "await consumeSessionStateChange(value)" returns and the loop enters the next iteration, which serializes the asynchronous operations.
-     */
-    override init() {
-        super.init()
-        Task {
-            for await value in asynStreamTuple.stream {
-                await consumeSessionStateChange(value)
-            }
-        }
-    }
-
 }
 
 // MARK: - Workout session management
@@ -88,7 +61,8 @@ extension WorkoutManager {
             // todo make a retry wrapper function
             if retryCount > 0 {
                 Logger.shared.log(
-                    "Failed to send data, retrying: \(retryCount)")
+                    "Failed to send data, retrying: \(retryCount)"
+                )
 
                 // Todo: maybe restart session?
 
@@ -106,17 +80,6 @@ extension WorkoutManager {
             // todo throw
             Logger.shared.log("Failed to send data: \(error)")
         }
-    }
-}
-
-// MARK: - Workout statistics
-//
-extension WorkoutManager {
-    /**
-     Consume the session state change from the async stream to update sessionState and finish the workout.
-     */
-    func consumeSessionStateChange(_ change: SessionStateChange) async {
-        await eventManager.trigger(key: .sessionStateChanged, data: change)
     }
 }
 
@@ -139,8 +102,12 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
          asynStreamTuple is a constant, so it's nonisolated.
          */
         let sessionSateChange = SessionStateChange(
-            newState: toState, date: date)
-        asynStreamTuple.continuation.yield(sessionSateChange)
+            newState: toState,
+            date: date
+        )
+        Task {
+            await eventManager.trigger(key: .sessionStateChanged, data: sessionSateChange)
+        }
     }
 
     nonisolated func workoutSession(
@@ -183,13 +150,6 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
             }
         }
     }
-}
-
-// MARK: - A structure for synchronizing the elapsed time.
-//
-struct WorkoutElapsedTime: Codable {
-    var timeInterval: TimeInterval
-    var date: Date
 }
 
 // MARK: - Convenient workout state

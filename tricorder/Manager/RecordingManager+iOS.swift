@@ -12,16 +12,18 @@ import os
 extension RecordingManager {
     func registerListeners() async {
         await eventManager.register(
-            key: .sessionStateChanged, handleData: self.handleSessionStateChange
+            key: .sessionStateChanged,
+            handleData: self.handleSessionStateChange
         )
 
         await eventManager.register(
-            key: .receivedData, handleData: self.handleReceivedData
+            key: .receivedData,
+            handleData: self.handleReceivedData
         )
     }
 
     func resetRest() {
-        
+
     }
 }
 
@@ -33,7 +35,8 @@ extension RecordingManager {
             try await workoutManager.startWatchWorkout()
         } catch {
             Logger.shared.log(
-                "Failed to start cycling on the paired watch.")
+                "Failed to start cycling on the paired watch."
+            )
         }
     }
 
@@ -53,7 +56,8 @@ extension RecordingManager {
         }
 
         Logger.shared.info(
-            "Session state changed to \(change.newState.rawValue)")
+            "Session state changed to \(change.newState.rawValue)"
+        )
 
         Task {
             await setRecordingState(newState: change.newState)
@@ -74,30 +78,33 @@ extension RecordingManager {
         // todo move these keys into and enum, so I know what is possible
 
         switch dataObject.key {
-        case "elapsedTime":
-            if let elapsedTime = try? JSONDecoder().decode(
-                WorkoutElapsedTime.self, from: dataObject.data)
-            {
-                Logger.shared.info("elapsedTime: \(elapsedTime.timeInterval)")
+        case "startDate":
+            if let startDate = try? JSONDecoder().decode(
+                Date.self,
+                from: dataObject.data
+            ) {
+                Logger.shared.info("Recieved startDate: \(startDate)")
 
                 Task {
-                    await setElapsedTimeInterval(elapsedTime: elapsedTime)
+                    await setStartDate(startDate)
                 }
             }
         case "statisticsArray":
             if let statisticsArray =
                 try NSKeyedUnarchiver.unarchivedArrayOfObjects(
-                    ofClass: HKStatistics.self, from: dataObject.data)
+                    ofClass: HKStatistics.self,
+                    from: dataObject.data
+                )
             {
                 Logger.shared.info(
-                    "statisticsArray: \(statisticsArray.debugDescription)")
+                    "statisticsArray: \(statisticsArray.debugDescription)"
+                )
 
                 Task {
                     for statistics in statisticsArray {
-                        let mostRecentStatistic = await statisticsManager.updateForStatistics(statistics)
-                        
-                        let newHeartRate = mostRecentStatistic[.heartRate] ?? 0
-                        await setHeartRate(heartRate: newHeartRate)
+                        await statisticsManager.updateForStatistics(
+                            statistics
+                        )
                     }
                 }
             }

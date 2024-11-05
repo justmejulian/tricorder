@@ -17,12 +17,13 @@ class RecordingManager: ObservableObject {
     @MainActor
     var workoutManager = WorkoutManager()
 
+    // todo move these background threads
     var nearbyInteractionManager = NearbyInteractionManager()
     var statisticsManager = StatisticsManager()
 
-    @Published var heartRate: Double = 0
-    @Published var elapsedTimeInterval: TimeInterval = 0
     @Published var recordingState: HKWorkoutSessionState = .notStarted
+
+    @Published var startDate: Date?
 
     #if os(watchOS)
         var motionManager = MotionManager()
@@ -34,35 +35,18 @@ class RecordingManager: ObservableObject {
         }
     }
 
-    func setElapsedTimeInterval(elapsedTime: WorkoutElapsedTime) {
-        
-        if recordingState == .running {
-            
-            let currentElapsedTime =
-            elapsedTime.timeInterval
-            + Date().timeIntervalSince(elapsedTime.date)
-            
-            self.elapsedTimeInterval = currentElapsedTime
-
-            return
-        }
-        
-        self.elapsedTimeInterval = 0
-    }
-   
-    func setHeartRate(heartRate: Double) {
-        self.heartRate = heartRate
-    }
-    
     func setRecordingState(newState: HKWorkoutSessionState) {
         self.recordingState = newState
     }
-    
+
+    func setStartDate(_ date: Date) {
+        self.startDate = date
+    }
+
     func reset() {
         recordingState = .notStarted
-        heartRate = 0
-        elapsedTimeInterval = 0
-        
+        startDate = nil
+
         resetRest()
     }
 }
@@ -71,13 +55,15 @@ extension RecordingManager {
     func sendData(key: String, data: Data) async {
         do {
             let dataObject = try DataObjectManager().encode(
-                key: key, data: data)
+                key: key,
+                data: data
+            )
             await workoutManager.sendData(dataObject, retryCount: 0)
         } catch {
             Logger.shared.error("Could not encode data for key : \(key)")
         }
     }
-    
+
     func sendNIDiscoveryToken() async {
         if nearbyInteractionManager.didSendDiscoveryToken {
             return

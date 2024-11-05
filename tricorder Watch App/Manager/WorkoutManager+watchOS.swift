@@ -23,19 +23,22 @@ extension WorkoutManager {
         Task {
             do {
                 try await healthStore.requestAuthorization(
-                    toShare: typesToShare, read: typesToRead)
+                    toShare: typesToShare,
+                    read: typesToRead
+                )
             } catch {
                 Logger.shared.log("Failed to request authorization: \(error)")
             }
         }
     }
 
-    func startWorkout(workoutConfiguration: HKWorkoutConfiguration) async throws
-    {
+    func startWorkout(workoutConfiguration: HKWorkoutConfiguration) async throws {
         Logger.shared.info("\(#function) called")
 
         session = try HKWorkoutSession(
-            healthStore: healthStore, configuration: workoutConfiguration)
+            healthStore: healthStore,
+            configuration: workoutConfiguration
+        )
 
         guard let session else {
             throw WorkoutManagerError.noWorkoutSession
@@ -45,7 +48,8 @@ extension WorkoutManager {
         session.delegate = self
         builder?.delegate = self
         builder?.dataSource = HKLiveWorkoutDataSource(
-            healthStore: healthStore, workoutConfiguration: workoutConfiguration
+            healthStore: healthStore,
+            workoutConfiguration: workoutConfiguration
         )
 
         // Make sure the session is ready to send data
@@ -89,12 +93,8 @@ extension WorkoutManager {
         Logger.shared.info("Received data: \(dataObject.key)")
     }
 
-    func getWorkoutElapsedTime(date: Date) -> WorkoutElapsedTime {
-        let elapsedTimeInterval =
-            session?.associatedWorkoutBuilder().elapsedTime(at: date)
-            ?? 0
-        return WorkoutElapsedTime(
-            timeInterval: elapsedTimeInterval, date: date)
+    func getStartDate() -> Date? {
+        session?.associatedWorkoutBuilder().startDate
     }
 
     func finishedWorkout(date: Date) async throws -> HKWorkout? {
@@ -132,10 +132,13 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
             for type in collectedTypes {
                 if let quantityType = type as? HKQuantityType,
                     let statistics = workoutBuilder.statistics(
-                        for: quantityType)
+                        for: quantityType
+                    )
                 {
                     await eventManager.trigger(
-                        key: .collectedStatistics, data: statistics)
+                        key: .collectedStatistics,
+                        data: statistics
+                    )
                 }
             }
         }

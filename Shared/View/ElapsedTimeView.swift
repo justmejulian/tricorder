@@ -42,11 +42,15 @@ class ElapsedTimeFormatter: Formatter {
 
         if showSubseconds {
             let hundredths = Int(
-                (time.truncatingRemainder(dividingBy: 1)) * 100)
+                (time.truncatingRemainder(dividingBy: 1)) * 100
+            )
             let decimalSeparator = Locale.current.decimalSeparator ?? "."
             return String(
-                format: "%@%@%0.2d", formattedString, decimalSeparator,
-                hundredths)
+                format: "%@%@%0.2d",
+                formattedString,
+                decimalSeparator,
+                hundredths
+            )
         }
 
         return formattedString

@@ -16,25 +16,28 @@ struct PagingView: View {
     @State private var isSheetActive = false
 
     private enum Tab {
-        case controls, metrics
+        case controls, metrics, settings
     }
 
     var body: some View {
         TabView(selection: $selection) {
+            SettingsView().tag(Tab.settings)
             ControlsView().tag(Tab.controls)
-            MetricsView().tag(Tab.metrics)
+            RecodingTimelineView().tag(Tab.metrics)
         }
         .navigationTitle("Cycling")
         .navigationBarBackButtonHidden(true)
         .tabViewStyle(
             PageTabViewStyle(
-                indexDisplayMode: isLuminanceReduced ? .never : .automatic)
+                indexDisplayMode: isLuminanceReduced ? .never : .automatic
+            )
         )
         .onChange(of: isLuminanceReduced) {
             displayMetricsView()
         }
         .onChange(of: recordingManager.recordingState) {
-            _, newValue in
+            _,
+            newValue in
             Logger.shared.debug(
                 "PagingView.onChange: Session state changed to \(newValue.rawValue)"
             )

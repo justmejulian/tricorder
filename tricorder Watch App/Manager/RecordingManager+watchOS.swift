@@ -12,7 +12,8 @@ import os
 extension RecordingManager {
     func registerListeners() async {
         await eventManager.register(
-            key: .sessionStateChanged, handleData: self.handleSessionStateChange
+            key: .sessionStateChanged,
+            handleData: self.handleSessionStateChange
         )
 
         await eventManager.register(
@@ -28,7 +29,8 @@ extension RecordingManager {
         }
 
         await eventManager.register(
-            key: .receivedData, handleData: self.handleReceivedData
+            key: .receivedData,
+            handleData: self.handleReceivedData
         )
     }
 
@@ -44,7 +46,8 @@ extension RecordingManager {
         Logger.shared.debug("Starting Recording")
         do {
             try await workoutManager.startWorkout(
-                workoutConfiguration: workoutConfiguration)
+                workoutConfiguration: workoutConfiguration
+            )
 
         } catch {
             Logger.shared.error("Failed to start startWorkout: \(error)")
@@ -90,7 +93,8 @@ extension RecordingManager {
         }
 
         Logger.shared.info(
-            "Session state changed to \(change.newState.rawValue)")
+            "Session state changed to \(change.newState.rawValue)"
+        )
 
         Task {
             await setRecordingState(newState: change.newState)
@@ -98,12 +102,10 @@ extension RecordingManager {
 
         if change.newState == .running {
             Task {
-                let elapsedTime = await workoutManager.getWorkoutElapsedTime(
-                    date: change.date)
+                let startDate = await workoutManager.getStartDate()
 
-                if let elapsedTimeData = try? JSONEncoder().encode(elapsedTime)
-                {
-                    await sendData(key: "elapsedTime", data: elapsedTimeData)
+                if let startDateData = try? JSONEncoder().encode(startDate) {
+                    await sendData(key: "startDate", data: startDateData)
                 }
             }
         }
@@ -113,12 +115,16 @@ extension RecordingManager {
 
             Task {
                 do {
-                    try await workoutManager.endWorkout(date: change.date)
                     await motionManager.stopUpdates()
                     await nearbyInteractionManager.stop()
+
+                    // todo finish sync
+
+                    try await workoutManager.endWorkout(date: change.date)
                 } catch {
                     Logger.shared.error(
-                        "\(#function): Error ending workout: \(error)")
+                        "\(#function): Error ending workout: \(error)"
+                    )
                 }
             }
         }
@@ -158,11 +164,7 @@ extension RecordingManager {
         }
 
         Task {
-            let mostRecentStatistic =
-                await statisticsManager.updateForStatistics(statistics)
-
-            let newHeartRate = mostRecentStatistic[.heartRate] ?? 0
-            await setHeartRate(heartRate: newHeartRate)
+            await statisticsManager.updateForStatistics(statistics)
         }
 
         // todo send to iphone
@@ -175,4 +177,3 @@ extension RecordingManager {
 
     }
 }
-

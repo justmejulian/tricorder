@@ -10,8 +10,25 @@ import HealthKit
 import os
 
 actor StatisticsManager: ObservableObject {
+    let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
+
+    @Published
     var statistics: [HKStatistics] = []
     // todo store and stuff
+
+    var mostRecentHeartRate: Double? {
+        guard let lastStatistics = statistics.last else {
+            return nil
+        }
+
+        if let mostRecentHeartRate = lastStatistics.mostRecentQuantity()?.doubleValue(
+            for: heartRateUnit
+        ) {
+            return mostRecentHeartRate
+        }
+
+        return nil
+    }
 }
 
 extension StatisticsManager {
@@ -19,24 +36,26 @@ extension StatisticsManager {
         statistics = []
     }
 
-    func updateForStatistics(_ statistics: HKStatistics) -> [StatisticsKey: Double] {
-        Logger.shared.log("\(#function): \(statistics.debugDescription)")
+    func updateForStatistics(_ lastStatistics: HKStatistics) {
+        Logger.shared.log("\(#function): \(lastStatistics.debugDescription)")
 
-        var mostRecentStatistic: [StatisticsKey: Double] = [:]
+        statistics.append(lastStatistics)
+    }
 
-        switch statistics.quantityType {
-        case HKQuantityType.quantityType(forIdentifier: .heartRate):
-            let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
-
-            mostRecentStatistic[.heartRate] =
-                statistics.mostRecentQuantity()?.doubleValue(for: heartRateUnit)
-                ?? 0
-
-        default:
-            Logger.shared.error("No case found for \(statistics.quantityType)")
+    func getMostReacentValue(for hkUnit: HKUnit) -> Double? {
+        guard let lastStatistics = statistics.last else {
+            return nil
         }
-        
-        return mostRecentStatistic
+
+        return lastStatistics.mostRecentQuantity()?.doubleValue(for: hkUnit)
+    }
+
+    func getDoubleValue(hkQuantity: HKQuantity?, hkUnit: HKUnit) -> Double? {
+        guard let hkQuantity else {
+            return 0
+        }
+
+        return hkQuantity.doubleValue(for: hkUnit)
     }
 }
 

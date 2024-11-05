@@ -19,12 +19,19 @@ extension WorkoutManager {
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .functionalStrengthTraining
         configuration.locationType = .indoor
+
+        // todo: how do I make sure it starts app?
         try await healthStore.startWatchApp(toHandle: configuration)
     }
 
-    func retrieveRemoteSession() {
+    func getEndDate() -> Date? {
+        return session?.endDate
+    }
 
+    func retrieveRemoteSession() {
         Logger.shared.info("\(#function) called")
+
+        // todo when called?
 
         /**
          HealthKit calls this handler when a session starts mirroring.
@@ -35,7 +42,8 @@ extension WorkoutManager {
                 self.session = mirroredSession
                 self.session?.delegate = self
                 Logger.shared.log(
-                    "Start mirroring remote session: \(mirroredSession)")
+                    "Start mirroring remote session: \(mirroredSession)"
+                )
             }
         }
     }

@@ -16,7 +16,9 @@ class AppDelegate: NSObject, WKApplicationDelegate {
         Task {
             Logger.shared.log("AppDelegate: received workout configuration")
             await EventManager.shared.trigger(
-                key: .companionStartedRecording, data: workoutConfiguration)
+                key: .companionStartedRecording,
+                data: workoutConfiguration
+            )
         }
     }
 }

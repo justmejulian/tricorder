@@ -36,7 +36,8 @@ actor EventManager {
             try listener(data)
         } catch {
             Logger.shared.error(
-                "Listener for \(key.rawValue) threw error: \(error)")
+                "Listener for \(key.rawValue) threw error: \(error)"
+            )
         }
     }
 

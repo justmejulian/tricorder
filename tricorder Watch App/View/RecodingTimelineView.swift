@@ -16,12 +16,12 @@ struct RecodingTimelineView: View {
             from: recordingManager.workoutManager.session?.startDate
                 ?? Date(),
             isPaused: recordingManager.recordingState
-                == .paused
+                == .ended
         )
         TimelineView(schedule) { context in
             RecordingElapsedTimeView(context: context)
             DotsView()
-            MetricsView()
+            MetricsView(statisticsManager: recordingManager.statisticsManager, nearbyInteractionManager: recordingManager.nearbyInteractionManager)
         }
         .scenePadding()
     }

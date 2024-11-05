@@ -29,8 +29,11 @@ struct RecordingElapsedTimeView: View {
 //
 extension RecordingElapsedTimeView {
     func elapsedTime(with contextDate: Date) -> TimeInterval {
-        return recordingManager.workoutManager.builder?.elapsedTime(
-            at: contextDate
-        ) ?? 0
+        guard
+            let elapsedTime = recordingManager.workoutManager.builder?.elapsedTime(at: contextDate)
+        else {
+            return 0
+        }
+        return elapsedTime
     }
 }

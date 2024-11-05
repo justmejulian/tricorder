@@ -12,11 +12,11 @@ struct RecodingTimelineView: View {
     @EnvironmentObject var recordingManager: RecordingManager
 
     var body: some View {
-        let fromDate =
-            recordingManager.workoutManager.session?.startDate ?? Date()
         let schedule = MetricsTimelineSchedule(
-            from: fromDate,
-            isPaused: recordingManager.recordingState == .ended
+            from: recordingManager.workoutManager.session?.startDate
+                ?? Date(),
+            isPaused: recordingManager.recordingState
+                == .ended
         )
         TimelineView(schedule) { context in
             VStack {
@@ -35,7 +35,7 @@ struct RecodingTimelineView: View {
             Spacer()
             Spacer()
 
-            MetricsView()
+            MetricsView(statisticsManager: recordingManager.statisticsManager, nearbyInteractionManager: recordingManager.nearbyInteractionManager)
         }
     }
 }

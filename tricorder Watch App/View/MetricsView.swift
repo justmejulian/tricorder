@@ -9,13 +9,16 @@ import HealthKit
 import SwiftUI
 
 struct MetricsView: View {
-    @EnvironmentObject var recordingManager: RecordingManager
+    @ObservedObject
+    var statisticsManager: StatisticsManager
+    
+    @ObservedObject
+    var nearbyInteractionManager: NearbyInteractionManager
 
     var body: some View {
         VStack(alignment: .leading) {
-            HeartRateMetricsView()
-            NearbyInteractionMetricsView()
-            Text(formatDistance(recordingManager.distance))
+            Text(formatHeartRate(statisticsManager.mostRecentHeartRate))
+            Text(formatDistance(nearbyInteractionManager.distance))
         }
         .font(
             .system(.title2, design: .rounded)

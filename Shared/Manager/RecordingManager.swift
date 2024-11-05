@@ -17,12 +17,11 @@ class RecordingManager: ObservableObject {
     @MainActor
     var workoutManager = WorkoutManager()
 
+    // todo move these background threads
     var nearbyInteractionManager = NearbyInteractionManager()
     var statisticsManager = StatisticsManager()
 
-    @Published var heartRate: Double = 0
     @Published var recordingState: HKWorkoutSessionState = .notStarted
-    @Published var distance: Measurement<UnitLength> = .init(value: 0, unit: .meters)
     
     @Published var startDate: Date?
 
@@ -36,10 +35,6 @@ class RecordingManager: ObservableObject {
         }
     }
 
-    func setHeartRate(heartRate: Double) {
-        self.heartRate = heartRate
-    }
-
     func setRecordingState(newState: HKWorkoutSessionState) {
         self.recordingState = newState
     }
@@ -50,7 +45,6 @@ class RecordingManager: ObservableObject {
 
     func reset() {
         recordingState = .notStarted
-        heartRate = 0
         startDate = nil
 
         resetRest()

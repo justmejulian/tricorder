@@ -164,11 +164,7 @@ extension RecordingManager {
         }
 
         Task {
-            let mostRecentStatistic =
-                await statisticsManager.updateForStatistics(statistics)
-
-            let newHeartRate = mostRecentStatistic[.heartRate] ?? 0
-            await setHeartRate(heartRate: newHeartRate)
+            await statisticsManager.updateForStatistics(statistics)
         }
 
         // todo send to iphone

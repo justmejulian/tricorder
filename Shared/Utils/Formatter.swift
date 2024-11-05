@@ -20,7 +20,18 @@ func getLocalFormatter() -> MeasurementFormatter {
 }
 let localFormatter = getLocalFormatter()
 
+func formatDistance(_ distance: Measurement<UnitLength>?) -> String {
+    guard let distance else {
+        return "-- m"
+    }
+    return localFormatter.string(from: distance)
+}
 
-func formatDistance(_ distance: Measurement<UnitLength>) -> String {
-   return localFormatter.string(from: distance)
+func formatHeartRate(_ heartRate: Double?) -> String {
+    guard let heartRate else {
+        return "-- bpm"
+    }
+    return heartRate.formatted(
+        .number.precision(.fractionLength(0))
+    ) + " bpm"
 }

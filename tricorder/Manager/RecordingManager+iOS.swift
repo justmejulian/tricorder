@@ -102,12 +102,9 @@ extension RecordingManager {
 
                 Task {
                     for statistics in statisticsArray {
-                        let mostRecentStatistic = await statisticsManager.updateForStatistics(
+                        await statisticsManager.updateForStatistics(
                             statistics
                         )
-
-                        let newHeartRate = mostRecentStatistic[.heartRate] ?? 0
-                        await setHeartRate(heartRate: newHeartRate)
                     }
                 }
             }

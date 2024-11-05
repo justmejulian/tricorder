@@ -26,7 +26,7 @@ struct StartView: View {
                 StartStopRecordingButton()
             }
             .padding()
-            .navigationBarTitle(Text("Tricoder"), displayMode: .inline)
+            .navigationBarTitle(Text("Tricorder"), displayMode: .inline)
             .navigationBarItems(
                 leading:
                     HStack {

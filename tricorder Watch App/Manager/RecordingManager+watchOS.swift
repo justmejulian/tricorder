@@ -11,6 +11,8 @@ import os
 
 extension RecordingManager {
     func registerListeners() async {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         await eventManager.register(
             key: .sessionStateChanged,
             handleData: self.handleSessionStateChange
@@ -24,6 +26,11 @@ extension RecordingManager {
         await eventManager.register(
             key: .collectedStatistics,
             handleData: self.handleCollectedStatistics
+        )
+
+        await eventManager.register(
+            key: .collectedMotionValues,
+            handleData: self.handleCollecteMotionValues
         )
 
         await eventManager.register(
@@ -41,7 +48,9 @@ extension RecordingManager {
 //
 extension RecordingManager {
     func startRecording(workoutConfiguration: HKWorkoutConfiguration) async {
-        Logger.shared.debug("Starting Recording")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.info("Starting Recording")
+
         do {
             try await workoutManager.startWorkout(
                 workoutConfiguration: workoutConfiguration
@@ -56,7 +65,7 @@ extension RecordingManager {
         await sendNIDiscoveryToken()
 
         do {
-            try await motionManager.startUpdates()
+            try await sensorManager.startUpdates()
         } catch {
             Logger.shared.error("Failed to start Motion Updates: \(error)")
         }
@@ -69,7 +78,7 @@ extension RecordingManager {
 extension RecordingManager {
     @Sendable
     nonisolated func handleCompanionStartedRecording(_ data: Sendable) throws {
-        Logger.shared.info("\(#function)")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         guard let workoutConfiguration = data as? HKWorkoutConfiguration else {
             Logger.shared.error("\(#function): Invalid data type")
@@ -83,7 +92,7 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleSessionStateChange(_ data: Sendable) throws {
-        Logger.shared.info("\(#function)")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         guard let change = data as? SessionStateChange else {
             Logger.shared.error("\(#function): Invalid data type")
@@ -113,7 +122,7 @@ extension RecordingManager {
 
             Task {
                 do {
-                    await motionManager.stopUpdates()
+                    await sensorManager.stopUpdates()
                     await nearbyInteractionManager.stop()
 
                     // todo finish sync
@@ -130,14 +139,14 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedData(_ data: Sendable) throws {
-        Logger.shared.info("\(#function) called")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         guard let data = data as? Data else {
             Logger.shared.error("\(#function): Invalid data type")
             return
         }
 
-        let dataObject = try DataObjectManager().decode(data)
+        let dataObject = try SendDataObjectManager().decode(data)
 
         // todo move these keys into and enum, so I know what is possible
         switch dataObject.key {
@@ -153,8 +162,29 @@ extension RecordingManager {
     }
 
     @Sendable
+    nonisolated func handleCollecteMotionValues(_ data: Sendable) throws {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        guard let values = data as? [MotionValue] else {
+            Logger.shared.error("\(#function): Invalid data type")
+            return
+        }
+        Task {
+            await motionManager.updateMotionValues(values)
+
+            do {
+                let archivedUpdates = try archiveSendable(values)
+                try await sendData(key: "motionUpdate", data: archivedUpdates)
+            } catch {
+                Logger.shared.error("\(#function): Failed to send data: \(error)")
+            }
+
+        }
+    }
+
+    @Sendable
     nonisolated func handleCollectedStatistics(_ data: Sendable) throws {
-        Logger.shared.info("\(#function)")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         guard let statistics = data as? HKStatistics else {
             Logger.shared.error("\(#function): Invalid data type")
@@ -163,20 +193,29 @@ extension RecordingManager {
 
         Task {
             await statisticsManager.updateForStatistics(statistics)
+
             do {
-                let archivedStatistics = try archiveData(statistics)
+                let archivedStatistics = try archiveNSObject(statistics)
                 try await sendData(key: "statistics", data: archivedStatistics)
             } catch {
-                
+                Logger.shared.error("\(#function): Failed to send data: \(error)")
             }
         }
 
     }
-    
-    nonisolated func archiveData(_ data: NSObject) throws -> Data{
+
+    nonisolated func archiveNSObject(_ data: NSObject) throws -> Data {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         return try NSKeyedArchiver.archivedData(
             withRootObject: data,
             requiringSecureCoding: true
         )
+    }
+
+    nonisolated func archiveSendable(_ data: Encodable) throws -> Data {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        return try JSONEncoder().encode(data)
     }
 }

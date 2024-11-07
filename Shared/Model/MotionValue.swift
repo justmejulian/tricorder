@@ -5,10 +5,10 @@
 //  Created by Julian Visser on 05.11.2024.
 //
 
-// LogItem
-// todo: CMAcceleration or CMRotationRate CMQuaternion
-// LogItem with timestamp
-struct Value: Codable {
+import Foundation
+
+// todo can I do some type magic?
+struct MotionValue: Codable {
     var x: Double
     var y: Double
     var z: Double

@@ -27,13 +27,13 @@ class NearbyInteractionManager: NSObject, ObservableObject {
 
     // todo: I guess this should be init
     func start() {
-        Logger.shared.debug("NearbyInteractionManager start called")
+        Logger.shared.debug("NearbyInteractionManager start called on Thread \(Thread.current)")
 
         restartNISession()
     }
 
     func stop() {
-        Logger.shared.debug("NearbyInteractionManager stop called")
+        Logger.shared.debug("NearbyInteractionManager stop called on Thread \(Thread.current)")
 
         // todo: maybe deinitializeNISession?
         session?.pause()
@@ -41,11 +41,14 @@ class NearbyInteractionManager: NSObject, ObservableObject {
     }
 
     private func reset() {
+        Logger.shared.debug("NearbyInteractionManager reset called on Thread \(Thread.current)")
+
         distance = nil
     }
 
     private func initializeNISession() {
-        Logger.shared.info("initializing the NISession")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         let isSupported = NISession.deviceCapabilities
             .supportsPreciseDistanceMeasurement
         guard isSupported else {
@@ -62,6 +65,8 @@ class NearbyInteractionManager: NSObject, ObservableObject {
     }
 
     private func deinitializeNISession() {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         Logger.shared.info("invalidating and deinitializing the NISession")
         session?.invalidate()
         session = nil
@@ -69,6 +74,8 @@ class NearbyInteractionManager: NSObject, ObservableObject {
     }
 
     private func restartNISession() {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         Logger.shared.info("restarting the NISession")
         if let config = session?.configuration {
             session?.run(config)
@@ -76,6 +83,8 @@ class NearbyInteractionManager: NSObject, ObservableObject {
     }
 
     func getDiscoveryToken() throws -> Data {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         guard let token = session?.discoveryToken else {
             throw NearbyInteractionManagerError.noDiscoveryTokenAvailable
         }
@@ -93,7 +102,7 @@ class NearbyInteractionManager: NSObject, ObservableObject {
 
     /// When a discovery token is received, run the session
     func didReceiveDiscoveryToken(_ tokenData: Data) {
-        Logger.shared.info("\(#function): \(tokenData.debugDescription)")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         if let token = try? NSKeyedUnarchiver.unarchivedObject(
             ofClass: NIDiscoveryToken.self,
@@ -109,6 +118,8 @@ class NearbyInteractionManager: NSObject, ObservableObject {
     }
 
     func getTokenData() -> Data? {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         guard let token = session?.discoveryToken else {
             os_log("NIDiscoveryToken not available")
             return nil

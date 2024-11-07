@@ -13,8 +13,7 @@ import os
 //
 extension WorkoutManager {
     func startWatchWorkout() async throws {
-
-        Logger.shared.info("\(#function) called")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .functionalStrengthTraining
@@ -29,18 +28,26 @@ extension WorkoutManager {
     }
 
     func retrieveRemoteSession() {
-        Logger.shared.info("\(#function) called")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         /**
          HealthKit calls this handler when a session starts mirroring.
          */
         healthStore.workoutSessionMirroringStartHandler = { mirroredSession in
-            Logger.shared.debug("workoutSessionMirroringStartHandler called")
+            Logger.shared.debug(
+                "workoutSessionMirroringStartHandler called on Thread \(Thread.current)"
+            )
 
-            Task { @MainActor in
-                self.resetWorkout()
-                self.session = mirroredSession
-                self.session?.delegate = self
+            Task {
+                Logger.shared.debug(
+                    "workoutSessionMirroringStartHandler Taks running on Thread \(Thread.current)"
+                )
+                await self.resetWorkout()
+                await self.setSession(mirroredSession)
+
+                // set object to call when state chnages
+                await self.session?.delegate = self
+
                 Logger.shared.log(
                     "Start mirroring remote session: \(mirroredSession)"
                 )

@@ -88,7 +88,7 @@ extension WorkoutManager {
 
         Logger.shared.info("\(#function) called")
 
-        let dataObject = try DataObjectManager().decode(data)
+        let dataObject = try SendDataObjectManager().decode(data)
 
         Logger.shared.info("Received data: \(dataObject.key)")
     }
@@ -121,14 +121,16 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
         _ workoutBuilder: HKLiveWorkoutBuilder,
         didCollectDataOf collectedTypes: Set<HKSampleType>
     ) {
-
-        Logger.shared.info("\(#function) called")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         /**
           HealthKit calls this method on an anonymous serial background queue.
           Use Task to provide an asynchronous context so MainActor can come to play.
          */
         Task { @MainActor in
+            Logger.shared.debug("\(#function) task called on Thread \(Thread.current)")
+            // todo needs to be on Main?
+
             for type in collectedTypes {
                 if let quantityType = type as? HKQuantityType,
                     let statistics = workoutBuilder.statistics(
@@ -148,6 +150,6 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
     nonisolated func workoutBuilderDidCollectEvent(
         _ workoutBuilder: HKLiveWorkoutBuilder
     ) {
-        Logger.shared.info("\(#function) called")
+        Logger.shared.debug("\(#function) task called on Thread \(Thread.current)")
     }
 }

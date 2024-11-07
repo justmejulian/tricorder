@@ -14,36 +14,47 @@ import os
 class RecordingManager: ObservableObject {
     let eventManager = EventManager.shared
 
-    @MainActor
-    var workoutManager = WorkoutManager()
-
-    // todo move these background threads
     var nearbyInteractionManager = NearbyInteractionManager()
     var statisticsManager = StatisticsManager()
+    var motionManager = MotionManager()
+
+    // todo can we move to backgroudn thread?
+    var workoutManager = WorkoutManager()
 
     @Published var recordingState: HKWorkoutSessionState = .notStarted
 
     @Published var startDate: Date?
 
     #if os(watchOS)
-        var motionManager = MotionManager()
+        // todo can we move to backgroudn thread?
+        var sensorManager = SensorManager()
     #endif
 
     init() {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         Task {
+            Logger.shared.debug("\(#function) taks called on Thread \(Thread.current)")
+
             await registerListeners()
         }
     }
 
     func setRecordingState(newState: HKWorkoutSessionState) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         self.recordingState = newState
     }
 
     func setStartDate(_ date: Date) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         self.startDate = date
     }
 
     func reset() {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         recordingState = .notStarted
         startDate = nil
 
@@ -53,7 +64,10 @@ class RecordingManager: ObservableObject {
 
 extension RecordingManager {
     func sendData(key: String, data: Data) async throws {
-        let dataObject = try DataObjectManager().encode(
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("Data size: \(data.debugDescription)")
+
+        let dataObject = try SendDataObjectManager().encode(
             key: key,
             data: data
         )
@@ -62,6 +76,8 @@ extension RecordingManager {
     }
 
     func sendNIDiscoveryToken() async {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         if nearbyInteractionManager.didSendDiscoveryToken {
             return
         }
@@ -79,7 +95,10 @@ extension RecordingManager {
     }
 
     func handleNIReceiveDiscoveryToken(_ data: Data) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
         Task {
+            Logger.shared.debug("\(#function) task called on Thread \(Thread.current)")
+
             await sendNIDiscoveryToken()
             nearbyInteractionManager.didReceiveDiscoveryToken(data)
         }

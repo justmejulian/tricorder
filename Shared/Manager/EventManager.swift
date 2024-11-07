@@ -17,6 +17,7 @@ actor EventManager {
         key: EventListenerKey,
         handleData: @escaping @Sendable (_ data: Sendable) throws -> Void
     ) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         // todo: check if already exists
         EventManager.listeners[key] = handleData
@@ -25,7 +26,9 @@ actor EventManager {
     }
 
     func trigger(key: EventListenerKey, data: Sendable) {
-        Logger.shared.debug("Event Listener triggered for \(key.rawValue)")
+        Logger.shared.debug(
+            "Event Listener triggered for \(key.rawValue) called on Thread \(Thread.current)"
+        )
 
         guard let listener = EventManager.listeners[key] else {
             Logger.shared.error("No listener found for \(key.rawValue)")
@@ -50,6 +53,7 @@ enum EventListenerKey: String, CaseIterable {
 
     case sessionStateChanged
     case collectedStatistics
+    case collectedMotionValues
     case receivedData
 }
 

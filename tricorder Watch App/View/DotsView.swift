@@ -24,6 +24,9 @@ private let data: [Bool] = [
 
 struct DotsView: View {
 
+    @ObservedObject
+    var motionManager: MotionManager
+
     var body: some View {
         VStack {
             HStack(spacing: 4) {
@@ -34,7 +37,7 @@ struct DotsView: View {
                 }
             }
             Spacer()
-            Text("# 8 / 10")
+            Text("# 0 / \(motionManager.motionValues.count)")
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -9,6 +9,7 @@ import Foundation
 import HealthKit
 import os
 
+// todo could this me just watch?
 @MainActor
 class StatisticsManager: ObservableObject {
     let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
@@ -26,17 +27,21 @@ extension StatisticsManager {
 
 extension StatisticsManager {
     func reset() {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         statistics = []
     }
 
     func updateForStatistics(_ lastStatistics: HKStatistics) {
-        Logger.shared.log("\(#function): \(lastStatistics)")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         statistics.append(lastStatistics)
         updateProperties(lastStatistics)
     }
 
     func updateProperties(_ lastStatistics: HKStatistics) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         switch lastStatistics.quantityType {
         case HKQuantityType.quantityType(forIdentifier: .heartRate):
             let heartRateUnit = HKUnit.count().unitDivided(by: .minute())

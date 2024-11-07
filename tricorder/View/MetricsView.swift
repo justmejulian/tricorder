@@ -8,11 +8,16 @@
 import SwiftUI
 
 struct MetricsView: View {
+    @EnvironmentObject var recordingManager: RecordingManager
+
     @ObservedObject
     var statisticsManager: StatisticsManager
 
     @ObservedObject
     var nearbyInteractionManager: NearbyInteractionManager
+
+    @ObservedObject
+    var motionManager: MotionManager
 
     var body: some View {
         VStack {
@@ -33,18 +38,18 @@ struct MetricsView: View {
                     value: formatDistance(nearbyInteractionManager.distance)
                 )
                 MetricsBox(
-                    title: "Heart Rate",
-                    value: formatHeartRate(statisticsManager.mostRecentHeartRate)
+                    title: "Top Speed",
+                    value: "42 km/h"
                 )
             }
             HStack {
                 MetricsBox(
-                    title: "Heart Rate",
-                    value: formatHeartRate(statisticsManager.mostRecentHeartRate)
+                    title: "# Motion Data",
+                    value: String(motionManager.motionValues.count)
                 )
                 MetricsBox(
-                    title: "Heart Rate",
-                    value: formatHeartRate(statisticsManager.mostRecentHeartRate)
+                    title: "# Statistics",
+                    value: String(statisticsManager.statistics.count)
                 )
             }
         }

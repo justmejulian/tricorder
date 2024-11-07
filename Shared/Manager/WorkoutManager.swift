@@ -9,19 +9,14 @@ import Foundation
 import HealthKit
 import os
 
-@MainActor
-class WorkoutManager: NSObject, ObservableObject {
-    /**
-     SummaryView (watchOS) changes from Saving Workout to the metric summary view when
-     a workout changes from nil to a valid value.
-     */
-    @Published var workout: HKWorkout?
-    /**
-     HealthKit data types to share and read.
-     */
+actor WorkoutManager: NSObject {
+    var workout: HKWorkout?
+
+    /// HealthKit data types to share and read.
     let typesToShare: Set = [
         HKQuantityType.workoutType()
     ]
+
     let typesToRead: Set = [
         HKQuantityType(.heartRate),
         HKQuantityType.workoutType(),
@@ -36,6 +31,12 @@ class WorkoutManager: NSObject, ObservableObject {
         var builder: HKLiveWorkoutBuilder?
     #else
     #endif
+
+    func setSession(_ session: HKWorkoutSession) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        self.session = session
+    }
 }
 
 // MARK: - Workout session management
@@ -52,7 +53,7 @@ extension WorkoutManager {
 
     func sendData(_ data: Data, retryCount: Int = 0) async throws {
         Logger.shared.info(
-            "\(#function) data: \(data.debugDescription) retry count: \(retryCount)"
+            "\(#function) data: \(data.debugDescription) retry count: \(retryCount) called on Thread \(Thread.current)"
         )
 
         do {
@@ -93,6 +94,8 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
         from fromState: HKWorkoutSessionState,
         date: Date
     ) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         Logger.shared.log(
             "Session state changed from \(fromState.rawValue) to \(toState.rawValue)"
         )
@@ -140,10 +143,12 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
         _ workoutSession: HKWorkoutSession,
         didReceiveDataFromRemoteWorkoutSession data: [Data]
     ) {
-        Logger.shared.log("\(#function): \(data.debugDescription)")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         // todo: is main needed?
         Task { @MainActor in
+            Logger.shared.debug("\(#function) task called on Thread \(Thread.current)")
+
             for anElement in data {
                 await eventManager.trigger(key: .receivedData, data: anElement)
             }

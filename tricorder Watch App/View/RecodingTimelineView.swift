@@ -20,7 +20,9 @@ struct RecodingTimelineView: View {
         )
         TimelineView(schedule) { context in
             RecordingElapsedTimeView(context: context)
-            DotsView()
+            DotsView(
+                motionManager: recordingManager.motionManager
+            )
             MetricsView(
                 statisticsManager: recordingManager.statisticsManager,
                 nearbyInteractionManager: recordingManager.nearbyInteractionManager

@@ -11,6 +11,8 @@ import os
 
 extension RecordingManager {
     func registerListeners() async {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         await eventManager.register(
             key: .sessionStateChanged,
             handleData: self.handleSessionStateChange
@@ -31,6 +33,7 @@ extension RecordingManager {
 //
 extension RecordingManager {
     func startRecording() async {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
         do {
             try await workoutManager.startWatchWorkout()
         } catch {
@@ -41,14 +44,14 @@ extension RecordingManager {
     }
 
     func stopRecording() async {
-        workoutManager.session?.stopActivity(with: .now)
+        await workoutManager.session?.stopActivity(with: .now)
     }
 }
 
 extension RecordingManager {
     @Sendable
     nonisolated func handleSessionStateChange(_ data: Sendable) throws {
-        Logger.shared.info("\(#function)")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         guard let change = data as? SessionStateChange else {
             Logger.shared.error("\(#function): Invalid data type")
@@ -66,14 +69,14 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedData(_ data: Sendable) throws {
-        Logger.shared.info("\(#function) called")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         guard let data = data as? Data else {
             Logger.shared.error("\(#function): Invalid data type")
             return
         }
 
-        let dataObject = try DataObjectManager().decode(data)
+        let dataObject = try SendDataObjectManager().decode(data)
 
         // todo move these keys into and enum, so I know what is possible
 
@@ -104,10 +107,19 @@ extension RecordingManager {
                     await statisticsManager.updateForStatistics(statistics)
                 }
             }
-
         case "discoveryToken":
             Task {
                 await handleNIReceiveDiscoveryToken(dataObject.data)
+            }
+
+        case "motionUpdate":
+            guard let values = try? JSONDecoder().decode([MotionValue].self, from: dataObject.data)
+            else {
+                Logger.shared.error("\(#function): Invalid data type")
+                return
+            }
+            Task {
+                await motionManager.updateMotionValues(values)
             }
 
         default:

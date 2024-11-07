@@ -9,47 +9,52 @@ import CoreMotion
 import Foundation
 import os
 
-@MainActor
-class MotionManager: ObservableObject {
+actor SensorManager {
     let eventManager = EventManager.shared
 
     let motionManager = CMBatchedSensorManager()
-
-    // todo should this be observable?
 }
-extension MotionManager {
+
+extension SensorManager {
     private func handleUpdate(
         _ timestamp: Date,
         _ sensor_id: String,
-        _ values: [Value]
+        _ values: [MotionValue]
     ) {
-        // todo: hanlde updates
-        //        Logger.shared.debug(
-        //            "Handle motion update: \(timestamp), \(sensor_id), \(values.debugDescription)"
-        //        )
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        Task {
+            await eventManager.trigger(
+                key: .collectedMotionValues,
+                data: values
+            )
+        }
     }
 }
 
-extension MotionManager {
+extension SensorManager {
     func stopUpdates() {
-        Logger.shared.debug("MotinManager: stopUpdates called")
+        Logger.shared.debug("MotinManager: stopUpdates called on Thread \(Thread.current)")
 
         motionManager.stopAccelerometerUpdates()
         motionManager.stopDeviceMotionUpdates()
     }
 
     func startUpdates() throws {
-        Logger.shared.debug("MotinManager: startUpdates called")
+        Logger.shared.debug("MotinManager: startUpdates called on Thread \(Thread.current)")
 
         guard
             CMBatchedSensorManager.isAccelerometerSupported
                 && CMBatchedSensorManager.isDeviceMotionSupported
         else {
-            throw MotionManagerError.notSupported
+            throw SensorManagerError.notSupported
         }
 
         motionManager.startAccelerometerUpdates(handler: {
             (batchedData, error) in
+
+            Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
             if let error = error {
                 Logger.shared.error(
                     "Error starting AccelerometerUpdates: \(error.localizedDescription)"
@@ -68,6 +73,9 @@ extension MotionManager {
 
         motionManager.startDeviceMotionUpdates(handler: {
             (batchedData, error) in
+
+            Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
             if let error = error {
                 Logger.shared.error(
                     "Error starting DeviceMotionUpdate: \(error.localizedDescription)"
@@ -84,23 +92,26 @@ extension MotionManager {
             self.consumeDeviceMotionUpdates(batchedData: batchedData)
         })
     }
+}
 
+// todo do this in another Manager
+extension SensorManager {
     func consumeDeviceMotionUpdates(batchedData: [CMDeviceMotion]) {
-        Logger.shared.debug("DeviceMotionUpdate")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         // todo make this more reusable
         // todo do all of this in a different thread
-        var rotationRateValues: [Value] = []
-        var userAccelerationValues: [Value] = []
-        var gravityValues: [Value] = []
-        var quaternionValues: [Value] = []
+        var rotationRateValues: [MotionValue] = []
+        var userAccelerationValues: [MotionValue] = []
+        var gravityValues: [MotionValue] = []
+        var quaternionValues: [MotionValue] = []
 
         batchedData.forEach { data in
             let dataDate = Date(
                 timeIntervalSince1970: data.timestamp.timeIntervalSince1970
             )
             rotationRateValues.append(
-                Value(
+                MotionValue(
                     x: data.rotationRate.x,
                     y: data.rotationRate.y,
                     z: data.rotationRate.z,
@@ -108,7 +119,7 @@ extension MotionManager {
                 )
             )
             userAccelerationValues.append(
-                Value(
+                MotionValue(
                     x: data.userAcceleration.x,
                     y: data.userAcceleration.y,
                     z: data.userAcceleration.z,
@@ -116,7 +127,7 @@ extension MotionManager {
                 )
             )
             gravityValues.append(
-                Value(
+                MotionValue(
                     x: data.gravity.x,
                     y: data.gravity.y,
                     z: data.gravity.z,
@@ -124,7 +135,7 @@ extension MotionManager {
                 )
             )
             quaternionValues.append(
-                Value(
+                MotionValue(
                     x: data.attitude.quaternion.x,
                     y: data.attitude.quaternion.y,
                     z: data.attitude.quaternion.z,
@@ -151,12 +162,13 @@ extension MotionManager {
     }
 
     func consumeAccelerometerUpdates(batchedData: [CMAccelerometerData]) {
-        Logger.shared.debug("AccelerometerUpdate")
-        var values: [Value] = []
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        var values: [MotionValue] = []
 
         batchedData.forEach { data in
             values.append(
-                Value(
+                MotionValue(
                     x: data.acceleration.x,
                     y: data.acceleration.y,
                     z: data.acceleration.z,
@@ -182,41 +194,6 @@ extension MotionManager {
 
 // MARK: - MotionManagerError
 //
-enum MotionManagerError: Error {
+enum SensorManagerError: Error {
     case notSupported
-}
-
-// MARK: - Value
-//
-extension MotionManager {
-    // LogItem
-    // todo: CMAcceleration or CMRotationRate CMQuaternion
-    // LogItem with timestamp
-
-    struct Value: Codable {
-        var x: Double
-        var y: Double
-        var z: Double
-        var w: Double?
-
-        var timestamp: Date
-
-        // Values may have 3 or 4 Datapoints
-        init(x: Double, y: Double, z: Double, timestamp: Date) {
-            self.x = x
-            self.y = y
-            self.z = z
-            self.w = nil
-            self.timestamp = timestamp
-        }
-
-        init(x: Double, y: Double, z: Double, w: Double, timestamp: Date) {
-            self.x = x
-            self.y = y
-            self.z = z
-            self.w = w
-            self.timestamp = timestamp
-        }
-    }
-
 }

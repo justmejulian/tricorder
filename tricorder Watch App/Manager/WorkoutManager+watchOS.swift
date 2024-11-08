@@ -33,7 +33,7 @@ extension WorkoutManager {
     }
 
     func startWorkout(workoutConfiguration: HKWorkoutConfiguration) async throws {
-        Logger.shared.info("\(#function) called")
+        Logger.shared.info("WorkoutManager \(#function) called")
 
         session = try HKWorkoutSession(
             healthStore: healthStore,
@@ -85,8 +85,7 @@ extension WorkoutManager {
     }
 
     func handleReceivedData(_ data: Data) throws {
-
-        Logger.shared.info("\(#function) called")
+        Logger.shared.info("WorkoutManager \(#function) called")
 
         let dataObject = try SendDataObjectManager().decode(data)
 
@@ -98,6 +97,8 @@ extension WorkoutManager {
     }
 
     func finishedWorkout(date: Date) async throws -> HKWorkout? {
+        Logger.shared.info("WorkoutManager \(#function) called")
+        
         guard let builder else {
             throw WorkoutManagerError.noLiveWorkoutBuilder
         }
@@ -121,14 +122,14 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
         _ workoutBuilder: HKLiveWorkoutBuilder,
         didCollectDataOf collectedTypes: Set<HKSampleType>
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("WorkoutManager \(#function) called on Thread \(Thread.current)")
 
         /**
           HealthKit calls this method on an anonymous serial background queue.
           Use Task to provide an asynchronous context so MainActor can come to play.
          */
         Task { @MainActor in
-            Logger.shared.debug("\(#function) task called on Thread \(Thread.current)")
+            Logger.shared.debug("WorkoutManager \(#function) task called on Thread \(Thread.current)")
             // todo needs to be on Main?
 
             for type in collectedTypes {
@@ -138,10 +139,14 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
                     )
                 {
                     Logger.shared.debug("New statistics for \(quantityType): \(statistics)")
-                    await eventManager.trigger(
-                        key: .collectedStatistics,
-                        data: statistics
-                    )
+                    do {
+                        let _ = try await eventManager.trigger(
+                            key: .collectedStatistics,
+                            data: statistics
+                        )
+                    } catch {
+                        Logger.shared.warning("Failed to trigger  collectedStatistics event: \(error)")
+                    }
                 }
             }
         }
@@ -150,6 +155,6 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
     nonisolated func workoutBuilderDidCollectEvent(
         _ workoutBuilder: HKLiveWorkoutBuilder
     ) {
-        Logger.shared.debug("\(#function) task called on Thread \(Thread.current)")
+        Logger.shared.debug("WorkoutManager \(#function) task called on Thread \(Thread.current)")
     }
 }

@@ -14,7 +14,7 @@ struct MetricsView: View {
     var statisticsManager: StatisticsManager
 
     @ObservedObject
-    var nearbyInteractionManager: NearbyInteractionManager
+    var distanceManager: DistanceManager
 
     @ObservedObject
     var motionManager: MotionManager
@@ -35,7 +35,7 @@ struct MetricsView: View {
             HStack {
                 MetricsBox(
                     title: "Distance",
-                    value: formatDistance(nearbyInteractionManager.distance)
+                    value: formatDistance(distanceManager.distance)
                 )
                 MetricsBox(
                     title: "Top Speed",

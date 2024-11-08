@@ -15,7 +15,7 @@ actor EventManager {
 
     func register(
         key: EventListenerKey,
-        handleData: @escaping @Sendable (_ data: Sendable) throws -> Void
+        handleData: @escaping @Sendable (_ data: Sendable) throws -> Data?
     ) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
@@ -25,36 +25,53 @@ actor EventManager {
         Logger.shared.debug("Added EventListener for \(key.rawValue)")
     }
 
-    func trigger(key: EventListenerKey, data: Sendable) {
+    func register(
+        key: EventListenerKey,
+        handleData: @escaping @Sendable (_ data: Sendable) throws -> Void
+    ) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        self.register(
+            key: key,
+            handleData: { data in
+                try handleData(data)
+                return nil
+            }
+        )
+    }
+
+    func trigger(key: EventListenerKey, data: Sendable) throws -> Data? {
         Logger.shared.debug(
             "Event Listener triggered for \(key.rawValue) called on Thread \(Thread.current)"
         )
 
         guard let listener = EventManager.listeners[key] else {
-            Logger.shared.error("No listener found for \(key.rawValue)")
-            return
+            throw EventManagerError.noListenerFound
         }
 
-        do {
-            try listener(data)
-        } catch {
-            Logger.shared.error(
-                "Listener for \(key.rawValue) threw error: \(error)"
-            )
-        }
+        return try listener(data)
     }
 
+}
+
+enum EventManagerError: Error {
+    case noListenerFound
 }
 
 enum EventListenerKey: String, CaseIterable {
     case startedRecording
     case endedRecroding
     case companionStartedRecording
-
     case sessionStateChanged
     case collectedStatistics
     case collectedMotionValues
+    case collectedDistance
     case receivedData
+    case receivedWorkoutData
 }
 
-typealias EventHandler = (_ data: Sendable) throws -> Void
+enum EventManagerHandler: Error {
+    case noListenerFound
+}
+
+typealias EventHandler = (_ data: Sendable) throws -> Data?

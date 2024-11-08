@@ -7,29 +7,67 @@
 
 import Combine
 import NearbyInteraction
-import WatchConnectivity
 import os
 
-//@MainActor
-class NearbyInteractionManager: NSObject, ObservableObject {
-    /// The distance to the nearby object (the paired device) in meters.
-    @Published
-    var distance: Measurement<UnitLength>?
+actor NearbyInteractionManager: NSObject {
+    let eventManager = EventManager.shared
 
-    var didSendDiscoveryToken: Bool = false
     private var session: NISession?
 
-    override init() {
-        super.init()
+    private var config: NINearbyPeerConfiguration?
+}
 
-        initializeNISession()
+extension NearbyInteractionManager {
+    func setDiscoveryToken(_ tokenData: Data) throws {
+        Logger.shared.debug("NearbyInteractionManager \(#function) called on Thread \(Thread.current)")
+
+        guard
+            let token = try? NSKeyedUnarchiver.unarchivedObject(
+                ofClass: NIDiscoveryToken.self,
+                from: tokenData
+            )
+        else {
+            throw NearbyInteractionManagerError.decodingError
+        }
+
+        // todo can i get rid of this? init?
+        if session == nil {
+            initializeNISession()
+        }
+
+        self.config = NINearbyPeerConfiguration(peerToken: token)
     }
 
-    // todo: I guess this should be init
+    func getDiscoveryToken() throws -> Data {
+        Logger.shared.debug("NearbyInteractionManager \(#function) called on Thread \(Thread.current)")
+
+        // todo can i get rid of this? init?
+        if session == nil {
+            initializeNISession()
+        }
+
+        guard let token = session?.discoveryToken else {
+            throw NearbyInteractionManagerError.noDiscoveryTokenAvailable
+        }
+
+        return try NSKeyedArchiver.archivedData(
+            withRootObject: token,
+            requiringSecureCoding: true
+        )
+    }
+}
+
+extension NearbyInteractionManager {
     func start() {
+        Logger.shared.info("Start NearbyInteractionManager")
         Logger.shared.debug("NearbyInteractionManager start called on Thread \(Thread.current)")
 
-        restartNISession()
+        guard let config = config else {
+            Logger.shared.error("No config set. Did you call setDiscoveryToken?")
+            return
+        }
+
+        session?.run(config)
     }
 
     func stop() {
@@ -37,13 +75,8 @@ class NearbyInteractionManager: NSObject, ObservableObject {
 
         // todo: maybe deinitializeNISession?
         session?.pause()
-        reset()
-    }
 
-    private func reset() {
-        Logger.shared.debug("NearbyInteractionManager reset called on Thread \(Thread.current)")
-
-        distance = nil
+        deinitializeNISession()
     }
 
     private func initializeNISession() {
@@ -58,7 +91,9 @@ class NearbyInteractionManager: NSObject, ObservableObject {
             )
             return
         }
+
         // todo: check if supported and
+
         session = NISession()
         session?.delegate = self
         session?.delegateQueue = DispatchQueue.main
@@ -70,85 +105,21 @@ class NearbyInteractionManager: NSObject, ObservableObject {
         Logger.shared.info("invalidating and deinitializing the NISession")
         session?.invalidate()
         session = nil
-        didSendDiscoveryToken = false
-    }
-
-    private func restartNISession() {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        Logger.shared.info("restarting the NISession")
-        if let config = session?.configuration {
-            session?.run(config)
-        }
-    }
-
-    func getDiscoveryToken() throws -> Data {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        guard let token = session?.discoveryToken else {
-            throw NearbyInteractionManagerError.noDiscoveryTokenAvailable
-        }
-        guard
-            let tokenData = try? NSKeyedArchiver.archivedData(
-                withRootObject: token,
-                requiringSecureCoding: true
-            )
-        else {
-            throw NearbyInteractionManagerError.encodingError
-        }
-
-        return tokenData
-    }
-
-    /// When a discovery token is received, run the session
-    func didReceiveDiscoveryToken(_ tokenData: Data) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        if let token = try? NSKeyedUnarchiver.unarchivedObject(
-            ofClass: NIDiscoveryToken.self,
-            from: tokenData
-        ) {
-            if session == nil { initializeNISession() }
-            Logger.shared.info("running NISession with peer token: \(token)")
-            let config = NINearbyPeerConfiguration(peerToken: token)
-            session?.run(config)
-        } else {
-            Logger.shared.error("failed to decode NIDiscoveryToken")
-        }
-    }
-
-    func getTokenData() -> Data? {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        guard let token = session?.discoveryToken else {
-            os_log("NIDiscoveryToken not available")
-            return nil
-        }
-
-        guard
-            let tokenData = try? NSKeyedArchiver.archivedData(
-                withRootObject: token,
-                requiringSecureCoding: true
-            )
-        else {
-            os_log("failed to encode NIDiscoveryToken")
-            return nil
-        }
-
-        return tokenData
     }
 }
 
 // MARK: - NISessionDelegate
 extension NearbyInteractionManager: NISessionDelegate {
     nonisolated func sessionWasSuspended(_ session: NISession) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
         Logger.shared.info("NISession was suspended")
-        distance = nil
     }
+
     nonisolated func sessionSuspensionEnded(_ session: NISession) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
         Logger.shared.info("NISession suspension ended")
-        restartNISession()
     }
+
     nonisolated func session(
         _ session: NISession,
         didInvalidateWith error: Error
@@ -156,37 +127,47 @@ extension NearbyInteractionManager: NISessionDelegate {
         Logger.shared.error(
             "NISession did invalidate with error: \(error.localizedDescription)"
         )
-        distance = nil
     }
+
     nonisolated func session(
         _ session: NISession,
         didUpdate nearbyObjects: [NINearbyObject]
     ) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         if let object = nearbyObjects.first, let distance = object.distance {
-            Logger.shared.info("object distance: \(distance) meters")
-            self.distance = Measurement(value: Double(distance), unit: .meters)
+            Task {
+                try await eventManager.trigger(
+                    key: .collectedDistance,
+                    data: distance
+                )
+            }
         }
     }
+
     nonisolated func session(
         _ session: NISession,
         didRemove nearbyObjects: [NINearbyObject],
         reason: NINearbyObject.RemovalReason
     ) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         switch reason {
         case .peerEnded:
-            Logger.shared.info("the remote peer ended the connection")
-            deinitializeNISession()
+            Logger.shared.info("NISession remote peer ended the connection")
+            Task {
+                await deinitializeNISession()
+            }
         case .timeout:
-            Logger.shared.error("peer connection timed out")
-            restartNISession()
+            Logger.shared.error("NISession peer connection timed out")
         default:
-            Logger.shared.error("disconnected from peer for an unknown reason")
+            Logger.shared.error("NISession disconnected from peer for an unknown reason")
         }
-        distance = nil
     }
 }
 
 enum NearbyInteractionManagerError: Error {
     case noDiscoveryTokenAvailable
     case encodingError
+    case decodingError
 }

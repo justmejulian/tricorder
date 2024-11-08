@@ -24,10 +24,14 @@ extension SensorManager {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         Task {
-            await eventManager.trigger(
-                key: .collectedMotionValues,
-                data: values
-            )
+            do {
+                let _ = try await eventManager.trigger(
+                    key: .collectedMotionValues,
+                    data: values
+                )
+            } catch {
+                Logger.shared.error("Error triggering  collectedMotionValues event: \(error)")
+            }
         }
     }
 }

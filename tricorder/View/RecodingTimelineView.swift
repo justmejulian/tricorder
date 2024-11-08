@@ -38,7 +38,7 @@ struct RecodingTimelineView: View {
 
             MetricsView(
                 statisticsManager: recordingManager.statisticsManager,
-                nearbyInteractionManager: recordingManager.nearbyInteractionManager,
+                distanceManager: recordingManager.distanceManager,
                 motionManager: recordingManager.motionManager
             )
         }

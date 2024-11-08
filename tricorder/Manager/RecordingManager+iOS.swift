@@ -22,6 +22,16 @@ extension RecordingManager {
             key: .receivedData,
             handleData: self.handleReceivedData
         )
+        
+        await eventManager.register(
+            key: .receivedWorkoutData,
+            handleData: self.handleReceivedWorkoutData
+        )
+
+        await eventManager.register(
+            key: .collectedDistance,
+            handleData: self.handleReceivedDistance
+        )
     }
 
     func resetRest() {
@@ -66,28 +76,64 @@ extension RecordingManager {
             await setRecordingState(newState: change.newState)
         }
     }
-
     @Sendable
-    nonisolated func handleReceivedData(_ data: Sendable) throws {
+    nonisolated func handleReceivedDistance(_ data: Sendable) throws {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
-        guard let data = data as? Data else {
+        guard let distance = data as? Double else {
             Logger.shared.error("\(#function): Invalid data type")
             return
         }
 
-        let dataObject = try SendDataObjectManager().decode(data)
+        Task {
+            await distanceManager.setDistance(distance)
+        }
+    }
+
+    @Sendable
+    nonisolated func handleReceivedData(_ data: Sendable) throws -> Data? {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        let dataObject = try getSendDataObject(data)
 
         // todo move these keys into and enum, so I know what is possible
+        switch dataObject.key {
+        case "discoveryToken":
+            Task {
+                // todo: maybe move this stuff into ios nearbyInteractionManager
+                // handleReceivedDiscoveryToken -> Data
+                try await nearbyInteractionManager.setDiscoveryToken(dataObject.data)
+                // return iPhones DiscoveryToken
+                return try await nearbyInteractionManager.getDiscoveryToken()
+            }
 
+        case "motionUpdate":
+            // todo: maybe move this stuff into Motion Manager
+            let values = try JSONDecoder().decode([MotionValue].self, from: dataObject.data)
+            Task {
+                await motionManager.updateMotionValues(values)
+            }
+
+        default:
+            throw RecordingManagerError.noKey
+        }
+        
+        return nil
+    }
+
+    @Sendable
+    nonisolated func handleReceivedWorkoutData(_ data: Sendable) throws {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        let dataObject = try getSendDataObject(data)
+
+        // todo move these keys into and enum, so I know what is possible
         switch dataObject.key {
         case "startDate":
             if let startDate = try? JSONDecoder().decode(
                 Date.self,
                 from: dataObject.data
             ) {
-                Logger.shared.info("Recieved startDate: \(startDate)")
-
                 Task {
                     await setStartDate(startDate)
                 }
@@ -99,31 +145,13 @@ extension RecordingManager {
                     from: dataObject.data
                 )
             {
-                Logger.shared.info(
-                    "statistics: \(statistics.debugDescription)"
-                )
-
                 Task {
                     await statisticsManager.updateForStatistics(statistics)
                 }
             }
-        case "discoveryToken":
-            Task {
-                await handleNIReceiveDiscoveryToken(dataObject.data)
-            }
-
-        case "motionUpdate":
-            guard let values = try? JSONDecoder().decode([MotionValue].self, from: dataObject.data)
-            else {
-                Logger.shared.error("\(#function): Invalid data type")
-                return
-            }
-            Task {
-                await motionManager.updateMotionValues(values)
-            }
 
         default:
-            Logger.shared.error("unknown dataObject key: \(dataObject.key)")
+            Logger.shared.error("\(#function): Unknown dataObject key: \(dataObject.key)")
         }
 
     }

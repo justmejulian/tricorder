@@ -50,6 +50,17 @@ extension WorkoutManager {
         session = nil
 
     }
+    
+    func sendCodable(key: String, data: Data) async throws {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        
+        let dataObject = try SendDataObjectManager().encode(
+            key: key,
+            data: data
+        )
+        
+        try await sendData(dataObject, retryCount: 0)
+    }
 
     func sendData(_ data: Data, retryCount: Int = 0) async throws {
         Logger.shared.info(
@@ -108,7 +119,11 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
             date: date
         )
         Task {
-            await eventManager.trigger(key: .sessionStateChanged, data: sessionSateChange)
+            do {
+                let _ = try await eventManager.trigger(key: .sessionStateChanged, data: sessionSateChange)
+            } catch {
+                Logger.shared.error("Failed to trigger sessionStateChanged event: \(error)")
+            }
         }
     }
 
@@ -150,7 +165,11 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
             Logger.shared.debug("\(#function) task called on Thread \(Thread.current)")
 
             for anElement in data {
-                await eventManager.trigger(key: .receivedData, data: anElement)
+                do {
+                    let _ = try await eventManager.trigger(key: .receivedWorkoutData, data: anElement)
+                } catch {
+                    Logger.shared.error("Failed to trigger receivedWorkoutData: \(error)")
+                }
             }
         }
     }

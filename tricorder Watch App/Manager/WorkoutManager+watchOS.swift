@@ -98,7 +98,7 @@ extension WorkoutManager {
 
     func finishedWorkout(date: Date) async throws -> HKWorkout? {
         Logger.shared.info("WorkoutManager \(#function) called")
-        
+
         guard let builder else {
             throw WorkoutManagerError.noLiveWorkoutBuilder
         }
@@ -129,7 +129,9 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
           Use Task to provide an asynchronous context so MainActor can come to play.
          */
         Task { @MainActor in
-            Logger.shared.debug("WorkoutManager \(#function) task called on Thread \(Thread.current)")
+            Logger.shared.debug(
+                "WorkoutManager \(#function) task called on Thread \(Thread.current)"
+            )
             // todo needs to be on Main?
 
             for type in collectedTypes {
@@ -139,14 +141,10 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
                     )
                 {
                     Logger.shared.debug("New statistics for \(quantityType): \(statistics)")
-                    do {
-                        let _ = try await eventManager.trigger(
-                            key: .collectedStatistics,
-                            data: statistics
-                        )
-                    } catch {
-                        Logger.shared.warning("Failed to trigger  collectedStatistics event: \(error)")
-                    }
+                    await eventManager.trigger(
+                        key: .collectedStatistics,
+                        data: statistics
+                    ) as Void
                 }
             }
         }

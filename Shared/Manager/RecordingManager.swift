@@ -36,7 +36,9 @@ class RecordingManager: ObservableObject {
         Logger.shared.debug("RecordingManager \(#function) called on Thread \(Thread.current)")
 
         Task {
-            Logger.shared.debug("RecordingManager \(#function) taks called on Thread \(Thread.current)")
+            Logger.shared.debug(
+                "RecordingManager \(#function) taks called on Thread \(Thread.current)"
+            )
 
             await registerListeners()
         }
@@ -68,15 +70,31 @@ extension RecordingManager {
 
 extension RecordingManager {
     @Sendable
-    nonisolated func getSendDataObject(_ data: Sendable) throws -> SendDataObjectManager.DataObject {
+    nonisolated func getSendDataObject(_ data: Sendable) throws -> SendDataObjectManager.DataObject
+    {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-        
+
         guard let data = data as? Data else {
             throw RecordingManagerError.invalidData
         }
 
         return try SendDataObjectManager().decode(data)
     }
+
+    @Sendable
+    nonisolated func handleReceivedDistance(_ data: Sendable) throws {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        guard let distance = data as? Double else {
+            Logger.shared.error("\(#function): Invalid data type")
+            return
+        }
+
+        Task {
+            await distanceManager.setDistance(distance)
+        }
+    }
+
 }
 
 enum RecordingManagerError: Error {

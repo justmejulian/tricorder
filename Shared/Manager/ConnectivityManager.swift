@@ -55,6 +55,7 @@ extension ConnectivityManager {
                     key: .receivedData,
                     data: messageData
                 ) {
+                    Logger.shared.debug("EventManager.trigger returned: \(data)")
                     replyHandler(data)
                     return
                 }
@@ -79,27 +80,17 @@ extension ConnectivityManager {
         Logger.shared.debug("\(#function) no replyHandler called on Thread \(Thread.current)")
 
         Task {
-            do {
-                let _ = try await eventManager.trigger(
-                    key: .receivedData,
-                    data: messageData
-                )
-            } catch {
-                Logger.shared.error("Error trying to trigger event: \(error.localizedDescription)")
-            }
+            await eventManager.trigger(
+                key: .receivedData,
+                data: messageData
+            ) as Void
         }
     }
 }
 
 extension ConnectivityManager {
+    // needs to be called with 'as Void'
     func sendCodable(key: String, data: Data) throws {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        try sendCodable(key: key, data: data, replyHandler: nil)
-    }
-
-    // todo convert to asyn await
-    func sendCodable(key: String, data: Data, replyHandler: ((Data) -> Void)?) throws {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         let dataObject = try SendDataObjectManager().encode(
@@ -107,12 +98,40 @@ extension ConnectivityManager {
             data: data
         )
 
+        sendMessageData(dataObject)
+    }
+
+    private func sendMessageData(_ data: Data) {
         self.session.sendMessageData(
-            dataObject,
-            replyHandler: replyHandler,
-            errorHandler: { (error) in
-                Logger.shared.error("Error sending: \(key) \(error.localizedDescription)")
-            }
+            data,
+            replyHandler: nil
         )
+    }
+
+    func sendCodable(key: String, data: Data) async throws -> Data? {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        let dataObject = try SendDataObjectManager().encode(
+            key: key,
+            data: data
+        )
+
+        return try await sendMessageData(dataObject)
+    }
+
+    private func sendMessageData(_ data: Data) async throws -> Data? {
+        return try await withCheckedThrowingContinuation({
+            continuation in
+            self.session.sendMessageData(
+                data,
+                replyHandler: { data in
+                    Logger.shared.debug("connectivityManager.sendMessageData replyHandler called")
+                    continuation.resume(returning: data)
+                },
+                errorHandler: { (error) in
+                    continuation.resume(throwing: error)
+                }
+            )
+        })
     }
 }

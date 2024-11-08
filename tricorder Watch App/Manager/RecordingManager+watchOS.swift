@@ -42,6 +42,11 @@ extension RecordingManager {
             key: .receivedWorkoutData,
             handleData: self.handleReceivedWorkoutData
         )
+
+        await eventManager.register(
+            key: .collectedDistance,
+            handleData: self.handleReceivedDistance
+        )
     }
 
     func resetRest() {
@@ -54,7 +59,7 @@ extension RecordingManager {
 extension RecordingManager {
     func startRecording(workoutConfiguration: HKWorkoutConfiguration) async {
         Logger.shared.info("Starting Recording")
-        
+
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         do {
@@ -84,20 +89,16 @@ extension RecordingManager {
         do {
             let discoveryToken =
                 try await nearbyInteractionManager.getDiscoveryToken()
-            try await connectivityManager.sendCodable(
-                key: "discoveryToken",
-                data: discoveryToken,
-                replyHandler: { data in
-                    Logger.shared.debug("connectivityManager.sendCodable replyHandler for discoveryToken called")
-                    Task {
-                        do {
-                            try await self.nearbyInteractionManager.setDiscoveryToken(data)
-                        } catch {
-                            Logger.shared.error("Failed to set discovery token: \(error)")
-                        }
-                    }
-                }
-            )
+            guard
+                let partnerDiscoveryToken = try await connectivityManager.sendCodable(
+                    key: "discoveryToken",
+                    data: discoveryToken
+                )
+            else {
+                throw NearbyInteractionManagerError.noDiscoveryTokenAvailable
+            }
+
+            try await self.nearbyInteractionManager.setDiscoveryToken(partnerDiscoveryToken)
         } catch {
             Logger.shared.error("Could not initNIDiscoveryToken: \(error)")
         }
@@ -145,7 +146,7 @@ extension RecordingManager {
                 if let startDateData = try? JSONEncoder().encode(startDate) {
                     try await workoutManager.sendCodable(key: "startDate", data: startDateData)
                 }
-                
+
             }
         }
 
@@ -213,7 +214,7 @@ extension RecordingManager {
                 try await connectivityManager.sendCodable(
                     key: "motionUpdate",
                     data: archivedUpdates
-                )
+                ) as Void
             } catch {
                 Logger.shared.error("\(#function): Failed to send data: \(error)")
             }

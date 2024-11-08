@@ -15,14 +15,10 @@ class AppDelegate: NSObject, WKApplicationDelegate {
     func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
         Task {
             Logger.shared.log("AppDelegate: received workout configuration")
-            do {
-                try await EventManager.shared.trigger(
-                    key: .companionStartedRecording,
-                    data: workoutConfiguration
-                )
-            } catch {
-                Logger.shared.error("AppDelegate: failed to trigger event: \(error)")
-            }
+            await EventManager.shared.trigger(
+                key: .companionStartedRecording,
+                data: workoutConfiguration
+            ) as Void
         }
     }
 }

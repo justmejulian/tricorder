@@ -14,7 +14,6 @@ struct MetricsView: View {
 
     @ObservedObject
     var distanceManager: DistanceManager
-    
 
     var body: some View {
         HStack {

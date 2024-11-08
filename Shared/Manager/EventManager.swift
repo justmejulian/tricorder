@@ -11,11 +11,11 @@ import os
 actor EventManager {
     static let shared = EventManager()
 
-    static var listeners: [EventListenerKey: EventHandler] = [:]
+    static var listeners: [EventListenerKey: AsyncEventHandler] = [:]
 
     func register(
         key: EventListenerKey,
-        handleData: @escaping @Sendable (_ data: Sendable) throws -> Data?
+        handleData: @escaping @Sendable (_ data: Sendable) async throws -> Data?
     ) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
@@ -39,8 +39,7 @@ actor EventManager {
             }
         )
     }
-
-    func trigger(key: EventListenerKey, data: Sendable) throws -> Data? {
+    func trigger(key: EventListenerKey, data: Sendable) async throws -> Data? {
         Logger.shared.debug(
             "Event Listener triggered for \(key.rawValue) called on Thread \(Thread.current)"
         )
@@ -49,9 +48,19 @@ actor EventManager {
             throw EventManagerError.noListenerFound
         }
 
-        return try listener(data)
+        return try await listener(data)
     }
 
+    // needs to be called with 'as Void'
+    func trigger(key: EventListenerKey, data: Sendable) async {
+        do {
+            let _: Data? = try await trigger(key: key, data: data)
+        } catch {
+            Logger.shared.error(
+                "Failed to trigger Event Listener for \(key.rawValue): \(error.localizedDescription)"
+            )
+        }
+    }
 }
 
 enum EventManagerError: Error {
@@ -74,4 +83,5 @@ enum EventManagerHandler: Error {
     case noListenerFound
 }
 
-typealias EventHandler = (_ data: Sendable) throws -> Data?
+typealias EventHandler = (_ data: Sendable) throws -> Void
+typealias AsyncEventHandler = (_ data: Sendable) async throws -> Data?

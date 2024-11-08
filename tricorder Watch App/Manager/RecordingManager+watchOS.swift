@@ -62,6 +62,8 @@ extension RecordingManager {
 
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
+        reset()
+
         do {
             try await workoutManager.startWorkout(
                 workoutConfiguration: workoutConfiguration

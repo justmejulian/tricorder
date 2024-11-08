@@ -63,8 +63,8 @@ extension RecordingManager {
 
         recordingState = .notStarted
         startDate = nil
-        
-        nearbyInteractionManager.reset()
+
+        distanceManager.reset()
         statisticsManager.reset()
         motionManager.reset()
 

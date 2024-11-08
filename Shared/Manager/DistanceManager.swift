@@ -12,6 +12,10 @@ import os
 class DistanceManager: ObservableObject {
     @Published
     var distance: Measurement<UnitLength>?
+
+    func reset() {
+        distance = nil
+    }
 }
 
 extension DistanceManager {

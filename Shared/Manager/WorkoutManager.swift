@@ -51,6 +51,17 @@ extension WorkoutManager {
 
     }
 
+    func sendCodable(key: String, data: Data) async throws {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        let dataObject = try SendDataObjectManager().encode(
+            key: key,
+            data: data
+        )
+
+        try await sendData(dataObject, retryCount: 0)
+    }
+
     func sendData(_ data: Data, retryCount: Int = 0) async throws {
         Logger.shared.info(
             "\(#function) data: \(data.debugDescription) retry count: \(retryCount) called on Thread \(Thread.current)"
@@ -108,7 +119,10 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
             date: date
         )
         Task {
-            await eventManager.trigger(key: .sessionStateChanged, data: sessionSateChange)
+            await eventManager.trigger(
+                key: .sessionStateChanged,
+                data: sessionSateChange
+            ) as Void
         }
     }
 
@@ -150,7 +164,10 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
             Logger.shared.debug("\(#function) task called on Thread \(Thread.current)")
 
             for anElement in data {
-                await eventManager.trigger(key: .receivedData, data: anElement)
+                await eventManager.trigger(
+                    key: .receivedWorkoutData,
+                    data: anElement
+                ) as Void
             }
         }
     }

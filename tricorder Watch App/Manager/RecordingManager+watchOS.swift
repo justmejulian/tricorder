@@ -37,6 +37,16 @@ extension RecordingManager {
             key: .receivedData,
             handleData: self.handleReceivedData
         )
+
+        await eventManager.register(
+            key: .receivedWorkoutData,
+            handleData: self.handleReceivedWorkoutData
+        )
+
+        await eventManager.register(
+            key: .collectedDistance,
+            handleData: self.handleReceivedDistance
+        )
     }
 
     func resetRest() {
@@ -48,8 +58,9 @@ extension RecordingManager {
 //
 extension RecordingManager {
     func startRecording(workoutConfiguration: HKWorkoutConfiguration) async {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
         Logger.shared.info("Starting Recording")
+
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         do {
             try await workoutManager.startWorkout(
@@ -60,9 +71,8 @@ extension RecordingManager {
             Logger.shared.error("Failed to start startWorkout: \(error)")
         }
 
-        // todo move the sending into init of RecordingManager
-        // then start from here and resend if fails
-        await sendNIDiscoveryToken()
+        await initNIDiscoveryToken()
+        await nearbyInteractionManager.start()
 
         do {
             try await sensorManager.startUpdates()
@@ -70,6 +80,28 @@ extension RecordingManager {
             Logger.shared.error("Failed to start Motion Updates: \(error)")
         }
 
+    }
+
+    func initNIDiscoveryToken() async {
+        Logger.shared.info("Init NIDiscovery Token")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        do {
+            let discoveryToken =
+                try await nearbyInteractionManager.getDiscoveryToken()
+            guard
+                let partnerDiscoveryToken = try await connectivityManager.sendCodable(
+                    key: "discoveryToken",
+                    data: discoveryToken
+                )
+            else {
+                throw NearbyInteractionManagerError.noDiscoveryTokenAvailable
+            }
+
+            try await self.nearbyInteractionManager.setDiscoveryToken(partnerDiscoveryToken)
+        } catch {
+            Logger.shared.error("Could not initNIDiscoveryToken: \(error)")
+        }
     }
 }
 
@@ -112,8 +144,9 @@ extension RecordingManager {
                 let startDate = await workoutManager.getStartDate()
 
                 if let startDateData = try? JSONEncoder().encode(startDate) {
-                    try await sendData(key: "startDate", data: startDateData)
+                    try await workoutManager.sendCodable(key: "startDate", data: startDateData)
                 }
+
             }
         }
 
@@ -141,22 +174,24 @@ extension RecordingManager {
     nonisolated func handleReceivedData(_ data: Sendable) throws {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
-        guard let data = data as? Data else {
-            Logger.shared.error("\(#function): Invalid data type")
-            return
+        let dataObject = try getSendDataObject(data)
+
+        switch dataObject.key {
+        default:
+            Logger.shared.error("\(#function): Unknown dataObject key: \(dataObject.key)")
         }
 
-        let dataObject = try SendDataObjectManager().decode(data)
+    }
 
-        // todo move these keys into and enum, so I know what is possible
+    @Sendable
+    nonisolated func handleReceivedWorkoutData(_ data: Sendable) throws {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        let dataObject = try getSendDataObject(data)
+
         switch dataObject.key {
-        case "discoveryToken":
-            Task {
-                await handleNIReceiveDiscoveryToken(dataObject.data)
-            }
-
         default:
-            Logger.shared.error("unknown dataObject key: \(dataObject.key)")
+            Logger.shared.error("\(#function): Unknown dataObject key: \(dataObject.key)")
         }
 
     }
@@ -165,6 +200,7 @@ extension RecordingManager {
     nonisolated func handleCollecteMotionValues(_ data: Sendable) throws {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
+        // todo: maybe move this stuff into motionManager
         guard let values = data as? [MotionValue] else {
             Logger.shared.error("\(#function): Invalid data type")
             return
@@ -174,7 +210,11 @@ extension RecordingManager {
 
             do {
                 let archivedUpdates = try archiveSendable(values)
-                try await sendData(key: "motionUpdate", data: archivedUpdates)
+
+                try await connectivityManager.sendCodable(
+                    key: "motionUpdate",
+                    data: archivedUpdates
+                ) as Void
             } catch {
                 Logger.shared.error("\(#function): Failed to send data: \(error)")
             }
@@ -196,7 +236,7 @@ extension RecordingManager {
 
             do {
                 let archivedStatistics = try archiveNSObject(statistics)
-                try await sendData(key: "statistics", data: archivedStatistics)
+                try await workoutManager.sendCodable(key: "statistics", data: archivedStatistics)
             } catch {
                 Logger.shared.error("\(#function): Failed to send data: \(error)")
             }

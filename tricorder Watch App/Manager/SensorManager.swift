@@ -22,12 +22,11 @@ extension SensorManager {
         _ values: [MotionValue]
     ) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
         Task {
             await eventManager.trigger(
                 key: .collectedMotionValues,
                 data: values
-            )
+            ) as Void
         }
     }
 }

@@ -22,6 +22,16 @@ extension RecordingManager {
             key: .receivedData,
             handleData: self.handleReceivedData
         )
+
+        await eventManager.register(
+            key: .receivedWorkoutData,
+            handleData: self.handleReceivedWorkoutData
+        )
+
+        await eventManager.register(
+            key: .collectedDistance,
+            handleData: self.handleReceivedDistance
+        )
     }
 
     func resetRest() {
@@ -68,26 +78,47 @@ extension RecordingManager {
     }
 
     @Sendable
-    nonisolated func handleReceivedData(_ data: Sendable) throws {
+    nonisolated func handleReceivedData(_ data: Sendable) async throws -> Data? {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
-        guard let data = data as? Data else {
-            Logger.shared.error("\(#function): Invalid data type")
-            return
-        }
-
-        let dataObject = try SendDataObjectManager().decode(data)
+        let dataObject = try getSendDataObject(data)
 
         // todo move these keys into and enum, so I know what is possible
+        switch dataObject.key {
+        case "discoveryToken":
+            // todo: maybe move this stuff into ios nearbyInteractionManager
+            // handleReceivedDiscoveryToken -> Data
+            try await nearbyInteractionManager.setDiscoveryToken(dataObject.data)
+            // return iPhones DiscoveryToken
+            let token = try await nearbyInteractionManager.getDiscoveryToken()
 
+            await nearbyInteractionManager.start()
+            return token
+
+        case "motionUpdate":
+            // todo: maybe move this stuff into Motion Manager
+            let values = try JSONDecoder().decode([MotionValue].self, from: dataObject.data)
+            await motionManager.updateMotionValues(values)
+            return nil
+
+        default:
+            throw RecordingManagerError.noKey
+        }
+    }
+
+    @Sendable
+    nonisolated func handleReceivedWorkoutData(_ data: Sendable) throws {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        let dataObject = try getSendDataObject(data)
+
+        // todo move these keys into and enum, so I know what is possible
         switch dataObject.key {
         case "startDate":
             if let startDate = try? JSONDecoder().decode(
                 Date.self,
                 from: dataObject.data
             ) {
-                Logger.shared.info("Recieved startDate: \(startDate)")
-
                 Task {
                     await setStartDate(startDate)
                 }
@@ -99,31 +130,13 @@ extension RecordingManager {
                     from: dataObject.data
                 )
             {
-                Logger.shared.info(
-                    "statistics: \(statistics.debugDescription)"
-                )
-
                 Task {
                     await statisticsManager.updateForStatistics(statistics)
                 }
             }
-        case "discoveryToken":
-            Task {
-                await handleNIReceiveDiscoveryToken(dataObject.data)
-            }
-
-        case "motionUpdate":
-            guard let values = try? JSONDecoder().decode([MotionValue].self, from: dataObject.data)
-            else {
-                Logger.shared.error("\(#function): Invalid data type")
-                return
-            }
-            Task {
-                await motionManager.updateMotionValues(values)
-            }
 
         default:
-            Logger.shared.error("unknown dataObject key: \(dataObject.key)")
+            Logger.shared.error("\(#function): Unknown dataObject key: \(dataObject.key)")
         }
 
     }

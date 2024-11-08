@@ -13,13 +13,13 @@ struct MetricsView: View {
     var statisticsManager: StatisticsManager
 
     @ObservedObject
-    var nearbyInteractionManager: NearbyInteractionManager
+    var distanceManager: DistanceManager
 
     var body: some View {
         HStack {
             Text(formatHeartRate(statisticsManager.mostRecentHeartRate))
             Spacer()
-            Text(formatDistance(nearbyInteractionManager.distance))
+            Text(formatDistance(distanceManager.distance))
         }
         .font(
             .system(.title2, design: .rounded)

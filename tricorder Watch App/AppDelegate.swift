@@ -18,7 +18,7 @@ class AppDelegate: NSObject, WKApplicationDelegate {
             await EventManager.shared.trigger(
                 key: .companionStartedRecording,
                 data: workoutConfiguration
-            )
+            ) as Void
         }
     }
 }

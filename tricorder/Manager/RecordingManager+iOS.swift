@@ -74,7 +74,13 @@ extension RecordingManager {
 
         Task {
             await setRecordingState(newState: change.newState)
+            
+            if change.newState == .running {
+                await reset()
+            }
         }
+                
+
     }
 
     @Sendable

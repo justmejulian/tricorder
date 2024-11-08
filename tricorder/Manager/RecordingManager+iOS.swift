@@ -44,6 +44,9 @@ extension RecordingManager {
 extension RecordingManager {
     func startRecording() async {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        reset()
+
         do {
             try await workoutManager.startWatchWorkout()
         } catch {
@@ -73,8 +76,12 @@ extension RecordingManager {
         )
 
         Task {
+            if change.newState == .running {
+                await reset()
+            }
             await setRecordingState(newState: change.newState)
         }
+
     }
 
     @Sendable

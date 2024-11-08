@@ -64,6 +64,10 @@ extension RecordingManager {
         recordingState = .notStarted
         startDate = nil
 
+        distanceManager.reset()
+        statisticsManager.reset()
+        motionManager.reset()
+
         resetRest()
     }
 }

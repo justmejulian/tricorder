@@ -30,6 +30,8 @@ extension StatisticsManager {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         statistics = []
+        mostRecentHeartRate = nil
+        avgHeartRate = nil
     }
 
     func updateForStatistics(_ lastStatistics: HKStatistics) {

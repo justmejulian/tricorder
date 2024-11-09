@@ -50,7 +50,7 @@ extension RecordingManager {
     }
 
     func resetRest() {
-        successSendCount = 0
+        successMotionUpdateSendCount = 0
     }
 }
 
@@ -81,7 +81,6 @@ extension RecordingManager {
         } catch {
             Logger.shared.error("Failed to start Motion Updates: \(error)")
         }
-
     }
 
     func initNIDiscoveryToken() async {
@@ -106,10 +105,10 @@ extension RecordingManager {
         }
     }
 
-    func addToSuccessSendCount(_ count: Int) {
+    func addToSuccessMotionUpdateSendCount(_ count: Int) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
-        successSendCount += count
+        successMotionUpdateSendCount += count
     }
 }
 
@@ -224,6 +223,8 @@ extension RecordingManager {
                     key: "motionUpdate",
                     data: archivedUpdates
                 ) as Void
+
+                await addToSuccessMotionUpdateSendCount(values.count)
             } catch {
                 Logger.shared.error("\(#function): Failed to send data: \(error)")
             }

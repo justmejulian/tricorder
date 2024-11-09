@@ -62,6 +62,8 @@ extension ConnectivityManager {
 
                 replyHandler(try JSONEncoder().encode(["sucess": true]))
             } catch {
+                // Todo do I need to replyHandler? or can I throw?
+                // maybe catch and thow with better string
                 Logger.shared.error("Error trying to trigger event: \(error.localizedDescription)")
 
                 do {

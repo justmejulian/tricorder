@@ -23,6 +23,8 @@ private let data: [Bool] = [
 ]
 
 struct DotsView: View {
+    @ObservedObject
+    var recordingManager: RecordingManager
 
     @ObservedObject
     var motionManager: MotionManager
@@ -30,7 +32,7 @@ struct DotsView: View {
     var body: some View {
 
         let recordedCount = motionManager.motionValues.count
-        let successCount = 0
+        let successCount = recordingManager.successMotionUpdateSendCount
 
         VStack {
             HStack(spacing: 4) {

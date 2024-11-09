@@ -26,13 +26,10 @@ struct DotsView: View {
     @ObservedObject
     var recordingManager: RecordingManager
 
-    @ObservedObject
-    var motionManager: MotionManager
-
     var body: some View {
 
-        let recordedCount = motionManager.motionValues.count
-        let successCount = recordingManager.successMotionUpdateSendCount
+        let sendCount = recordingManager.motionUpdateSendCount
+        let successSendCount = recordingManager.successMotionUpdateSendCount
 
         VStack {
             HStack(spacing: 4) {
@@ -43,7 +40,7 @@ struct DotsView: View {
                 }
             }
             Spacer()
-            Text("# \(successCount) / \(recordedCount)")
+            Text("# \(successSendCount) / \(sendCount)")
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)

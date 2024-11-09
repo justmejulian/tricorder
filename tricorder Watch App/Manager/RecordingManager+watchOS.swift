@@ -50,6 +50,7 @@ extension RecordingManager {
     }
 
     func resetRest() {
+        motionUpdateSendCount = 0
         successMotionUpdateSendCount = 0
     }
 }
@@ -105,10 +106,16 @@ extension RecordingManager {
         }
     }
 
-    func addToSuccessMotionUpdateSendCount(_ count: Int) {
+    func increaseSuccessMotionUpdateSendCount() {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
-        successMotionUpdateSendCount += count
+        successMotionUpdateSendCount += 1
+    }
+
+    func increaseMotionUpdateSendCount() {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        motionUpdateSendCount += 1
     }
 }
 
@@ -219,12 +226,14 @@ extension RecordingManager {
             do {
                 let archivedUpdates = try archiveSendable(values)
 
+                await increaseMotionUpdateSendCount()
+
                 try await connectivityManager.sendCodable(
                     key: "motionUpdate",
                     data: archivedUpdates
                 ) as Void
 
-                await addToSuccessMotionUpdateSendCount(values.count)
+                await increaseSuccessMotionUpdateSendCount()
             } catch {
                 Logger.shared.error("\(#function): Failed to send data: \(error)")
             }

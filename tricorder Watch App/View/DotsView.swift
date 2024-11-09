@@ -28,6 +28,10 @@ struct DotsView: View {
     var motionManager: MotionManager
 
     var body: some View {
+        
+        let recordedCount = motionManager.motionValues.count
+        let successCount = 0
+        
         VStack {
             HStack(spacing: 4) {
                 ForEach(data, id: \.self) { wasSuccess in
@@ -37,7 +41,7 @@ struct DotsView: View {
                 }
             }
             Spacer()
-            Text("# 0 / \(motionManager.motionValues.count)")
+            Text("# \(successCount) / \(recordedCount)")
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)

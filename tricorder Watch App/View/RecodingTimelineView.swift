@@ -21,7 +21,7 @@ struct RecodingTimelineView: View {
         TimelineView(schedule) { context in
             RecordingElapsedTimeView(context: context)
             DotsView(
-                recordingManager: recordingManager
+                monitoringManager: recordingManager.monitoringManager
             )
             MetricsView(
                 statisticsManager: recordingManager.statisticsManager,

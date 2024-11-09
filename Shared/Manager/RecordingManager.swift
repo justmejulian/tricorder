@@ -28,10 +28,7 @@ class RecordingManager: ObservableObject {
 
     #if os(watchOS)
         var sensorManager = SensorManager()
-
-        // todo maybe move this out into a Manager
-        @Published var motionUpdateSendCount: Int = 0
-        @Published var successMotionUpdateSendCount: Int = 0
+    var monitoringManager = MonitoringManager()
     #endif
 
     init() {

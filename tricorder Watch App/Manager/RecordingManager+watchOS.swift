@@ -50,8 +50,7 @@ extension RecordingManager {
     }
 
     func resetRest() {
-        motionUpdateSendCount = 0
-        successMotionUpdateSendCount = 0
+        monitoringManager.reset()
     }
 }
 
@@ -104,18 +103,6 @@ extension RecordingManager {
         } catch {
             Logger.shared.error("Could not initNIDiscoveryToken: \(error)")
         }
-    }
-
-    func increaseSuccessMotionUpdateSendCount() {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        successMotionUpdateSendCount += 1
-    }
-
-    func increaseMotionUpdateSendCount() {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        motionUpdateSendCount += 1
     }
 }
 
@@ -226,14 +213,14 @@ extension RecordingManager {
             do {
                 let archivedUpdates = try archiveSendable(values)
 
-                await increaseMotionUpdateSendCount()
+                await monitoringManager.increaseMotionUpdateSendCount()
 
                 try await connectivityManager.sendCodable(
                     key: "motionUpdate",
                     data: archivedUpdates
                 ) as Void
 
-                await increaseSuccessMotionUpdateSendCount()
+                await monitoringManager.increaseSuccessMotionUpdateSendCount()
             } catch {
                 Logger.shared.error("\(#function): Failed to send data: \(error)")
             }

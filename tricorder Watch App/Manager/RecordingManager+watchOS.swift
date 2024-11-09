@@ -50,7 +50,7 @@ extension RecordingManager {
     }
 
     func resetRest() {
-
+        successSendCount = 0
     }
 }
 
@@ -104,6 +104,12 @@ extension RecordingManager {
         } catch {
             Logger.shared.error("Could not initNIDiscoveryToken: \(error)")
         }
+    }
+
+    func addToSuccessSendCount(_ count: Int) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        successSendCount += count
     }
 }
 
@@ -161,6 +167,7 @@ extension RecordingManager {
                     await nearbyInteractionManager.stop()
 
                     // todo finish sync
+                    // maybe use a HKWorkoutSessionState
 
                     try await workoutManager.endWorkout(date: change.date)
                 } catch {

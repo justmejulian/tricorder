@@ -28,7 +28,7 @@ class RecordingManager: ObservableObject {
 
     #if os(watchOS)
         var sensorManager = SensorManager()
-    var monitoringManager = MonitoringManager()
+        var monitoringManager = MonitoringManager()
     #endif
 
     init() {

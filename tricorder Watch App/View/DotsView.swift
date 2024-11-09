@@ -28,8 +28,8 @@ struct DotsView: View {
 
     var body: some View {
 
-        let sendCount = monitoringManager.motionUpdateSendCount
-        let successSendCount = monitoringManager.successMotionUpdateSendCount
+        let sendCount = monitoringManager.motionUpdateSendSuccessCount
+        let successSendCount = monitoringManager.motionUpdateSendSuccessTrueCount
 
         VStack {
             HStack(spacing: 4) {
@@ -40,7 +40,7 @@ struct DotsView: View {
                 }
             }
             Spacer()
-            Text("# \(successSendCount) / \(sendCount)")
+            Text("Batch #: \(successSendCount) / \(sendCount)")
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)

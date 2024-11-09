@@ -213,16 +213,15 @@ extension RecordingManager {
             do {
                 let archivedUpdates = try archiveSendable(values)
 
-                await monitoringManager.increaseMotionUpdateSendCount()
-
                 try await connectivityManager.sendCodable(
                     key: "motionUpdate",
                     data: archivedUpdates
                 ) as Void
 
-                await monitoringManager.increaseSuccessMotionUpdateSendCount()
+                await monitoringManager.addMotioUpdateSendSuccess(true)
             } catch {
                 Logger.shared.error("\(#function): Failed to send data: \(error)")
+                await monitoringManager.addMotioUpdateSendSuccess(false)
             }
 
         }

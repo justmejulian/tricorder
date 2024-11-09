@@ -47,7 +47,7 @@ extension ConnectivityManager {
         didReceiveMessageData messageData: Data,
         replyHandler: @escaping (Data) -> Void
     ) {
-        Logger.shared.debug("\(#function) with replyHandler called on Thread \(Thread.current)")
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         Task {
             do {
@@ -72,40 +72,12 @@ extension ConnectivityManager {
             }
         }
     }
-
-    nonisolated func session(
-        _ session: WCSession,
-        didReceiveMessageData messageData: Data
-    ) {
-        Logger.shared.debug("\(#function) no replyHandler called on Thread \(Thread.current)")
-
-        Task {
-            await eventManager.trigger(
-                key: .receivedData,
-                data: messageData
-            ) as Void
-        }
-    }
 }
 
 extension ConnectivityManager {
     // needs to be called with 'as Void'
-    func sendCodable(key: String, data: Data) throws {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        let dataObject = try SendDataObjectManager().encode(
-            key: key,
-            data: data
-        )
-
-        sendMessageData(dataObject)
-    }
-
-    private func sendMessageData(_ data: Data) {
-        self.session.sendMessageData(
-            data,
-            replyHandler: nil
-        )
+    func sendCodable(key: String, data: Data) async throws {
+        let _ = try await sendCodable(key: key, data: data) as Data?
     }
 
     func sendCodable(key: String, data: Data) async throws -> Data? {

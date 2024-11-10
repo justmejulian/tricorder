@@ -18,7 +18,6 @@ class RecordingManager: ObservableObject {
     var motionManager = MotionManager()
     var distanceManager = DistanceManager()
 
-    // todo can we move to backgroudn thread?
     var workoutManager = WorkoutManager()
     var nearbyInteractionManager = NearbyInteractionManager()
     var connectivityManager = ConnectivityManager()
@@ -28,8 +27,8 @@ class RecordingManager: ObservableObject {
     @Published var startDate: Date?
 
     #if os(watchOS)
-        // todo can we move to backgroudn thread?
         var sensorManager = SensorManager()
+        var monitoringManager = MonitoringManager()
     #endif
 
     init() {

@@ -9,6 +9,9 @@ import Foundation
 import HealthKit
 import os
 
+// todo can this be bigger?
+let MAXCHUNKSIZE = 300
+
 extension RecordingManager {
     func registerListeners() async {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
@@ -50,7 +53,7 @@ extension RecordingManager {
     }
 
     func resetRest() {
-
+        monitoringManager.reset()
     }
 }
 
@@ -81,7 +84,6 @@ extension RecordingManager {
         } catch {
             Logger.shared.error("Failed to start Motion Updates: \(error)")
         }
-
     }
 
     func initNIDiscoveryToken() async {
@@ -161,6 +163,7 @@ extension RecordingManager {
                     await nearbyInteractionManager.stop()
 
                     // todo finish sync
+                    // maybe use a HKWorkoutSessionState
 
                     try await workoutManager.endWorkout(date: change.date)
                 } catch {
@@ -211,14 +214,28 @@ extension RecordingManager {
             await motionManager.updateMotionValues(values)
 
             do {
-                let archivedUpdates = try archiveSendable(values)
+                let archiveMotionValueArrays = try archiveMotionValueArray(values)
 
-                try await connectivityManager.sendCodable(
-                    key: "motionUpdate",
-                    data: archivedUpdates
-                ) as Void
+                for archiveMotionValueArray in archiveMotionValueArrays {
+                    do {
+                        try await connectivityManager.sendCodable(
+                            key: "motionUpdate",
+                            data: archiveMotionValueArray
+                        ) as Void
+                        await monitoringManager.addMotioUpdateSendSuccess(true)
+                    } catch {
+                        Logger.shared.error("\(#function): Failed to send data: \(error)")
+                        Logger.shared.debug(
+                            "archiveMotionValueArray lenght \(archiveMotionValueArray.count), size \(archiveMotionValueArray.debugDescription)"
+                        )
+                        // todo presist data
+                        await monitoringManager.addMotioUpdateSendSuccess(false)
+                    }
+                }
+
             } catch {
-                Logger.shared.error("\(#function): Failed to send data: \(error)")
+                Logger.shared.error("\(#function): Failed to archive data: \(error)")
+                await monitoringManager.addMotioUpdateSendSuccess(false)
             }
 
         }
@@ -255,9 +272,25 @@ extension RecordingManager {
         )
     }
 
-    nonisolated func archiveSendable(_ data: Encodable) throws -> Data {
+    nonisolated func archiveSendable(_ data: Codable) throws -> Data {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         return try JSONEncoder().encode(data)
+    }
+
+    // for data that could be too large
+    nonisolated func archiveMotionValueArray(_ data: [MotionValue]) throws -> [Data] {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        if data.count < MAXCHUNKSIZE {
+            let json = try archiveSendable(data)
+            return [json]
+        }
+
+        let chunks = data.chunked(into: MAXCHUNKSIZE)
+
+        return try chunks.map {
+            try archiveSendable($0)
+        }
     }
 }

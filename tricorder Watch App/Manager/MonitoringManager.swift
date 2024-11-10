@@ -10,12 +10,16 @@ import os
 
 @MainActor
 class MonitoringManager: ObservableObject {
-    @Published var motionUpdateSendSuccess: [Bool] = []
+    @Published var motionUpdateSendSuccess: [Success] = []
 
     @Published var motionUpdateSendSuccessTrueCount: Int = 0
 
     var motionUpdateSendSuccessCount: Int {
         return motionUpdateSendSuccess.count
+    }
+
+    var last10MotionUpdateSendSuccess: [Success] {
+        return motionUpdateSendSuccess.suffix(10)
     }
 
     func reset() {
@@ -31,6 +35,13 @@ class MonitoringManager: ObservableObject {
             motionUpdateSendSuccessTrueCount += 1
         }
 
-        motionUpdateSendSuccess.append(success)
+        motionUpdateSendSuccess.append(Success(state: success))
+    }
+}
+
+extension MonitoringManager {
+    struct Success: Identifiable {
+        var id: UUID = .init()
+        var state: Bool
     }
 }

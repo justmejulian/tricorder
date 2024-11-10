@@ -7,21 +7,6 @@
 
 import SwiftUI
 
-// todo add an id and only display last 10
-private let data: [Bool] = [
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-    true,
-]
-
 struct DotsView: View {
     @ObservedObject
     var monitoringManager: MonitoringManager
@@ -30,12 +15,13 @@ struct DotsView: View {
 
         let sendCount = monitoringManager.motionUpdateSendSuccessCount
         let successSendCount = monitoringManager.motionUpdateSendSuccessTrueCount
+        let last10 = monitoringManager.last10MotionUpdateSendSuccess
 
         VStack {
             HStack(spacing: 4) {
-                ForEach(data, id: \.self) { wasSuccess in
+                ForEach(last10) { data in
                     Circle()
-                        .fill(wasSuccess ? Color.blue : Color.gray)
+                        .fill(data.state ? Color.blue : Color.gray)
                         .frame(width: 10, height: 10)
                 }
             }

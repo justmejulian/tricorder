@@ -29,7 +29,7 @@ struct DotsView: View {
             Text("Batch #: \(successSendCount) / \(sendCount)")
         }
         .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .center)
         .clipped()
     }
 }

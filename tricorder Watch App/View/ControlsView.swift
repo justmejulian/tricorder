@@ -12,7 +12,18 @@ import os
 struct ControlsView: View {
     @EnvironmentObject var recordingManager: RecordingManager
 
+    @State private var error: Error?
+    @State private var showAlert: Bool = false
+
     var body: some View {
+        var errorMessage: String {
+            if let localizedDescription = error?.localizedDescription {
+                return localizedDescription
+            }
+
+            return "Something went wrong starting the workout."
+        }
+
         VStack {
             Button {
                 startWorkout()
@@ -24,15 +35,19 @@ struct ControlsView: View {
             .tint(.green)
 
             Button {
-                recordingManager.workoutManager.session?.stopActivity(
-                    with: .now
-                )
+                stopWorkout()
             } label: {
                 Label("End", systemImage: "xmark")
                     .labelStyle(WatchMenuLabelStyle())
             }
             .tint(.red)
             .disabled(!recordingManager.recordingState.isActive)
+        }
+        .alert(errorMessage, isPresented: $showAlert) {
+            Button("Dismiss", role: .cancel) {
+                reset()
+                stopWorkout()
+            }
         }
     }
 }
@@ -50,14 +65,30 @@ extension ControlsView {
 }
 
 extension ControlsView {
+    private func reset() {
+        self.error = nil
+        self.showAlert = false
+    }
+    private func stopWorkout() {
+        recordingManager.workoutManager.session?.stopActivity(
+            with: .now
+        )
+    }
     private func startWorkout() {
         Task {
             let configuration = HKWorkoutConfiguration()
             configuration.activityType = .functionalStrengthTraining
             configuration.locationType = .indoor
-            await recordingManager.startRecording(
-                workoutConfiguration: configuration
-            )
+
+            do {
+                try await recordingManager.startRecording(
+                    workoutConfiguration: configuration
+                )
+            } catch {
+                Logger.shared.error("Error starting workout: \(error)")
+                self.error = error
+                self.showAlert = true
+            }
         }
     }
 }

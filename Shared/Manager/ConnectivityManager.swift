@@ -16,6 +16,16 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
 
     private var session: WCSession = .default
 
+    private var failedSendCount: Int = 0
+
+    private var shoudSend: Bool {
+        if failedSendCount > 10 {
+            return false
+        }
+
+        return true
+    }
+
     override init() {
         Logger.shared.debug("Creating ConnectivityManager")
 
@@ -25,6 +35,9 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
         self.session.activate()
     }
 
+    func reset() {
+        self.failedSendCount = 0
+    }
 }
 
 extension ConnectivityManager {
@@ -76,6 +89,8 @@ extension ConnectivityManager {
     }
 }
 
+// MARK: -  ConnectivityManager sendData
+//
 extension ConnectivityManager {
     // needs to be called with 'as Void'
     func sendCodable(key: String, data: Data) async throws {
@@ -94,6 +109,12 @@ extension ConnectivityManager {
     }
 
     private func sendMessageData(_ data: Data) async throws -> Data? {
+
+        // stop sending Packets when too many fail
+        if !shoudSend {
+            throw ConnectivityError.toManyFailed
+        }
+
         return try await withCheckedThrowingContinuation({
             continuation in
             self.session.sendMessageData(
@@ -103,9 +124,14 @@ extension ConnectivityManager {
                     continuation.resume(returning: data)
                 },
                 errorHandler: { (error) in
+                    self.failedSendCount += 1
                     continuation.resume(throwing: error)
                 }
             )
         })
     }
+}
+
+enum ConnectivityError: Error {
+    case toManyFailed
 }

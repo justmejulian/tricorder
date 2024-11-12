@@ -67,6 +67,10 @@ extension RecordingManager {
         statisticsManager.reset()
         motionManager.reset()
 
+        Task {
+            await connectivityManager.reset()
+        }
+
         resetRest()
     }
 }
@@ -105,5 +109,4 @@ enum RecordingManagerError: Error {
     case noKey
     case startWorkout
     case startUpdates
-    case startNI
 }

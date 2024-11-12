@@ -14,6 +14,7 @@ struct ControlsView: View {
 
     @State private var error: Error?
     @State private var showAlert: Bool = false
+    @State private var loading: Bool = false
 
     var body: some View {
         var errorMessage: String {
@@ -43,6 +44,7 @@ struct ControlsView: View {
             .tint(.red)
             .disabled(!recordingManager.recordingState.isActive)
         }
+        .disabled(loading)
         .alert(errorMessage, isPresented: $showAlert) {
             Button("Dismiss", role: .cancel) {
                 reset()
@@ -71,11 +73,14 @@ extension ControlsView {
     }
     private func stopWorkout() {
         Task {
+            self.loading = true
             await recordingManager.workoutManager.stop()
+            self.loading = false
         }
     }
     private func startWorkout() {
         Task {
+            self.loading = true
             let configuration = HKWorkoutConfiguration()
             configuration.activityType = .functionalStrengthTraining
             configuration.locationType = .indoor
@@ -89,6 +94,7 @@ extension ControlsView {
                 self.error = error
                 self.showAlert = true
             }
+            self.loading = false
         }
     }
 }

@@ -61,12 +61,9 @@ extension RecordingManager {
 //
 extension RecordingManager {
     func startRecording(workoutConfiguration: HKWorkoutConfiguration) async throws {
-
-        throw RecordingManagerError.startWorkout
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         Logger.shared.info("Starting Recording")
-
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         reset()
 

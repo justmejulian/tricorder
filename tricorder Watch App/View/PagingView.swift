@@ -46,7 +46,9 @@ struct PagingView: View {
                 displayMetricsView()
             }
         }.onAppear {
-            recordingManager.workoutManager.requestAuthorization()
+            Task {
+                await recordingManager.workoutManager.requestAuthorization()
+            }
             selection = .metrics
         }
     }

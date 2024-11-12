@@ -42,8 +42,10 @@ extension RecordingManager {
 // MARK: -  RecordingManager functions
 //
 extension RecordingManager {
-    func startRecording() async {
+    func startRecording() async throws {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        Logger.shared.info("Starting Recording")
 
         reset()
 
@@ -53,11 +55,12 @@ extension RecordingManager {
             Logger.shared.log(
                 "Failed to start cycling on the paired watch."
             )
+            throw RecordingManagerError.startWorkout
         }
     }
 
     func stopRecording() async {
-        await workoutManager.session?.stopActivity(with: .now)
+        await workoutManager.stop()
     }
 }
 

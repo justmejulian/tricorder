@@ -103,4 +103,7 @@ extension RecordingManager {
 enum RecordingManagerError: Error {
     case invalidData
     case noKey
+    case startWorkout
+    case startUpdates
+    case startNI
 }

@@ -60,13 +60,22 @@ extension RecordingManager {
 // MARK: -  RecordingManager functions
 //
 extension RecordingManager {
-    func startRecording(workoutConfiguration: HKWorkoutConfiguration) async {
-        Logger.shared.info("Starting Recording")
-
+    func startRecording(workoutConfiguration: HKWorkoutConfiguration) async throws {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
+        Logger.shared.info("Starting Recording")
 
         reset()
 
+        try await startWorkout(workoutConfiguration)
+
+        try await initNIDiscoveryToken()
+        await nearbyInteractionManager.start()
+
+        try await startUpdates()
+    }
+
+    func startWorkout(_ workoutConfiguration: HKWorkoutConfiguration) async throws {
         do {
             try await workoutManager.startWorkout(
                 workoutConfiguration: workoutConfiguration
@@ -74,19 +83,20 @@ extension RecordingManager {
 
         } catch {
             Logger.shared.error("Failed to start startWorkout: \(error)")
+            throw RecordingManagerError.startWorkout
         }
+    }
 
-        await initNIDiscoveryToken()
-        await nearbyInteractionManager.start()
-
+    func startUpdates() async throws {
         do {
             try await sensorManager.startUpdates()
         } catch {
             Logger.shared.error("Failed to start Motion Updates: \(error)")
+            throw RecordingManagerError.startWorkout
         }
     }
 
-    func initNIDiscoveryToken() async {
+    func initNIDiscoveryToken() async throws {
         Logger.shared.info("Init NIDiscovery Token")
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
@@ -105,6 +115,7 @@ extension RecordingManager {
             try await self.nearbyInteractionManager.setDiscoveryToken(partnerDiscoveryToken)
         } catch {
             Logger.shared.error("Could not initNIDiscoveryToken: \(error)")
+            throw RecordingManagerError.startNI
         }
     }
 }
@@ -122,7 +133,7 @@ extension RecordingManager {
         }
 
         Task {
-            await startRecording(workoutConfiguration: workoutConfiguration)
+            try await startRecording(workoutConfiguration: workoutConfiguration)
         }
     }
 

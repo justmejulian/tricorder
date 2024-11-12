@@ -70,9 +70,9 @@ extension ControlsView {
         self.showAlert = false
     }
     private func stopWorkout() {
-        recordingManager.workoutManager.session?.stopActivity(
-            with: .now
-        )
+        Task {
+            await recordingManager.workoutManager.stop()
+        }
     }
     private func startWorkout() {
         Task {

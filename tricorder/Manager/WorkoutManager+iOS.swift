@@ -42,7 +42,7 @@ extension WorkoutManager {
                 Logger.shared.debug(
                     "workoutSessionMirroringStartHandler Taks running on Thread \(Thread.current)"
                 )
-                await self.resetWorkout()
+                await self.reset()
                 await self.setSession(mirroredSession)
 
                 // set object to call when state chnages

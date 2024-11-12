@@ -42,13 +42,19 @@ actor WorkoutManager: NSObject {
 // MARK: - Workout session management
 //
 extension WorkoutManager {
-    func resetWorkout() {
+    func reset() {
         #if os(watchOS)
             builder = nil
         #endif
         workout = nil
         session = nil
 
+    }
+
+    func stop() {
+        session?.stopActivity(
+            with: .now
+        )
     }
 
     func sendCodable(key: String, data: Data) async throws {

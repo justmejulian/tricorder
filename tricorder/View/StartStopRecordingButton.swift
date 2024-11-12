@@ -14,6 +14,7 @@ struct StartStopRecordingButton: View {
 
     @State private var error: Error?
     @State private var showAlert: Bool = false
+    @State private var loading: Bool = false
 
     var body: some View {
         let isActive = recordingManager.recordingState.isActive
@@ -30,7 +31,9 @@ struct StartStopRecordingButton: View {
             title: isActive ? "Stop Recording" : "Start Recording",
             tint: isActive ? .red : .blue,
             action: isActive ? stopRecording : startRecording
-        ).alert(errorMessage, isPresented: $showAlert) {
+        )
+        .disabled(loading)
+        .alert(errorMessage, isPresented: $showAlert) {
             Button("Dismiss", role: .cancel) {
                 reset()
                 stopRecording()
@@ -55,7 +58,6 @@ extension StartStopRecordingButton {
                 Text(title)
                     .frame(maxWidth: .infinity)
             }
-
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .tint(tint)
@@ -74,6 +76,7 @@ extension StartStopRecordingButton {
     func startRecording() {
         // todo error handling
         Task {
+            self.loading = true
             do {
                 try await recordingManager.startRecording()
             } catch {
@@ -81,12 +84,15 @@ extension StartStopRecordingButton {
                 self.showAlert = true
                 self.error = error
             }
+            self.loading = false
         }
     }
 
     func stopRecording() {
         Task {
+            self.loading = true
             await recordingManager.stopRecording()
+            self.loading = false
         }
     }
 }

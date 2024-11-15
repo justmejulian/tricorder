@@ -48,7 +48,7 @@ struct StartView: View {
         }
         .onAppear {
             Task {
-                recordingManager.reset()
+                await recordingManager.reset()
                 triggerAuthorization.toggle()
                 await recordingManager.workoutManager.retrieveRemoteSession()
             }

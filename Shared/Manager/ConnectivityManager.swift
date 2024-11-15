@@ -18,6 +18,9 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
 
     private var failedSendCount: Int = 0
 
+    @MainActor
+    let openConnectionManager = ConnectivityMetaInfoManager()
+
     private var shoudSend: Bool {
         if failedSendCount > 10 {
             return false
@@ -35,8 +38,9 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
         self.session.activate()
     }
 
-    func reset() {
+    func reset() async {
         self.failedSendCount = 0
+        await openConnectionManager.reset()
     }
 }
 
@@ -63,6 +67,9 @@ extension ConnectivityManager {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         Task {
+
+            await openConnectionManager.updateLastDidReceiveDataDate()
+
             do {
                 if let data = try await eventManager.trigger(
                     key: .receivedData,
@@ -115,16 +122,26 @@ extension ConnectivityManager {
             throw ConnectivityError.toManyFailed
         }
 
+        Task {
+            await openConnectionManager.increaseOpenSendConnectionsCount()
+        }
+
         return try await withCheckedThrowingContinuation({
             continuation in
             self.session.sendMessageData(
                 data,
                 replyHandler: { data in
                     Logger.shared.debug("connectivityManager.sendMessageData replyHandler called")
+                    Task {
+                        await self.openConnectionManager.decreaseOpenSendConnectionsCount()
+                    }
                     continuation.resume(returning: data)
                 },
                 errorHandler: { (error) in
                     self.failedSendCount += 1
+                    Task {
+                        await self.openConnectionManager.decreaseOpenSendConnectionsCount()
+                    }
                     continuation.resume(throwing: error)
                 }
             )

@@ -57,7 +57,7 @@ extension RecordingManager {
         self.startDate = date
     }
 
-    func reset() {
+    func reset() async {
         Logger.shared.debug("RecordingManager \(#function) called on Thread \(Thread.current)")
 
         recordingState = .notStarted
@@ -67,9 +67,7 @@ extension RecordingManager {
         statisticsManager.reset()
         motionManager.reset()
 
-        Task {
-            await connectivityManager.reset()
-        }
+        await connectivityManager.reset()
 
         resetRest()
     }

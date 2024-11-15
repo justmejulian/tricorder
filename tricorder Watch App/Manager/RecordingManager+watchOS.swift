@@ -65,7 +65,7 @@ extension RecordingManager {
 
         Logger.shared.info("Starting Recording")
 
-        reset()
+        await reset()
 
         try await startWorkout(workoutConfiguration)
 

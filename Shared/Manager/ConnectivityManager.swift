@@ -19,7 +19,7 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
     private var failedSendCount: Int = 0
 
     @MainActor
-    let openConnectionManager = ConnectivityMetaInfoManager()
+    let connectivityMetaInfoManager = ConnectivityMetaInfoManager()
 
     private var shoudSend: Bool {
         if failedSendCount > 10 {
@@ -40,7 +40,7 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
 
     func reset() async {
         self.failedSendCount = 0
-        await openConnectionManager.reset()
+        await connectivityMetaInfoManager.reset()
     }
 }
 
@@ -68,7 +68,7 @@ extension ConnectivityManager {
 
         Task {
 
-            await openConnectionManager.updateLastDidReceiveDataDate()
+            await connectivityMetaInfoManager.updateLastDidReceiveDataDate()
 
             do {
                 if let data = try await eventManager.trigger(
@@ -123,7 +123,7 @@ extension ConnectivityManager {
         }
 
         Task {
-            await openConnectionManager.increaseOpenSendConnectionsCount()
+            await connectivityMetaInfoManager.increaseOpenSendConnectionsCount()
         }
 
         return try await withCheckedThrowingContinuation({
@@ -133,14 +133,14 @@ extension ConnectivityManager {
                 replyHandler: { data in
                     Logger.shared.debug("connectivityManager.sendMessageData replyHandler called")
                     Task {
-                        await self.openConnectionManager.decreaseOpenSendConnectionsCount()
+                        await self.connectivityMetaInfoManager.decreaseOpenSendConnectionsCount()
                     }
                     continuation.resume(returning: data)
                 },
                 errorHandler: { (error) in
                     self.failedSendCount += 1
                     Task {
-                        await self.openConnectionManager.decreaseOpenSendConnectionsCount()
+                        await self.connectivityMetaInfoManager.decreaseOpenSendConnectionsCount()
                     }
                     continuation.resume(throwing: error)
                 }

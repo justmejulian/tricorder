@@ -57,7 +57,7 @@ extension RecordingManager {
         self.startDate = date
     }
 
-    func reset() {
+    func reset() async {
         Logger.shared.debug("RecordingManager \(#function) called on Thread \(Thread.current)")
 
         recordingState = .notStarted
@@ -66,6 +66,8 @@ extension RecordingManager {
         distanceManager.reset()
         statisticsManager.reset()
         motionManager.reset()
+
+        await connectivityManager.reset()
 
         resetRest()
     }
@@ -105,5 +107,4 @@ enum RecordingManagerError: Error {
     case noKey
     case startWorkout
     case startUpdates
-    case startNI
 }

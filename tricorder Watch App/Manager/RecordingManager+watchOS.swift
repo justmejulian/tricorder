@@ -65,12 +65,16 @@ extension RecordingManager {
 
         Logger.shared.info("Starting Recording")
 
-        reset()
+        await reset()
 
         try await startWorkout(workoutConfiguration)
 
-        try await initNIDiscoveryToken()
-        await nearbyInteractionManager.start()
+        do {
+            try await initNIDiscoveryToken()
+            await nearbyInteractionManager.start()
+        } catch {
+            Logger.shared.error("Failed to start Nearby Interaction: \(error)")
+        }
 
         try await startUpdates()
     }
@@ -100,23 +104,18 @@ extension RecordingManager {
         Logger.shared.info("Init NIDiscovery Token")
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
-        do {
-            let discoveryToken =
-                try await nearbyInteractionManager.getDiscoveryToken()
-            guard
-                let partnerDiscoveryToken = try await connectivityManager.sendCodable(
-                    key: "discoveryToken",
-                    data: discoveryToken
-                )
-            else {
-                throw NearbyInteractionManagerError.noDiscoveryTokenAvailable
-            }
-
-            try await self.nearbyInteractionManager.setDiscoveryToken(partnerDiscoveryToken)
-        } catch {
-            Logger.shared.error("Could not initNIDiscoveryToken: \(error)")
-            throw RecordingManagerError.startNI
+        let discoveryToken =
+            try await nearbyInteractionManager.getDiscoveryToken()
+        guard
+            let partnerDiscoveryToken = try await connectivityManager.sendCodable(
+                key: "discoveryToken",
+                data: discoveryToken
+            )
+        else {
+            throw NearbyInteractionManagerError.noDiscoveryTokenAvailable
         }
+
+        try await self.nearbyInteractionManager.setDiscoveryToken(partnerDiscoveryToken)
     }
 }
 

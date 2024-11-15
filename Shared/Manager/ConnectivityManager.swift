@@ -16,6 +16,19 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
 
     private var session: WCSession = .default
 
+    private var failedSendCount: Int = 0
+
+    @MainActor
+    let connectivityMetaInfoManager = ConnectivityMetaInfoManager()
+
+    private var shoudSend: Bool {
+        if failedSendCount > 10 {
+            return false
+        }
+
+        return true
+    }
+
     override init() {
         Logger.shared.debug("Creating ConnectivityManager")
 
@@ -25,6 +38,10 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
         self.session.activate()
     }
 
+    func reset() async {
+        self.failedSendCount = 0
+        await connectivityMetaInfoManager.reset()
+    }
 }
 
 extension ConnectivityManager {
@@ -50,6 +67,9 @@ extension ConnectivityManager {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         Task {
+
+            await connectivityMetaInfoManager.updateLastDidReceiveDataDate()
+
             do {
                 if let data = try await eventManager.trigger(
                     key: .receivedData,
@@ -76,6 +96,8 @@ extension ConnectivityManager {
     }
 }
 
+// MARK: -  ConnectivityManager sendData
+//
 extension ConnectivityManager {
     // needs to be called with 'as Void'
     func sendCodable(key: String, data: Data) async throws {
@@ -94,18 +116,39 @@ extension ConnectivityManager {
     }
 
     private func sendMessageData(_ data: Data) async throws -> Data? {
+
+        // stop sending Packets when too many fail
+        if !shoudSend {
+            throw ConnectivityError.toManyFailed
+        }
+
+        Task {
+            await connectivityMetaInfoManager.increaseOpenSendConnectionsCount()
+        }
+
         return try await withCheckedThrowingContinuation({
             continuation in
             self.session.sendMessageData(
                 data,
                 replyHandler: { data in
                     Logger.shared.debug("connectivityManager.sendMessageData replyHandler called")
+                    Task {
+                        await self.connectivityMetaInfoManager.decreaseOpenSendConnectionsCount()
+                    }
                     continuation.resume(returning: data)
                 },
                 errorHandler: { (error) in
+                    self.failedSendCount += 1
+                    Task {
+                        await self.connectivityMetaInfoManager.decreaseOpenSendConnectionsCount()
+                    }
                     continuation.resume(throwing: error)
                 }
             )
         })
     }
+}
+
+enum ConnectivityError: Error {
+    case toManyFailed
 }

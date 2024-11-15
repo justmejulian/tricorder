@@ -23,7 +23,10 @@ struct StartView: View {
                 Spacer()
                 Spacer()
 
-                StartStopRecordingButton()
+                StartStopRecordingButton(
+                    connectivityMetaInfoManager: recordingManager.connectivityManager
+                        .connectivityMetaInfoManager
+                )
             }
             .padding()
             .navigationBarTitle(Text("Tricorder"), displayMode: .inline)
@@ -48,7 +51,7 @@ struct StartView: View {
         }
         .onAppear {
             Task {
-                recordingManager.reset()
+                await recordingManager.reset()
                 triggerAuthorization.toggle()
                 await recordingManager.workoutManager.retrieveRemoteSession()
             }

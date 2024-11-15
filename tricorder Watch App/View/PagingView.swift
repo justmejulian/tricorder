@@ -22,7 +22,10 @@ struct PagingView: View {
     var body: some View {
         TabView(selection: $selection) {
             SettingsView().tag(Tab.settings)
-            ControlsView().tag(Tab.controls)
+            ControlsView(
+                connectivityMetaInfoManager: recordingManager.connectivityManager
+                    .connectivityMetaInfoManager
+            ).tag(Tab.controls)
             RecodingTimelineView().tag(Tab.metrics)
         }
         .navigationTitle("Cycling")

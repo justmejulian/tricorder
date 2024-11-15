@@ -12,6 +12,9 @@ import os
 struct ControlsView: View {
     @EnvironmentObject var recordingManager: RecordingManager
 
+    @ObservedObject
+    var connectivityMetaInfoManager: ConnectivityMetaInfoManager
+
     @State private var error: Error?
     @State private var showAlert: Bool = false
     @State private var loading: Bool = false
@@ -25,6 +28,12 @@ struct ControlsView: View {
             return "Something went wrong starting the workout."
         }
 
+        let isSending = connectivityMetaInfoManager.hasOpenSendConnections
+        let isActive = recordingManager.recordingState.isActive
+
+        let disableStart = isActive || isSending
+        let disableStop = !isActive || (!isActive && isSending)
+
         VStack {
             Button {
                 startWorkout()
@@ -32,7 +41,7 @@ struct ControlsView: View {
                 Label("Start", systemImage: "play.fill")
                     .labelStyle(WatchMenuLabelStyle())
             }
-            .disabled(recordingManager.recordingState.isActive)
+            .disabled(disableStart)
             .tint(.green)
 
             Button {
@@ -42,7 +51,13 @@ struct ControlsView: View {
                     .labelStyle(WatchMenuLabelStyle())
             }
             .tint(.red)
-            .disabled(!recordingManager.recordingState.isActive)
+            .disabled(disableStop)
+
+            Spacer()
+
+            if isSending {
+                SpinnerView(text: "Sending Data")
+            }
         }
         .disabled(loading)
         .alert(errorMessage, isPresented: $showAlert) {

@@ -12,12 +12,27 @@ struct StartStopRecordingButton: View {
     // todo do I need this or can it be passed down?
     @EnvironmentObject var recordingManager: RecordingManager
 
+    @ObservedObject
+    var connectivityMetaInfoManager: ConnectivityMetaInfoManager
+
     @State private var error: Error?
     @State private var showAlert: Bool = false
     @State private var loading: Bool = false
 
     var body: some View {
         let isActive = recordingManager.recordingState.isActive
+        let isReceivingData =
+            !isActive && connectivityMetaInfoManager.isLastDidReceiveDataDateTooRecent
+
+        var title: String {
+            if isReceivingData {
+                return "Receiving Data"
+            }
+            if isActive {
+                return "Stop Recording"
+            }
+            return "Start Recording"
+        }
 
         var errorMessage: String {
             if let localizedDescription = error?.localizedDescription {
@@ -28,11 +43,11 @@ struct StartStopRecordingButton: View {
         }
 
         StartStopRecordingButton(
-            title: isActive ? "Stop Recording" : "Start Recording",
+            title: title,
             tint: isActive ? .red : .blue,
             action: isActive ? stopRecording : startRecording
         )
-        .disabled(loading)
+        .disabled(loading || isReceivingData)
         .alert(errorMessage, isPresented: $showAlert) {
             Button("Dismiss", role: .cancel) {
                 reset()

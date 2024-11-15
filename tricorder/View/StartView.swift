@@ -23,7 +23,10 @@ struct StartView: View {
                 Spacer()
                 Spacer()
 
-                StartStopRecordingButton()
+                StartStopRecordingButton(
+                    connectivityMetaInfoManager: recordingManager.connectivityManager
+                        .connectivityMetaInfoManager
+                )
             }
             .padding()
             .navigationBarTitle(Text("Tricorder"), displayMode: .inline)

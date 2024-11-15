@@ -8,7 +8,7 @@ A SwiftUI view that shows the elapsed time.
 import SwiftUI
 
 struct ElapsedTimeView: View {
-    var elapsedTime: TimeInterval = 0
+    var elapsedTime: TimeInterval
     var showSubseconds = true
     @State private var timeFormatter = ElapsedTimeFormatter()
 

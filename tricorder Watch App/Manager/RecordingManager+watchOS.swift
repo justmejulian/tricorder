@@ -186,16 +186,24 @@ extension RecordingManager {
     }
 
     @Sendable
-    nonisolated func handleReceivedData(_ data: Sendable) throws {
+    nonisolated func handleReceivedData(_ data: Sendable) async throws -> Data? {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         let dataObject = try getSendDataObject(data)
 
         switch dataObject.key {
-        default:
-            Logger.shared.error("\(#function): Unknown dataObject key: \(dataObject.key)")
-        }
+        case "recordingState":
+            let recordingObject = await RecordingObject(
+                recordingState: self.recordingState.rawValue,
+                startTime: self.workoutManager.getStartDate()?.timeIntervalSince1970,
+                motionDataCount: self.motionManager.motionValues.count,
+                statisticCount: self.statisticsManager.statistics.count
+            )
+            return try JSONEncoder().encode(recordingObject)
 
+        default:
+            throw RecordingManagerError.noKey
+        }
     }
 
     @Sendable

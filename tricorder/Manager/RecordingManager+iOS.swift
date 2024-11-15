@@ -62,6 +62,32 @@ extension RecordingManager {
     func stopRecording() async {
         await workoutManager.stop()
     }
+
+    func fetchRemoteRecordingState() async {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        do {
+            guard
+                let recordingStateData = try await connectivityManager.sendCodable(
+                    key: "recordingState",
+                    data: JSONEncoder().encode([] as [Int])  // send empty data
+                )
+            else {
+                throw RecordingManagerError.invalidData
+            }
+
+            let recordingObject = try JSONDecoder().decode(
+                RecordingObject.self,
+                from: recordingStateData
+            )
+            self.recordingState = HKWorkoutSessionState(rawValue: recordingObject.recordingState)!
+            if let startTime = recordingObject.startTime {
+                self.startDate = Date(timeIntervalSince1970: startTime)
+            }
+            // todo also do something about the motionData count
+        } catch {
+            Logger.shared.error("Failed to send request for recording state: \(error)")
+        }
+    }
 }
 
 extension RecordingManager {

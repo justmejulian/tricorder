@@ -8,7 +8,7 @@
 import Foundation
 import os
 
-//@MainActor
+@MainActor
 class DistanceManager: ObservableObject {
     @Published
     var distance: Measurement<UnitLength>?

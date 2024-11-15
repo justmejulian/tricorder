@@ -92,13 +92,19 @@ extension StartStopRecordingButton {
         // todo error handling
         Task {
             self.loading = true
-            do {
-                try await recordingManager.startRecording()
-            } catch {
-                Logger.shared.error("Error starting recording: \(error)")
-                self.showAlert = true
-                self.error = error
+            await recordingManager.fetchRemoteRecordingState()
+
+            // Make sure recording was not started already
+            if recordingManager.recordingState != .running {
+                do {
+                    try await recordingManager.startRecording()
+                } catch {
+                    Logger.shared.error("Error starting recording: \(error)")
+                    self.showAlert = true
+                    self.error = error
+                }
             }
+
             self.loading = false
         }
     }

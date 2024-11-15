@@ -15,7 +15,7 @@ actor EventManager {
 
     func register(
         key: EventListenerKey,
-        handleData: @escaping @Sendable (_ data: Sendable) async throws -> Data?
+        handleData: @escaping @Sendable (_ data: Sendable) async throws -> Data?  // todo make sendable?
     ) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 

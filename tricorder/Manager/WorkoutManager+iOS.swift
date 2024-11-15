@@ -19,7 +19,9 @@ extension WorkoutManager {
         configuration.activityType = .functionalStrengthTraining
         configuration.locationType = .indoor
 
-        // todo: how do I make sure it starts app?
+        // todo: how do I make sure it starts app? do I have to start twice?
+        // or make the wake up the watch and only start with a followup request
+        // test once have logs
         try await healthStore.startWatchApp(toHandle: configuration)
     }
 

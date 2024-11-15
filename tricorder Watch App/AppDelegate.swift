@@ -15,6 +15,7 @@ class AppDelegate: NSObject, WKApplicationDelegate {
     func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
         Task {
             Logger.shared.log("AppDelegate: received workout configuration")
+            // todo don't start yet, just say that ready
             await EventManager.shared.trigger(
                 key: .companionStartedRecording,
                 data: workoutConfiguration

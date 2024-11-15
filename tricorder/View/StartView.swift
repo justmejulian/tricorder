@@ -54,8 +54,8 @@ struct StartView: View {
                 await recordingManager.reset()
                 triggerAuthorization.toggle()
                 await recordingManager.workoutManager.retrieveRemoteSession()
+                await recordingManager.fetchRemoteRecordingState()
             }
-            // todo ask for recording state and get infos (count, ...)
         }
         .healthDataAccessRequest(
             store: recordingManager.workoutManager.healthStore,

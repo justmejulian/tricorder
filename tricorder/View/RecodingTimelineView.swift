@@ -13,9 +13,7 @@ struct RecodingTimelineView: View {
 
     var body: some View {
         let schedule = MetricsTimelineSchedule(
-            // todo move to get function
-            from: recordingManager.workoutManager.session?.startDate
-                ?? Date(),
+            from: Date(),
             isPaused: recordingManager.recordingState
                 == .ended
         )

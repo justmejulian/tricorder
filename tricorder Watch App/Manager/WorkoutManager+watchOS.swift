@@ -100,6 +100,14 @@ extension WorkoutManager {
         session?.associatedWorkoutBuilder().startDate
     }
 
+    func getElapsedTime(at: Date? = nil) -> TimeInterval? {
+        if let at = at {
+            return builder?.elapsedTime(at: at)
+        }
+
+        return builder?.elapsedTime
+    }
+
     func finishedWorkout(date: Date) async throws -> HKWorkout? {
         Logger.shared.info("WorkoutManager \(#function) called")
 

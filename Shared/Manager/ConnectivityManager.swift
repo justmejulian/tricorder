@@ -9,7 +9,7 @@ import Foundation
 import OSLog
 import SwiftData
 import SwiftUI
-import WatchConnectivity
+@preconcurrency import WatchConnectivity
 
 actor ConnectivityManager: NSObject, WCSessionDelegate {
     let eventManager = EventManager.shared
@@ -18,8 +18,9 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
 
     private var failedSendCount: Int = 0
 
+    // property whose initial value is not calculated until the first time it’s called
     @MainActor
-    let connectivityMetaInfoManager = ConnectivityMetaInfoManager()
+    lazy var connectivityMetaInfoManager = ConnectivityMetaInfoManager()
 
     private var shoudSend: Bool {
         if failedSendCount > 10 {
@@ -62,12 +63,12 @@ extension ConnectivityManager {
     nonisolated func session(
         _ session: WCSession,
         didReceiveMessageData messageData: Data,
-        replyHandler: @escaping (Data) -> Void
+        // todo not sure if this works
+        replyHandler: @Sendable @escaping (Data) -> Void
     ) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         Task {
-
             await connectivityMetaInfoManager.updateLastDidReceiveDataDate()
 
             do {

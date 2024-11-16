@@ -51,6 +51,7 @@ actor EventManager {
         return try await listener(data)
     }
 
+    // todo: make data optional
     // needs to be called with 'as Void'
     func trigger(key: EventListenerKey, data: Sendable) async {
         do {

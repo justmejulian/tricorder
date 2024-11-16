@@ -60,14 +60,14 @@ extension RecordingManager {
 // MARK: -  RecordingManager functions
 //
 extension RecordingManager {
-    func startRecording(workoutConfiguration: HKWorkoutConfiguration) async throws {
+    func startRecording() async throws {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         Logger.shared.info("Starting Recording")
 
         await reset()
 
-        try await startWorkout(workoutConfiguration)
+        try await startWorkout()
 
         do {
             try await initNIDiscoveryToken()
@@ -79,11 +79,9 @@ extension RecordingManager {
         try await startUpdates()
     }
 
-    func startWorkout(_ workoutConfiguration: HKWorkoutConfiguration) async throws {
+    func startWorkout() async throws {
         do {
-            try await workoutManager.startWorkout(
-                workoutConfiguration: workoutConfiguration
-            )
+            try await workoutManager.startWorkout()
 
         } catch {
             Logger.shared.error("Failed to start startWorkout: \(error)")
@@ -126,13 +124,8 @@ extension RecordingManager {
     nonisolated func handleCompanionStartedRecording(_ data: Sendable) throws {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
-        guard let workoutConfiguration = data as? HKWorkoutConfiguration else {
-            Logger.shared.error("\(#function): Invalid data type")
-            return
-        }
-
         Task {
-            try await startRecording(workoutConfiguration: workoutConfiguration)
+            try await startRecording()
         }
     }
 

@@ -32,12 +32,16 @@ extension WorkoutManager {
         }
     }
 
-    func startWorkout(workoutConfiguration: HKWorkoutConfiguration) async throws {
+    func startWorkout() async throws {
         Logger.shared.info("WorkoutManager \(#function) called")
+
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .functionalStrengthTraining
+        configuration.locationType = .indoor
 
         session = try HKWorkoutSession(
             healthStore: healthStore,
-            configuration: workoutConfiguration
+            configuration: configuration
         )
 
         guard let session else {
@@ -49,7 +53,7 @@ extension WorkoutManager {
         builder?.delegate = self
         builder?.dataSource = HKLiveWorkoutDataSource(
             healthStore: healthStore,
-            workoutConfiguration: workoutConfiguration
+            workoutConfiguration: configuration
         )
 
         // Make sure the session is ready to send data

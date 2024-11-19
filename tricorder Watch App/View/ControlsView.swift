@@ -96,14 +96,8 @@ extension ControlsView {
     private func startWorkout() {
         Task {
             self.loading = true
-            let configuration = HKWorkoutConfiguration()
-            configuration.activityType = .functionalStrengthTraining
-            configuration.locationType = .indoor
-
             do {
-                try await recordingManager.startRecording(
-                    workoutConfiguration: configuration
-                )
+                try await recordingManager.startRecording()
             } catch {
                 Logger.shared.error("Error starting workout: \(error)")
                 self.error = error

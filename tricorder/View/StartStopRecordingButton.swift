@@ -105,6 +105,8 @@ extension StartStopRecordingButton {
                 }
             }
 
+            await sleepFor1Second()
+
             self.loading = false
         }
     }
@@ -113,7 +115,16 @@ extension StartStopRecordingButton {
         Task {
             self.loading = true
             await recordingManager.stopRecording()
+            await sleepFor1Second()
             self.loading = false
+        }
+    }
+
+    func sleepFor1Second() async {
+        do {
+            try await Task.sleep(for: .seconds(1))
+        } catch {
+            Logger.shared.error("Failed to sleep: \(error)")
         }
     }
 }

@@ -12,13 +12,14 @@ import os
 
 class AppDelegate: NSObject, WKApplicationDelegate {
 
+    // Ignoring the sentt workoutConfiguration
     func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
         Task {
-            Logger.shared.log("AppDelegate: received workout configuration")
+            Logger.shared.log("AppDelegate: received start companion workout")
             // todo don't start yet, just say that ready
             await EventManager.shared.trigger(
                 key: .companionStartedRecording,
-                data: workoutConfiguration
+                data: try JSONEncoder().encode([] as [Int])
             ) as Void
         }
     }

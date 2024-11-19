@@ -9,7 +9,7 @@ import Foundation
 import os
 
 extension Logger {
-    private static var subsystem = Bundle.main.bundleIdentifier!
+    private static let subsystem = Bundle.main.bundleIdentifier!
     #if os(watchOS)
         static let shared = Logger(
             subsystem: subsystem,

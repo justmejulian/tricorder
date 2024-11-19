@@ -12,28 +12,45 @@ struct RecordingElapsedTimeView: View {
 
     let context: TimelineViewDefaultContext
 
+    @State private var isLoading = false
+    @State var elapsedTime: TimeInterval = 0
+
     var body: some View {
-        ElapsedTimeView(
-            elapsedTime: elapsedTime(with: context.date),
-            showSubseconds: context.cadence == .live
-        )
-        .foregroundStyle(.yellow)
-        .font(
-            .system(.title, design: .rounded).monospacedDigit()
-                .lowercaseSmallCaps()
-        )
+        Group {
+            if isLoading {
+                SpinnerView(text: "Loading")
+            } else {
+                ElapsedTimeView(
+                    elapsedTime: elapsedTime,
+                    showSubseconds: context.cadence == .live
+                )
+                .foregroundStyle(.yellow)
+                .font(
+                    .system(.title, design: .rounded).monospacedDigit()
+                        .lowercaseSmallCaps()
+                )
+            }
+        }
+        // Run task on context.date changes
+        .task(id: context.date) {
+            await loadData(contextDate: context.date)
+        }
     }
 }
 
 // MARK: - RecordingElapsedTimeView functions
 //
 extension RecordingElapsedTimeView {
-    func elapsedTime(with contextDate: Date) -> TimeInterval {
+    func loadData(contextDate: Date) async {
+        self.isLoading = true
         guard
-            let elapsedTime = recordingManager.workoutManager.builder?.elapsedTime(at: contextDate)
+            let elapsedTime = await recordingManager.workoutManager.getElapsedTime(at: contextDate)
         else {
-            return 0
+            self.elapsedTime = 0
+            self.isLoading = false
+            return
         }
-        return elapsedTime
+        self.elapsedTime = elapsedTime
+        self.isLoading = false
     }
 }

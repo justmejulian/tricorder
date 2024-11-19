@@ -7,9 +7,7 @@
 
 import Foundation
 import OSLog
-import SwiftData
-import SwiftUI
-import WatchConnectivity
+@preconcurrency import WatchConnectivity
 
 actor ConnectivityManager: NSObject, WCSessionDelegate {
     let eventManager = EventManager.shared
@@ -18,8 +16,9 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
 
     private var failedSendCount: Int = 0
 
+    // property whose initial value is not calculated until the first time it’s called
     @MainActor
-    let connectivityMetaInfoManager = ConnectivityMetaInfoManager()
+    lazy var connectivityMetaInfoManager = ConnectivityMetaInfoManager()
 
     private var shoudSend: Bool {
         if failedSendCount > 10 {
@@ -30,12 +29,16 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
     }
 
     override init() {
-        Logger.shared.debug("Creating ConnectivityManager")
+        Logger.shared.debug("run on Thread \(Thread.current)")
 
         super.init()
 
         self.session.delegate = self
         self.session.activate()
+    }
+
+    func increaseFailedSendCount() {
+        self.failedSendCount += 1
     }
 
     func reset() async {
@@ -62,12 +65,12 @@ extension ConnectivityManager {
     nonisolated func session(
         _ session: WCSession,
         didReceiveMessageData messageData: Data,
-        replyHandler: @escaping (Data) -> Void
+        // todo not sure if this works
+        replyHandler: @Sendable @escaping (Data) -> Void
     ) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         Task {
-
             await connectivityMetaInfoManager.updateLastDidReceiveDataDate()
 
             do {
@@ -105,7 +108,7 @@ extension ConnectivityManager {
     }
 
     func sendCodable(key: String, data: Data) async throws -> Data? {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("key: \(key), data: \(data) called on Thread \(Thread.current)")
 
         let dataObject = try SendDataObjectManager().encode(
             key: key,
@@ -127,24 +130,30 @@ extension ConnectivityManager {
         }
 
         return try await withCheckedThrowingContinuation({
-            continuation in
-            self.session.sendMessageData(
-                data,
-                replyHandler: { data in
-                    Logger.shared.debug("connectivityManager.sendMessageData replyHandler called")
-                    Task {
-                        await self.connectivityMetaInfoManager.decreaseOpenSendConnectionsCount()
+            @Sendable continuation in
+            Task {
+                await self.session.sendMessageData(
+                    data,
+                    replyHandler: { data in
+                        Logger.shared.debug(
+                            "connectivityManager.sendMessageData replyHandler called"
+                        )
+                        Task {
+                            await self.connectivityMetaInfoManager
+                                .decreaseOpenSendConnectionsCount()
+                            continuation.resume(returning: data)
+                        }
+                    },
+                    errorHandler: { (error) in
+                        Task {
+                            await self.increaseFailedSendCount()
+                            await self.connectivityMetaInfoManager
+                                .decreaseOpenSendConnectionsCount()
+                            continuation.resume(throwing: error)
+                        }
                     }
-                    continuation.resume(returning: data)
-                },
-                errorHandler: { (error) in
-                    self.failedSendCount += 1
-                    Task {
-                        await self.connectivityMetaInfoManager.decreaseOpenSendConnectionsCount()
-                    }
-                    continuation.resume(throwing: error)
-                }
-            )
+                )
+            }
         })
     }
 }

@@ -18,12 +18,12 @@ func getLocalFormatter() -> MeasurementFormatter {
     formatter.numberFormatter.minimumFractionDigits = 1
     return formatter
 }
-let localFormatter = getLocalFormatter()
 
 func formatDistance(_ distance: Measurement<UnitLength>?) -> String {
     guard let distance else {
         return "-- m"
     }
+    let localFormatter = getLocalFormatter()
     return localFormatter.string(from: distance)
 }
 

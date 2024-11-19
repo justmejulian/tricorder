@@ -14,6 +14,7 @@ struct StartView: View {
     @EnvironmentObject var recordingManager: RecordingManager
     @State private var isFullScreenCoverActive = false
     @State private var triggerAuthorization = false
+    @State private var isLoading = false
 
     var body: some View {
         NavigationView {
@@ -51,10 +52,12 @@ struct StartView: View {
         }
         .onAppear {
             Task {
+                self.isLoading = true
                 await recordingManager.reset()
                 triggerAuthorization.toggle()
                 await recordingManager.workoutManager.retrieveRemoteSession()
                 await recordingManager.fetchRemoteRecordingState()
+                self.isLoading = false
             }
         }
         .healthDataAccessRequest(

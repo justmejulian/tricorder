@@ -17,8 +17,7 @@ extension WorkoutManager {
      healthDataAccessRequest isn't available yet.
      */
     func requestAuthorization() {
-
-        Logger.shared.info("\(#function) called")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Task {
             do {
@@ -32,12 +31,16 @@ extension WorkoutManager {
         }
     }
 
-    func startWorkout(workoutConfiguration: HKWorkoutConfiguration) async throws {
-        Logger.shared.info("WorkoutManager \(#function) called")
+    func startWorkout() async throws {
+        Logger.shared.debug("called on Thread \(Thread.current)")
+
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .functionalStrengthTraining
+        configuration.locationType = .indoor
 
         session = try HKWorkoutSession(
             healthStore: healthStore,
-            configuration: workoutConfiguration
+            configuration: configuration
         )
 
         guard let session else {
@@ -49,7 +52,7 @@ extension WorkoutManager {
         builder?.delegate = self
         builder?.dataSource = HKLiveWorkoutDataSource(
             healthStore: healthStore,
-            workoutConfiguration: workoutConfiguration
+            workoutConfiguration: configuration
         )
 
         // Make sure the session is ready to send data
@@ -85,10 +88,9 @@ extension WorkoutManager {
     }
 
     func handleReceivedData(_ data: Data) throws {
-        Logger.shared.info("WorkoutManager \(#function) called")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let dataObject = try SendDataObjectManager().decode(data)
-
         Logger.shared.info("Received data: \(dataObject.key)")
     }
 
@@ -96,8 +98,16 @@ extension WorkoutManager {
         session?.associatedWorkoutBuilder().startDate
     }
 
+    func getElapsedTime(at: Date? = nil) -> TimeInterval? {
+        if let at = at {
+            return builder?.elapsedTime(at: at)
+        }
+
+        return builder?.elapsedTime
+    }
+
     func finishedWorkout(date: Date) async throws -> HKWorkout? {
-        Logger.shared.info("WorkoutManager \(#function) called")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         guard let builder else {
             throw WorkoutManagerError.noLiveWorkoutBuilder
@@ -122,16 +132,14 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
         _ workoutBuilder: HKLiveWorkoutBuilder,
         didCollectDataOf collectedTypes: Set<HKSampleType>
     ) {
-        Logger.shared.debug("WorkoutManager \(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         /**
           HealthKit calls this method on an anonymous serial background queue.
           Use Task to provide an asynchronous context so MainActor can come to play.
          */
         Task { @MainActor in
-            Logger.shared.debug(
-                "WorkoutManager \(#function) task called on Thread \(Thread.current)"
-            )
+            Logger.shared.debug("Task called on Thread \(Thread.current)")
             // todo needs to be on Main?
 
             for type in collectedTypes {
@@ -153,6 +161,6 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
     nonisolated func workoutBuilderDidCollectEvent(
         _ workoutBuilder: HKLiveWorkoutBuilder
     ) {
-        Logger.shared.debug("WorkoutManager \(#function) task called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
     }
 }

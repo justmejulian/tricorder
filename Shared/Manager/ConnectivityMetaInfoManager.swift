@@ -52,7 +52,7 @@ extension ConnectivityMetaInfoManager {
         Task {
             Logger.shared.debug("Setting lastDidReceiveDataDateTooRecent to true")
             isLastDidReceiveDataDateTooRecent = true
-            
+
             // Only continue if no more updates
             guard await debouncer.sleep() else { return }
 

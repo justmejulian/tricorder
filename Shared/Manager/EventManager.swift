@@ -40,9 +40,7 @@ actor EventManager {
         )
     }
     func trigger(key: EventListenerKey, data: Sendable) async throws -> Data? {
-        Logger.shared.debug(
-            "Event Listener triggered for \(key.rawValue) called on Thread \(Thread.current)"
-        )
+        Logger.shared.debug("key\(key.rawValue) called on Thread \(Thread.current)")
 
         guard let listener = EventManager.listeners[key] else {
             throw EventManagerError.noListenerFound

@@ -31,7 +31,7 @@ struct RecordingElapsedTimeView: View {
                 )
             }
         }
-        // Run task on context change
+        // Run task on context.date changes
         .task(id: context.date) {
             await loadData(contextDate: context.date)
         }

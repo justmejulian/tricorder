@@ -17,8 +17,7 @@ extension WorkoutManager {
      healthDataAccessRequest isn't available yet.
      */
     func requestAuthorization() {
-
-        Logger.shared.info("\(#function) called")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Task {
             do {
@@ -33,7 +32,7 @@ extension WorkoutManager {
     }
 
     func startWorkout() async throws {
-        Logger.shared.info("WorkoutManager \(#function) called")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .functionalStrengthTraining
@@ -89,10 +88,9 @@ extension WorkoutManager {
     }
 
     func handleReceivedData(_ data: Data) throws {
-        Logger.shared.info("WorkoutManager \(#function) called")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let dataObject = try SendDataObjectManager().decode(data)
-
         Logger.shared.info("Received data: \(dataObject.key)")
     }
 
@@ -109,7 +107,7 @@ extension WorkoutManager {
     }
 
     func finishedWorkout(date: Date) async throws -> HKWorkout? {
-        Logger.shared.info("WorkoutManager \(#function) called")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         guard let builder else {
             throw WorkoutManagerError.noLiveWorkoutBuilder
@@ -134,16 +132,14 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
         _ workoutBuilder: HKLiveWorkoutBuilder,
         didCollectDataOf collectedTypes: Set<HKSampleType>
     ) {
-        Logger.shared.debug("WorkoutManager \(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         /**
           HealthKit calls this method on an anonymous serial background queue.
           Use Task to provide an asynchronous context so MainActor can come to play.
          */
         Task { @MainActor in
-            Logger.shared.debug(
-                "WorkoutManager \(#function) task called on Thread \(Thread.current)"
-            )
+            Logger.shared.debug("Task called on Thread \(Thread.current)")
             // todo needs to be on Main?
 
             for type in collectedTypes {
@@ -165,6 +161,6 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
     nonisolated func workoutBuilderDidCollectEvent(
         _ workoutBuilder: HKLiveWorkoutBuilder
     ) {
-        Logger.shared.debug("WorkoutManager \(#function) task called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
     }
 }

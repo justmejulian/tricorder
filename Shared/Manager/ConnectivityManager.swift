@@ -37,6 +37,10 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
         self.session.activate()
     }
 
+    func increaseFailedSendCount() {
+        self.failedSendCount += 1
+    }
+
     func reset() async {
         self.failedSendCount = 0
         await connectivityMetaInfoManager.reset()
@@ -126,24 +130,30 @@ extension ConnectivityManager {
         }
 
         return try await withCheckedThrowingContinuation({
-            continuation in
-            self.session.sendMessageData(
-                data,
-                replyHandler: { data in
-                    Logger.shared.debug("connectivityManager.sendMessageData replyHandler called")
-                    Task {
-                        await self.connectivityMetaInfoManager.decreaseOpenSendConnectionsCount()
+            @Sendable continuation in
+            Task {
+                await self.session.sendMessageData(
+                    data,
+                    replyHandler: { data in
+                        Logger.shared.debug(
+                            "connectivityManager.sendMessageData replyHandler called"
+                        )
+                        Task {
+                            await self.connectivityMetaInfoManager
+                                .decreaseOpenSendConnectionsCount()
+                            continuation.resume(returning: data)
+                        }
+                    },
+                    errorHandler: { (error) in
+                        Task {
+                            await self.increaseFailedSendCount()
+                            await self.connectivityMetaInfoManager
+                                .decreaseOpenSendConnectionsCount()
+                            continuation.resume(throwing: error)
+                        }
                     }
-                    continuation.resume(returning: data)
-                },
-                errorHandler: { (error) in
-                    self.failedSendCount += 1
-                    Task {
-                        await self.connectivityMetaInfoManager.decreaseOpenSendConnectionsCount()
-                    }
-                    continuation.resume(throwing: error)
-                }
-            )
+                )
+            }
         })
     }
 }

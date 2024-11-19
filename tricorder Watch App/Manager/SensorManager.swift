@@ -16,22 +16,6 @@ actor SensorManager {
 }
 
 extension SensorManager {
-    private func handleUpdate(
-        _ timestamp: Date,
-        _ sensor_id: String,
-        _ values: [MotionValue]
-    ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-        Task {
-            await eventManager.trigger(
-                key: .collectedMotionValues,
-                data: values
-            ) as Void
-        }
-    }
-}
-
-extension SensorManager {
     func stopUpdates() {
         Logger.shared.debug("MotinManager: stopUpdates called on Thread \(Thread.current)")
 
@@ -50,7 +34,7 @@ extension SensorManager {
         }
 
         motionManager.startAccelerometerUpdates(handler: {
-            (batchedData, error) in
+            @Sendable (batchedData, error) in
 
             Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
@@ -71,7 +55,7 @@ extension SensorManager {
         })
 
         motionManager.startDeviceMotionUpdates(handler: {
-            (batchedData, error) in
+            @Sendable (batchedData, error) in
 
             Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
@@ -93,9 +77,24 @@ extension SensorManager {
     }
 }
 
-// todo do this in another Manager
+// MARK: - nonisolated
+//
 extension SensorManager {
-    func consumeDeviceMotionUpdates(batchedData: [CMDeviceMotion]) {
+    nonisolated private func handleUpdate(
+        _ timestamp: Date,
+        _ sensor_id: String,
+        _ values: [MotionValue]
+    ) {
+        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Task {
+            await eventManager.trigger(
+                key: .collectedMotionValues,
+                data: values
+            ) as Void
+        }
+    }
+
+    nonisolated func consumeDeviceMotionUpdates(batchedData: [CMDeviceMotion]) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         // todo make this more reusable
@@ -160,7 +159,7 @@ extension SensorManager {
         handleUpdate(date, "quaternion", quaternionValues)
     }
 
-    func consumeAccelerometerUpdates(batchedData: [CMAccelerometerData]) {
+    nonisolated func consumeAccelerometerUpdates(batchedData: [CMAccelerometerData]) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         var values: [MotionValue] = []

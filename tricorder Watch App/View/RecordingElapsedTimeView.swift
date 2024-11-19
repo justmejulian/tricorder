@@ -31,7 +31,8 @@ struct RecordingElapsedTimeView: View {
                 )
             }
         }
-        .task {
+        // Run task on context change
+        .task(id: context.date) {
             await loadData(contextDate: context.date)
         }
     }
@@ -46,9 +47,10 @@ extension RecordingElapsedTimeView {
             let elapsedTime = await recordingManager.workoutManager.getElapsedTime(at: contextDate)
         else {
             self.elapsedTime = 0
+            self.isLoading = false
             return
         }
         self.elapsedTime = elapsedTime
-        self.isLoading = true
+        self.isLoading = false
     }
 }

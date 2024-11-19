@@ -7,8 +7,6 @@
 
 import Foundation
 import OSLog
-import SwiftData
-import SwiftUI
 @preconcurrency import WatchConnectivity
 
 actor ConnectivityManager: NSObject, WCSessionDelegate {
@@ -31,7 +29,7 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
     }
 
     override init() {
-        Logger.shared.debug("Creating ConnectivityManager")
+        Logger.shared.debug("run on Thread \(Thread.current)")
 
         super.init()
 
@@ -106,7 +104,7 @@ extension ConnectivityManager {
     }
 
     func sendCodable(key: String, data: Data) async throws -> Data? {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("key: \(key), data: \(data) called on Thread \(Thread.current)")
 
         let dataObject = try SendDataObjectManager().encode(
             key: key,

@@ -27,7 +27,7 @@ class RecordingManager: ObservableObject {
     @Published var startDate: Date?
 
     #if os(watchOS)
-        var sensorManager = SensorManager()
+        var coreMotionManager = CoreMotionManager()
         var monitoringManager = MonitoringManager()
     #endif
 

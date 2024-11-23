@@ -91,7 +91,7 @@ extension RecordingManager {
 
     func startUpdates() async throws {
         do {
-            try await sensorManager.startUpdates()
+            try await coreMotionManager.startUpdates()
         } catch {
             Logger.shared.error("Failed to start Motion Updates: \(error)")
             throw RecordingManagerError.startWorkout
@@ -162,7 +162,7 @@ extension RecordingManager {
 
             Task {
                 do {
-                    await sensorManager.stopUpdates()
+                    await coreMotionManager.stopUpdates()
                     await nearbyInteractionManager.stop()
 
                     // todo finish sync

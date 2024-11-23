@@ -1,6 +1,5 @@
 //
 //  Value.swift
-//  tricorder
 //
 //  Created by Julian Visser on 05.11.2024.
 //

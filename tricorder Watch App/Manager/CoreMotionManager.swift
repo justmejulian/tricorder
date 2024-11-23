@@ -9,13 +9,13 @@ import CoreMotion
 import Foundation
 import os
 
-actor SensorManager {
+actor CoreMotionManager {
     let eventManager = EventManager.shared
 
     let motionManager = CMBatchedSensorManager()
 }
 
-extension SensorManager {
+extension CoreMotionManager {
     func stopUpdates() {
         Logger.shared.debug("MotinManager: stopUpdates called on Thread \(Thread.current)")
 
@@ -30,7 +30,7 @@ extension SensorManager {
             CMBatchedSensorManager.isAccelerometerSupported
                 && CMBatchedSensorManager.isDeviceMotionSupported
         else {
-            throw SensorManagerError.notSupported
+            throw CoreMotionManagerError.notSupported
         }
 
         motionManager.startAccelerometerUpdates(handler: {
@@ -79,7 +79,7 @@ extension SensorManager {
 
 // MARK: - nonisolated
 //
-extension SensorManager {
+extension CoreMotionManager {
     nonisolated private func handleUpdate(
         _ timestamp: Date,
         _ sensor_id: String,
@@ -192,6 +192,6 @@ extension SensorManager {
 
 // MARK: - MotionManagerError
 //
-enum SensorManagerError: Error {
+enum CoreMotionManagerError: Error {
     case notSupported
 }

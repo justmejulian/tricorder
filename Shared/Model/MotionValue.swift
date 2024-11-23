@@ -8,7 +8,7 @@
 import Foundation
 
 // todo can I do some type magic?
-struct MotionValue: Codable {
+struct MotionValue: Value {
     var x: Double
     var y: Double
     var z: Double

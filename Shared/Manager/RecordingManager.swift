@@ -32,11 +32,11 @@ class RecordingManager: ObservableObject {
     #endif
 
     init() {
-        Logger.shared.debug("RecordingManager \(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Task {
             Logger.shared.debug(
-                "RecordingManager \(#function) taks called on Thread \(Thread.current)"
+                "task called on Thread \(Thread.current)"
             )
 
             await registerListeners()
@@ -46,19 +46,19 @@ class RecordingManager: ObservableObject {
 
 extension RecordingManager {
     func setRecordingState(newState: HKWorkoutSessionState) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         self.recordingState = newState
     }
 
     func setStartDate(_ date: Date) {
-        Logger.shared.debug("\(#function) with: \(date) on called on Thread \(Thread.current)")
+        Logger.shared.debug("with: \(date) on called on Thread \(Thread.current)")
 
         self.startDate = date
     }
 
     func reset() async {
-        Logger.shared.debug("RecordingManager \(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         recordingState = .notStarted
         startDate = nil

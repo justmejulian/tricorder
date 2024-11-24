@@ -53,7 +53,7 @@ extension ConnectivityManager {
         activationDidCompleteWith activationState: WCSessionActivationState,
         error: Error?
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         if let error = error {
             Logger.shared.error("Error trying to activate WCSession: \(error.localizedDescription)")
@@ -68,7 +68,7 @@ extension ConnectivityManager {
         // todo not sure if this works
         replyHandler: @Sendable @escaping (Data) -> Void
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Task {
             await connectivityMetaInfoManager.updateLastDidReceiveDataDate()

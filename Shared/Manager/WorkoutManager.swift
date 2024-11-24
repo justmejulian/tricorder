@@ -35,7 +35,7 @@ actor WorkoutManager: NSObject {
     #endif
 
     func setSession(_ session: HKWorkoutSession) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         self.session = session
     }
@@ -65,7 +65,7 @@ extension WorkoutManager {
     }
 
     func sendCodable(key: String, data: Data) async throws {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let dataObject = try SendDataObjectManager().encode(
             key: key,
@@ -76,8 +76,8 @@ extension WorkoutManager {
     }
 
     func sendData(_ data: Data, retryCount: Int = 0) async throws {
-        Logger.shared.info(
-            "\(#function) data: \(data.debugDescription) retry count: \(retryCount) called on Thread \(Thread.current)"
+        Logger.shared.debug(
+            "with data: \(data) retry count: \(retryCount) called on Thread \(Thread.current)"
         )
 
         do {
@@ -118,7 +118,7 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
         from fromState: HKWorkoutSessionState,
         date: Date
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Logger.shared.log(
             "Session state changed from \(fromState.rawValue) to \(toState.rawValue)"
@@ -170,11 +170,11 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
         _ workoutSession: HKWorkoutSession,
         didReceiveDataFromRemoteWorkoutSession data: [Data]
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         // todo: is main needed?
         Task { @MainActor in
-            Logger.shared.debug("\(#function) task called on Thread \(Thread.current)")
+            Logger.shared.debug("task called on Thread \(Thread.current)")
 
             for anElement in data {
                 await eventManager.trigger(

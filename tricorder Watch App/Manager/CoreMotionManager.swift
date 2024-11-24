@@ -36,7 +36,7 @@ extension CoreMotionManager {
         motionManager.startAccelerometerUpdates(handler: {
             @Sendable (batchedData, error) in
 
-            Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+            Logger.shared.debug("called on Thread \(Thread.current)")
 
             if let error = error {
                 Logger.shared.error(
@@ -57,7 +57,7 @@ extension CoreMotionManager {
         motionManager.startDeviceMotionUpdates(handler: {
             @Sendable (batchedData, error) in
 
-            Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+            Logger.shared.debug("called on Thread \(Thread.current)")
 
             if let error = error {
                 Logger.shared.error(
@@ -83,7 +83,7 @@ extension CoreMotionManager {
     nonisolated private func handleUpdate(
         _ motionSensor: MotionSensor
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Task {
             await eventManager.trigger(
@@ -94,7 +94,7 @@ extension CoreMotionManager {
     }
 
     nonisolated func consumeDeviceMotionUpdates(batchedData: [CMDeviceMotion]) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         // todo make this more reusable
         // todo do all of this in a different thread
@@ -153,7 +153,7 @@ extension CoreMotionManager {
     }
 
     nonisolated func consumeAccelerometerUpdates(batchedData: [CMAccelerometerData]) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         var values: [MotionValue] = []
 

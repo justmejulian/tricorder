@@ -25,7 +25,7 @@ extension MotionManager {
     }
 
     func update(sensorName: String, newValues: [MotionValue]) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let observableValueManager = getOrCreateObservableValueManager(for: sensorName)
 

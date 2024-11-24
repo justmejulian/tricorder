@@ -53,7 +53,7 @@ extension ConnectivityManager {
         activationDidCompleteWith activationState: WCSessionActivationState,
         error: Error?
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         if let error = error {
             Logger.shared.error("Error trying to activate WCSession: \(error.localizedDescription)")
@@ -68,7 +68,7 @@ extension ConnectivityManager {
         // todo not sure if this works
         replyHandler: @Sendable @escaping (Data) -> Void
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Task {
             await connectivityMetaInfoManager.updateLastDidReceiveDataDate()
@@ -102,12 +102,19 @@ extension ConnectivityManager {
 // MARK: -  ConnectivityManager sendData
 //
 extension ConnectivityManager {
-    // needs to be called with 'as Void'
-    func sendCodable(key: String, data: Data) async throws {
-        let _ = try await sendCodable(key: key, data: data) as Data?
+
+    func sendDataArray(key: String, dataArray: [Data]) async throws {
+        for data in dataArray {
+            try await sendData(key: key, data: data) as Void
+        }
     }
 
-    func sendCodable(key: String, data: Data) async throws -> Data? {
+    // needs to be called with 'as Void'
+    func sendData(key: String, data: Data) async throws {
+        let _ = try await sendData(key: key, data: data) as Data?
+    }
+
+    func sendData(key: String, data: Data) async throws -> Data? {
         Logger.shared.debug("key: \(key), data: \(data) called on Thread \(Thread.current)")
 
         let dataObject = try SendDataObjectManager().encode(

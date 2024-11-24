@@ -17,7 +17,7 @@ actor EventManager {
         key: EventListenerKey,
         handleData: @escaping @Sendable (_ data: Sendable) async throws -> Data?  // todo make sendable?
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         // todo: check if already exists
         EventManager.listeners[key] = handleData
@@ -29,7 +29,7 @@ actor EventManager {
         key: EventListenerKey,
         handleData: @escaping @Sendable (_ data: Sendable) throws -> Void
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         self.register(
             key: key,

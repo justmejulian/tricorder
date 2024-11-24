@@ -9,13 +9,13 @@ import CoreMotion
 import Foundation
 import os
 
-actor SensorManager {
+actor CoreMotionManager {
     let eventManager = EventManager.shared
 
     let motionManager = CMBatchedSensorManager()
 }
 
-extension SensorManager {
+extension CoreMotionManager {
     func stopUpdates() {
         Logger.shared.debug("MotinManager: stopUpdates called on Thread \(Thread.current)")
 
@@ -30,13 +30,13 @@ extension SensorManager {
             CMBatchedSensorManager.isAccelerometerSupported
                 && CMBatchedSensorManager.isDeviceMotionSupported
         else {
-            throw SensorManagerError.notSupported
+            throw CoreMotionManagerError.notSupported
         }
 
         motionManager.startAccelerometerUpdates(handler: {
             @Sendable (batchedData, error) in
 
-            Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+            Logger.shared.debug("called on Thread \(Thread.current)")
 
             if let error = error {
                 Logger.shared.error(
@@ -57,7 +57,7 @@ extension SensorManager {
         motionManager.startDeviceMotionUpdates(handler: {
             @Sendable (batchedData, error) in
 
-            Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+            Logger.shared.debug("called on Thread \(Thread.current)")
 
             if let error = error {
                 Logger.shared.error(
@@ -79,23 +79,22 @@ extension SensorManager {
 
 // MARK: - nonisolated
 //
-extension SensorManager {
+extension CoreMotionManager {
     nonisolated private func handleUpdate(
-        _ timestamp: Date,
-        _ sensor_id: String,
-        _ values: [MotionValue]
+        _ motionSensor: MotionSensor
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
+
         Task {
             await eventManager.trigger(
                 key: .collectedMotionValues,
-                data: values
+                data: motionSensor
             ) as Void
         }
     }
 
     nonisolated func consumeDeviceMotionUpdates(batchedData: [CMDeviceMotion]) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         // todo make this more reusable
         // todo do all of this in a different thread
@@ -143,24 +142,18 @@ extension SensorManager {
             )
         }
 
-        let firstValue = rotationRateValues.first!
-
-        let date = Date(
-            timeIntervalSince1970: firstValue.timestamp.timeIntervalSince1970
-        )
-
         // todo store these keys in enum
-        handleUpdate(date, "rotationRate", rotationRateValues)
+        handleUpdate(MotionSensor(name: "rotationRate", values: rotationRateValues))
 
-        handleUpdate(date, "userAcceleration", userAccelerationValues)
+        handleUpdate(MotionSensor(name: "userAcceleration", values: userAccelerationValues))
 
-        handleUpdate(date, "gravity", gravityValues)
+        handleUpdate(MotionSensor(name: "gravity", values: gravityValues))
 
-        handleUpdate(date, "quaternion", quaternionValues)
+        handleUpdate(MotionSensor(name: "quaternion", values: quaternionValues))
     }
 
     nonisolated func consumeAccelerometerUpdates(batchedData: [CMAccelerometerData]) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         var values: [MotionValue] = []
 
@@ -170,6 +163,8 @@ extension SensorManager {
                     x: data.acceleration.x,
                     y: data.acceleration.y,
                     z: data.acceleration.z,
+
+                    // The timestamp is the amount of time in seconds since the device booted.
                     timestamp: Date(
                         timeIntervalSince1970: data.timestamp
                             .timeIntervalSince1970
@@ -178,20 +173,12 @@ extension SensorManager {
             )
         }
 
-        // all have differnt timestamps
-        // use first as batch tiemstamp
-        // The timestamp is the amount of time in seconds since the device booted.
-        let firstValue = values.first!
-
-        let date = Date(
-            timeIntervalSince1970: firstValue.timestamp.timeIntervalSince1970
-        )
-        handleUpdate(date, "acceleration", values)
+        handleUpdate(MotionSensor(name: "acceleration", values: values))
     }
 }
 
 // MARK: - MotionManagerError
 //
-enum SensorManagerError: Error {
+enum CoreMotionManagerError: Error {
     case notSupported
 }

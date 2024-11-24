@@ -18,10 +18,17 @@ actor NearbyInteractionManager: NSObject {
 }
 
 extension NearbyInteractionManager {
+    func setDiscoveryToken(_ token: NIDiscoveryToken) throws {
+        // todo can i get rid of this? init?
+        if session == nil {
+            initializeNISession()
+        }
+
+        self.config = NINearbyPeerConfiguration(peerToken: token)
+    }
+
     func setDiscoveryToken(_ tokenData: Data) throws {
-        Logger.shared.debug(
-            "NearbyInteractionManager \(#function) called on Thread \(Thread.current)"
-        )
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         guard
             let token = try? NSKeyedUnarchiver.unarchivedObject(
@@ -32,18 +39,11 @@ extension NearbyInteractionManager {
             throw NearbyInteractionManagerError.decodingError
         }
 
-        // todo can i get rid of this? init?
-        if session == nil {
-            initializeNISession()
-        }
-
-        self.config = NINearbyPeerConfiguration(peerToken: token)
+        try setDiscoveryToken(token)
     }
 
-    func getDiscoveryToken() throws -> Data {
-        Logger.shared.debug(
-            "NearbyInteractionManager \(#function) called on Thread \(Thread.current)"
-        )
+    func getDiscoveryTokenData() throws -> Data {
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         // todo can i get rid of this? init?
         if session == nil {
@@ -63,8 +63,9 @@ extension NearbyInteractionManager {
 
 extension NearbyInteractionManager {
     func start() {
+        Logger.shared.debug("called on Thread \(Thread.current)")
+
         Logger.shared.info("Start NearbyInteractionManager")
-        Logger.shared.debug("NearbyInteractionManager start called on Thread \(Thread.current)")
 
         guard let config = config else {
             Logger.shared.error(
@@ -77,7 +78,7 @@ extension NearbyInteractionManager {
     }
 
     func stop() {
-        Logger.shared.debug("NearbyInteractionManager stop called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         // todo: maybe deinitializeNISession?
         session?.pause()
@@ -86,9 +87,7 @@ extension NearbyInteractionManager {
     }
 
     private func initializeNISession() {
-        Logger.shared.debug(
-            "NearbyInteractionManager \(#function) called on Thread \(Thread.current)"
-        )
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let isSupported = NISession.deviceCapabilities
             .supportsPreciseDistanceMeasurement
@@ -108,11 +107,10 @@ extension NearbyInteractionManager {
     }
 
     private func deinitializeNISession() {
-        Logger.shared.debug(
-            "NearbyInteractionManager \(#function) called on Thread \(Thread.current)"
-        )
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Logger.shared.info("invalidating and deinitializing the NISession")
+
         session?.invalidate()
         session = nil
     }
@@ -121,12 +119,12 @@ extension NearbyInteractionManager {
 // MARK: - NISessionDelegate
 extension NearbyInteractionManager: NISessionDelegate {
     nonisolated func sessionWasSuspended(_ session: NISession) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
         Logger.shared.info("NISession was suspended")
     }
 
     nonisolated func sessionSuspensionEnded(_ session: NISession) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
         Logger.shared.info("NISession suspension ended")
     }
 
@@ -143,18 +141,14 @@ extension NearbyInteractionManager: NISessionDelegate {
         _ session: NISession,
         didUpdate nearbyObjects: [NINearbyObject]
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        if let object = nearbyObjects.first, let distance = object.distance {
-
-            let distanceDouble = Double(distance)
-
-            Task {
-                await eventManager.trigger(
-                    key: .collectedDistance,
-                    data: distanceDouble
-                ) as Void
-            }
+        Logger.shared.debug("called on Thread \(Thread.current)")
+        let timestamp = Date()
+        let values: [Double] = nearbyObjects.map { Double($0.distance ?? 0) }
+        Task {
+            await eventManager.trigger(
+                key: .collectedDistance,
+                data: DistanceValue(values: values, timestamp: timestamp)
+            ) as Void
         }
     }
 
@@ -163,7 +157,7 @@ extension NearbyInteractionManager: NISessionDelegate {
         didRemove nearbyObjects: [NINearbyObject],
         reason: NINearbyObject.RemovalReason
     ) {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         switch reason {
         case .peerEnded:

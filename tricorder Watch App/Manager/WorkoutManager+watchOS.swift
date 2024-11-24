@@ -140,7 +140,6 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
          */
         Task { @MainActor in
             Logger.shared.debug("Task called on Thread \(Thread.current)")
-            // todo needs to be on Main?
 
             for type in collectedTypes {
                 if let quantityType = type as? HKQuantityType,
@@ -148,11 +147,7 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
                         for: quantityType
                     )
                 {
-                    Logger.shared.debug("New statistics for \(quantityType): \(statistics)")
-                    await eventManager.trigger(
-                        key: .collectedStatistics,
-                        data: statistics
-                    ) as Void
+                    await statisticsManager.handle(statistics)
                 }
             }
         }

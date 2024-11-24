@@ -40,14 +40,14 @@ extension ConnectivityMetaInfoManager {
     }
 
     func updateLastDidReceiveDataDate() {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         lastDidReceiveDataDate = Date()
         updateIsLastDidReceiveDataDateTooRecent()
     }
 
     func updateIsLastDidReceiveDataDateTooRecent() {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Task {
             Logger.shared.debug("Setting lastDidReceiveDataDateTooRecent to true")

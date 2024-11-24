@@ -17,7 +17,7 @@ struct SendDataObjectManager {
     }
 
     func encode(key: String, data: Data) throws -> Data {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let dataObject = DataObject(key: key, data: data)
         guard let encodedData = try? JSONEncoder().encode(dataObject) else {
@@ -27,7 +27,7 @@ struct SendDataObjectManager {
     }
 
     func decode(_ data: Data) throws -> DataObject {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         guard
             let dataObject = try? JSONDecoder().decode(
@@ -39,6 +39,14 @@ struct SendDataObjectManager {
         }
 
         return dataObject
+    }
+
+    func decode(_ data: Sendable) throws -> DataObject {
+        guard let data = data as? Data else {
+            throw SendDataObjectManagerError.couldNotDecodeData
+        }
+
+        return try decode(data)
     }
 }
 

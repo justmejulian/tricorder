@@ -10,16 +10,16 @@ import SwiftUI
 
 struct MetricsView: View {
     @ObservedObject
-    var statisticsManager: StatisticsManager
+    var heartRateManager: ObservableValueManager<HeartRateValue>
 
     @ObservedObject
-    var distanceManager: DistanceManager
+    var distanceManager: ObservableValueManager<DistanceValue>
 
     var body: some View {
         HStack {
-            Text(formatHeartRate(statisticsManager.mostRecentHeartRate))
+            Text(formatHeartRate(heartRateManager.mostRecent?.value))
             Spacer()
-            Text(formatDistance(distanceManager.distance))
+            Text(formatDistance(distanceManager.mostRecent?.avg))
         }
         .font(
             .system(.title2, design: .rounded)

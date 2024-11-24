@@ -11,10 +11,10 @@ struct MetricsView: View {
     @EnvironmentObject var recordingManager: RecordingManager
 
     @ObservedObject
-    var statisticsManager: StatisticsManager
+    var heartRateManager: ObservableValueManager<HeartRateValue>
 
     @ObservedObject
-    var distanceManager: DistanceManager
+    var distanceManager: ObservableValueManager<DistanceValue>
 
     @ObservedObject
     var motionManager: MotionManager
@@ -24,32 +24,31 @@ struct MetricsView: View {
             HStack {
                 MetricsBox(
                     title: "Heart Rate",
-                    value: formatHeartRate(statisticsManager.mostRecentHeartRate)
+                    value: formatHeartRate(heartRateManager.mostRecent?.value)
                 )
-                // todo avg
                 MetricsBox(
-                    title: "Avg Heart Rate",
-                    value: formatHeartRate(statisticsManager.avgHeartRate)
+                    title: "# Heart Rate",
+                    value: String(heartRateManager.count)
                 )
             }
             HStack {
                 MetricsBox(
                     title: "Distance",
-                    value: formatDistance(distanceManager.distance)
+                    value: formatDistance(distanceManager.mostRecent?.avg)
                 )
                 MetricsBox(
-                    title: "Top Speed",
-                    value: "42 km/h"
+                    title: "# Distance",
+                    value: String(distanceManager.count)
                 )
             }
             HStack {
                 MetricsBox(
-                    title: "# Motion Data",
-                    value: String(motionManager.motionValues.count)
+                    title: "Top Speed",
+                    value: "42 km/h"
                 )
                 MetricsBox(
-                    title: "# Statistics",
-                    value: String(statisticsManager.statistics.count)
+                    title: "# Motion Data",
+                    value: String(motionManager.count)
                 )
             }
         }

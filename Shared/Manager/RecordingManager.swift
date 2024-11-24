@@ -14,9 +14,9 @@ import os
 class RecordingManager: ObservableObject {
     let eventManager = EventManager.shared
 
-    var statisticsManager = StatisticsManager()
     var motionManager = MotionManager()
-    var distanceManager = DistanceManager()
+    var distanceManager = ObservableValueManager<DistanceValue>()
+    var heartRateManager = ObservableValueManager<HeartRateValue>()
 
     var workoutManager = WorkoutManager()
     var nearbyInteractionManager = NearbyInteractionManager()
@@ -64,7 +64,7 @@ extension RecordingManager {
         startDate = nil
 
         distanceManager.reset()
-        statisticsManager.reset()
+        heartRateManager.reset()
         motionManager.reset()
 
         await connectivityManager.reset()
@@ -73,35 +73,25 @@ extension RecordingManager {
     }
 }
 
+// MARK: -  Shared handlers
+//
 extension RecordingManager {
     @Sendable
-    nonisolated func getSendDataObject(_ data: Sendable) throws -> SendDataObjectManager.DataObject
-    {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        guard let data = data as? Data else {
-            throw RecordingManagerError.invalidData
-        }
-
-        return try SendDataObjectManager().decode(data)
-    }
-
-    @Sendable
     nonisolated func handleReceivedDistance(_ data: Sendable) throws {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        guard let distance = data as? Double else {
-            Logger.shared.error("\(#function): Invalid data type")
-            return
-        }
-
+        Logger.shared.debug("called on Thread \(Thread.current)")
         Task {
-            await distanceManager.setDistance(distance)
+            await distanceManager.update(data: data)
         }
     }
-
 }
 
+// MARK: -  Shared functions
+//
+extension RecordingManager {
+}
+
+// MARK: -  RecordingManagerError
+//
 enum RecordingManagerError: Error {
     case invalidData
     case noKey

@@ -23,7 +23,7 @@ struct RecodingTimelineView: View {
                 monitoringManager: recordingManager.monitoringManager
             )
             MetricsView(
-                statisticsManager: recordingManager.statisticsManager,
+                heartRateManager: recordingManager.heartRateManager,
                 distanceManager: recordingManager.distanceManager
             )
         }

@@ -8,7 +8,7 @@ import Foundation
 
 protocol Sensor: Codable {
     associatedtype T: Value
-    
+
     var name: String { get }
     var values: [T] { get set }
 }

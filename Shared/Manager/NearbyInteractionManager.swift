@@ -18,6 +18,15 @@ actor NearbyInteractionManager: NSObject {
 }
 
 extension NearbyInteractionManager {
+    func setDiscoveryToken(_ token: NIDiscoveryToken) throws {
+        // todo can i get rid of this? init?
+        if session == nil {
+            initializeNISession()
+        }
+
+        self.config = NINearbyPeerConfiguration(peerToken: token)
+    }
+
     func setDiscoveryToken(_ tokenData: Data) throws {
         Logger.shared.debug(
             "NearbyInteractionManager \(#function) called on Thread \(Thread.current)"
@@ -32,15 +41,10 @@ extension NearbyInteractionManager {
             throw NearbyInteractionManagerError.decodingError
         }
 
-        // todo can i get rid of this? init?
-        if session == nil {
-            initializeNISession()
-        }
-
-        self.config = NINearbyPeerConfiguration(peerToken: token)
+        try setDiscoveryToken(token)
     }
 
-    func getDiscoveryToken() throws -> Data {
+    func getDiscoveryTokenData() throws -> Data {
         Logger.shared.debug(
             "NearbyInteractionManager \(#function) called on Thread \(Thread.current)"
         )
@@ -144,17 +148,13 @@ extension NearbyInteractionManager: NISessionDelegate {
         didUpdate nearbyObjects: [NINearbyObject]
     ) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        if let object = nearbyObjects.first, let distance = object.distance {
-
-            let distanceDouble = Double(distance)
-
-            Task {
-                await eventManager.trigger(
-                    key: .collectedDistance,
-                    data: distanceDouble
-                ) as Void
-            }
+        let timestamp = Date()
+        let values: [Double] = nearbyObjects.map { Double($0.distance ?? 0) }
+        Task {
+            await eventManager.trigger(
+                key: .collectedDistance,
+                data: DistanceValue(values: values, timestamp: timestamp)
+            ) as Void
         }
     }
 

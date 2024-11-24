@@ -40,6 +40,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		743137382CF252D500B36B5A /* tricorder Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "tricorder Watch App";
+			sourceTree = "<group>";
+		};
 		749192822CCA7C7100AAC143 /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Shared;
@@ -48,11 +53,6 @@
 		749276B62CAC263A004315FD /* tricorder */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = tricorder;
-			sourceTree = "<group>";
-		};
-		749276C82CAC263B004315FD /* tricorder Watch App */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "tricorder Watch App";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -78,10 +78,10 @@
 		749276AB2CAC2639004315FD = {
 			isa = PBXGroup;
 			children = (
-				749276B62CAC263A004315FD /* tricorder */,
-				749276C82CAC263B004315FD /* tricorder Watch App */,
 				749276B52CAC263A004315FD /* Products */,
 				749192822CCA7C7100AAC143 /* Shared */,
+				749276B62CAC263A004315FD /* tricorder */,
+				743137382CF252D500B36B5A /* tricorder Watch App */,
 			);
 			sourceTree = "<group>";
 		};
@@ -135,8 +135,8 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				743137382CF252D500B36B5A /* tricorder Watch App */,
 				749192822CCA7C7100AAC143 /* Shared */,
-				749276C82CAC263B004315FD /* tricorder Watch App */,
 			);
 			name = "tricorder Watch App";
 			packageProductDependencies = (

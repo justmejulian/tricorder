@@ -11,7 +11,7 @@ import os
 
 extension RecordingManager {
     func registerListeners() async {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         await eventManager.register(
             key: .sessionStateChanged,
@@ -43,7 +43,7 @@ extension RecordingManager {
 //
 extension RecordingManager {
     func startRecording() async throws {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Logger.shared.info("Starting Recording")
 
@@ -64,10 +64,10 @@ extension RecordingManager {
     }
 
     func fetchRemoteRecordingState() async {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
         do {
             guard
-                let recordingStateData = try await connectivityManager.sendCodable(
+                let recordingStateData = try await connectivityManager.sendData(
                     key: "recordingState",
                     data: JSONEncoder().encode([] as [Int])  // send empty data
                 )
@@ -93,7 +93,7 @@ extension RecordingManager {
 extension RecordingManager {
     @Sendable
     nonisolated func handleSessionStateChange(_ data: Sendable) throws {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         guard let change = data as? SessionStateChange else {
             Logger.shared.error("\(#function): Invalid data type")
@@ -115,26 +115,22 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedData(_ data: Sendable) async throws -> Data? {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
-        let dataObject = try getSendDataObject(data)
+        let dataObject = try SendDataObjectManager().decode(data)
 
         // todo move these keys into and enum, so I know what is possible
         switch dataObject.key {
         case "discoveryToken":
-            // todo: maybe move this stuff into ios nearbyInteractionManager
-            // handleReceivedDiscoveryToken -> Data
             try await nearbyInteractionManager.setDiscoveryToken(dataObject.data)
-            // return iPhones DiscoveryToken
-            let token = try await nearbyInteractionManager.getDiscoveryToken()
-
+            // return own DiscoveryToken
+            let token = try await nearbyInteractionManager.getDiscoveryTokenData()
             await nearbyInteractionManager.start()
             return token
 
         case "motionUpdate":
-            // todo: maybe move this stuff into Motion Manager
-            let values = try JSONDecoder().decode([MotionValue].self, from: dataObject.data)
-            await motionManager.updateMotionValues(values)
+            let motionSensor = try JSONDecoder().decode(MotionSensor.self, from: dataObject.data)
+            await motionManager.update(motionSensor: motionSensor)
             return nil
 
         default:
@@ -144,31 +140,31 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedWorkoutData(_ data: Sendable) throws {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
-        let dataObject = try getSendDataObject(data)
+        let dataObject = try SendDataObjectManager().decode(data)
 
         // todo move these keys into and enum, so I know what is possible
         switch dataObject.key {
         case "startDate":
-            if let startDate = try? JSONDecoder().decode(
-                Date.self,
-                from: dataObject.data
-            ) {
-                Task {
-                    await setStartDate(startDate)
-                }
-            }
-        case "statistics":
-            if let statistics =
-                try NSKeyedUnarchiver.unarchivedObject(
-                    ofClass: HKStatistics.self,
-                    from: dataObject.data
+            Task {
+                await setStartDate(
+                    try JSONDecoder().decode(
+                        Date.self,
+                        from: dataObject.data
+
+                    )
                 )
-            {
-                Task {
-                    await statisticsManager.updateForStatistics(statistics)
-                }
+            }
+
+        case "statistics":
+            Task {
+                await heartRateManager.update(
+                    data: try JSONDecoder().decode(
+                        HeartRateValue.self,
+                        from: dataObject.data
+                    )
+                )
             }
 
         default:

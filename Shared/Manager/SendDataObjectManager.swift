@@ -40,6 +40,14 @@ struct SendDataObjectManager {
 
         return dataObject
     }
+
+    func decode(_ data: Sendable) throws -> DataObject {
+        guard let data = data as? Data else {
+            throw SendDataObjectManagerError.couldNotDecodeData
+        }
+
+        return try decode(data)
+    }
 }
 
 // MARK: - SendDataObjectManagerError

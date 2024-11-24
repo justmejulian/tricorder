@@ -20,6 +20,7 @@ actor WorkoutManager: NSObject {
     let typesToRead: Set = [
         HKQuantityType(.heartRate),
         HKQuantityType.workoutType(),
+        // todo can this be removed? (i guess requires reinstall)
         HKObjectType.activitySummaryType(),
     ]
     let healthStore = HKHealthStore()
@@ -29,6 +30,7 @@ actor WorkoutManager: NSObject {
 
     #if os(watchOS)
         var builder: HKLiveWorkoutBuilder?
+        var statisticsManager = StatisticsManager()
     #else
     #endif
 

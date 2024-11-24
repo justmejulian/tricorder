@@ -103,13 +103,14 @@ extension RecordingManager {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
         let discoveryToken =
-            try await nearbyInteractionManager.getDiscoveryToken()
+            try await nearbyInteractionManager.getDiscoveryTokenData()
         guard
-            let partnerDiscoveryToken = try await connectivityManager.sendCodable(
+            let partnerDiscoveryToken = try await connectivityManager.sendData(
                 key: "discoveryToken",
                 data: discoveryToken
             )
         else {
+            Logger.shared.error("Did not receive a discovery token from companion.")
             throw NearbyInteractionManagerError.noDiscoveryTokenAvailable
         }
 
@@ -182,15 +183,15 @@ extension RecordingManager {
     nonisolated func handleReceivedData(_ data: Sendable) async throws -> Data? {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
-        let dataObject = try getSendDataObject(data)
+        let dataObject = try SendDataObjectManager().decode(data)
 
         switch dataObject.key {
         case "recordingState":
             let recordingObject = await RecordingObject(
                 recordingState: self.recordingState.rawValue,
                 startTime: self.workoutManager.getStartDate()?.timeIntervalSince1970,
-                motionDataCount: self.motionManager.motionValues.count,
-                statisticCount: self.statisticsManager.statistics.count
+                motionDataCount: self.motionManager.count,
+                statisticCount: self.heartRateManager.count
             )
             return try JSONEncoder().encode(recordingObject)
 
@@ -203,7 +204,7 @@ extension RecordingManager {
     nonisolated func handleReceivedWorkoutData(_ data: Sendable) throws {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
-        let dataObject = try getSendDataObject(data)
+        let dataObject = try SendDataObjectManager().decode(data)
 
         switch dataObject.key {
         default:
@@ -213,42 +214,29 @@ extension RecordingManager {
     }
 
     @Sendable
-    nonisolated func handleCollecteMotionValues(_ data: Sendable) throws {
+    nonisolated func handleCollecteMotionValues(_ data: Sendable) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
-        // todo: maybe move this stuff into motionManager
-        guard let values = data as? [MotionValue] else {
-            Logger.shared.error("\(#function): Invalid data type")
-            return
-        }
+        let motionSensor = data as! MotionSensor
+
         Task {
-            await motionManager.updateMotionValues(values)
+            await motionManager.update(motionSensor: motionSensor)
 
             do {
-                let archiveMotionValueArrays = try archiveMotionValueArray(values)
+                let archiveMotionValueArrays = try archiveSendableArray(
+                    motionSensor.chunked(into: MAXCHUNKSIZE)
+                )
 
-                for archiveMotionValueArray in archiveMotionValueArrays {
-                    do {
-                        try await connectivityManager.sendCodable(
-                            key: "motionUpdate",
-                            data: archiveMotionValueArray
-                        ) as Void
-                        await monitoringManager.addMotioUpdateSendSuccess(true)
-                    } catch {
-                        Logger.shared.error("\(#function): Failed to send data: \(error)")
-                        Logger.shared.debug(
-                            "archiveMotionValueArray lenght \(archiveMotionValueArray.count), size \(archiveMotionValueArray.debugDescription)"
-                        )
-                        // todo presist data
-                        await monitoringManager.addMotioUpdateSendSuccess(false)
-                    }
-                }
+                try await connectivityManager.sendDataArray(
+                    key: "motionUpdate",
+                    dataArray: archiveMotionValueArrays
+                ) as Void
 
+                await monitoringManager.addMotioUpdateSendSuccess(true)
             } catch {
                 Logger.shared.error("\(#function): Failed to archive data: \(error)")
                 await monitoringManager.addMotioUpdateSendSuccess(false)
             }
-
         }
     }
 
@@ -256,16 +244,16 @@ extension RecordingManager {
     nonisolated func handleCollectedStatistics(_ data: Sendable) throws {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
 
-        guard let statistics = data as? HKStatistics else {
+        guard let statistics = data as? HeartRateValue else {
             Logger.shared.error("\(#function): Invalid data type")
             return
         }
 
         Task {
-            await statisticsManager.updateForStatistics(statistics)
+            await heartRateManager.update(statistics)
 
             do {
-                let archivedStatistics = try archiveNSObject(statistics)
+                let archivedStatistics = try archiveSendable(statistics)
                 try await workoutManager.sendCodable(key: "statistics", data: archivedStatistics)
             } catch {
                 Logger.shared.error("\(#function): Failed to send data: \(error)")
@@ -273,35 +261,20 @@ extension RecordingManager {
         }
 
     }
-
-    nonisolated func archiveNSObject(_ data: NSObject) throws -> Data {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
-
-        return try NSKeyedArchiver.archivedData(
-            withRootObject: data,
-            requiringSecureCoding: true
-        )
-    }
-
+}
+// MARK: -  RecordingManager Helper functions
+//
+extension RecordingManager {
     nonisolated func archiveSendable(_ data: Codable) throws -> Data {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
         return try JSONEncoder().encode(data)
     }
 
-    // for data that could be too large
-    nonisolated func archiveMotionValueArray(_ data: [MotionValue]) throws -> [Data] {
-        Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+    nonisolated func archiveSendableArray(_ data: [Codable]) throws -> [Data] {
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
-        if data.count < MAXCHUNKSIZE {
-            let json = try archiveSendable(data)
-            return [json]
-        }
-
-        let chunks = data.chunked(into: MAXCHUNKSIZE)
-
-        return try chunks.map {
-            try archiveSendable($0)
-        }
+        return try data.map(archiveSendable(_:))
     }
+
 }

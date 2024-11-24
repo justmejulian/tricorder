@@ -81,15 +81,14 @@ extension CoreMotionManager {
 //
 extension CoreMotionManager {
     nonisolated private func handleUpdate(
-        _ timestamp: Date,
-        _ sensor_id: String,
-        _ values: [MotionValue]
+        _ motionSensor: MotionSensor
     ) {
         Logger.shared.debug("\(#function) called on Thread \(Thread.current)")
+
         Task {
             await eventManager.trigger(
                 key: .collectedMotionValues,
-                data: values
+                data: motionSensor
             ) as Void
         }
     }
@@ -143,20 +142,14 @@ extension CoreMotionManager {
             )
         }
 
-        let firstValue = rotationRateValues.first!
-
-        let date = Date(
-            timeIntervalSince1970: firstValue.timestamp.timeIntervalSince1970
-        )
-
         // todo store these keys in enum
-        handleUpdate(date, "rotationRate", rotationRateValues)
+        handleUpdate(MotionSensor(name: "rotationRate", values: rotationRateValues))
 
-        handleUpdate(date, "userAcceleration", userAccelerationValues)
+        handleUpdate(MotionSensor(name: "userAcceleration", values: userAccelerationValues))
 
-        handleUpdate(date, "gravity", gravityValues)
+        handleUpdate(MotionSensor(name: "gravity", values: gravityValues))
 
-        handleUpdate(date, "quaternion", quaternionValues)
+        handleUpdate(MotionSensor(name: "quaternion", values: quaternionValues))
     }
 
     nonisolated func consumeAccelerometerUpdates(batchedData: [CMAccelerometerData]) {
@@ -170,6 +163,8 @@ extension CoreMotionManager {
                     x: data.acceleration.x,
                     y: data.acceleration.y,
                     z: data.acceleration.z,
+
+                    // The timestamp is the amount of time in seconds since the device booted.
                     timestamp: Date(
                         timeIntervalSince1970: data.timestamp
                             .timeIntervalSince1970
@@ -178,15 +173,7 @@ extension CoreMotionManager {
             )
         }
 
-        // all have differnt timestamps
-        // use first as batch tiemstamp
-        // The timestamp is the amount of time in seconds since the device booted.
-        let firstValue = values.first!
-
-        let date = Date(
-            timeIntervalSince1970: firstValue.timestamp.timeIntervalSince1970
-        )
-        handleUpdate(date, "acceleration", values)
+        handleUpdate(MotionSensor(name: "acceleration", values: values))
     }
 }
 

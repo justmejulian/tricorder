@@ -26,6 +26,14 @@ actor RecordingBackgroundDataHandler {
         try await backgroundDataHandler.appendData(recording)
     }
 
+    func fetchAllRecordingPersistentIdentifiers() async throws -> [PersistentIdentifier] {
+        Logger.shared.debug("called on Thread \(Thread.current)")
+
+        return try await backgroundDataHandler.fetchPersistentIdentifiers(
+            for: RecordingDatabaseModel.self
+        )
+    }
+
     func getRecordingPersistentIdentifierByStartTimestamp(startTimestamp: Date) async throws
         -> PersistentIdentifier
     {

@@ -37,46 +37,20 @@ extension BackgroundDataHandler {
         try save(modelContext: modelContext)
     }
 
-    func removeData(identifier: PersistentIdentifier) {
+    func removeData(identifier: PersistentIdentifier) throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         let modelContext = createModelContext(modelContainer: modelContainer)
         let model = modelContext.model(for: identifier)
         modelContext.delete(model)
-        do {
-            try save(modelContext: modelContext)
-        } catch {
-            Logger.shared.error("Failed to save from append \(error.localizedDescription)")
-        }
+        try save(modelContext: modelContext)
     }
 
-    func fetchData<T>() -> [T] where T: PersistentModel {
+    func fetchDataCount<T: PersistentModel>(for _: T.Type) throws -> Int {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        return fetchData(descriptor: FetchDescriptor<T>())
-    }
-
-    func fetchData<T>(descriptor: FetchDescriptor<T>) -> [T] where T: PersistentModel {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
-        do {
-            return try modelContext.fetch(descriptor)
-        } catch {
-            Logger.shared.error("Failed to fetch \(T.self)")
-            return []
-        }
-    }
-
-    func fetchDataCount<T: PersistentModel>(for _: T.Type) -> Int {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
-        do {
-            let descriptor = FetchDescriptor<T>()
-            return try modelContext.fetchCount(descriptor)
-        } catch {
-            Logger.shared.error("Failed to fetch count \(T.self)")
-            return 0
-        }
+        let descriptor = FetchDescriptor<T>()
+        return try modelContext.fetchCount(descriptor)
     }
 
     func fetchPersistentIdentifiers<T>(for _: T.Type) throws -> [PersistentIdentifier]

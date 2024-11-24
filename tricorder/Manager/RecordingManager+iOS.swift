@@ -54,7 +54,7 @@ extension RecordingManager {
             try await workoutManager.startWatchWorkout()
             Task {
                 let recordingBackgroundDataHandler = RecordingBackgroundDataHandler(
-                    modelContainer: database.getModelContainer()
+                    modelContainer: modelContainer
                 )
 
                 try await recordingBackgroundDataHandler.addNewRecording(

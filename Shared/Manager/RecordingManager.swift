@@ -15,7 +15,7 @@ import os
 class RecordingManager: ObservableObject {
     let eventManager = EventManager.shared
 
-    let database: Database
+    let modelContainer: ModelContainer
 
     var motionManager = MotionManager()
     var distanceManager = ObservableValueManager<DistanceValue>()
@@ -34,18 +34,10 @@ class RecordingManager: ObservableObject {
         var monitoringManager = MonitoringManager()
     #endif
 
-    init() {
+    init(modelContainer: ModelContainer) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        // Initialize Database
-        do {
-            let schema = Schema([
-                RecordingDatabaseModel.self
-            ])
-            self.database = Database(modelContainer: try ModelContainer(for: schema))
-        } catch {
-            fatalError("Could not create Database")
-        }
+        self.modelContainer = modelContainer
 
         Task {
             Logger.shared.debug(

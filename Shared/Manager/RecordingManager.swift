@@ -7,12 +7,15 @@
 
 import Foundation
 import HealthKit
+import SwiftData
 import SwiftUICore
 import os
 
 @MainActor
 class RecordingManager: ObservableObject {
     let eventManager = EventManager.shared
+
+    let database: Database
 
     var motionManager = MotionManager()
     var distanceManager = ObservableValueManager<DistanceValue>()
@@ -33,6 +36,16 @@ class RecordingManager: ObservableObject {
 
     init() {
         Logger.shared.debug("called on Thread \(Thread.current)")
+
+        // Initialize Database
+        do {
+            let schema = Schema([
+                RecordingDatabaseModel.self
+            ])
+            self.database = Database(modelContainer: try ModelContainer(for: schema))
+        } catch {
+            fatalError("Could not create Database")
+        }
 
         Task {
             Logger.shared.debug(

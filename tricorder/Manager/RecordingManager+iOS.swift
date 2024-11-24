@@ -42,6 +42,7 @@ extension RecordingManager {
 // MARK: -  RecordingManager functions
 //
 extension RecordingManager {
+    // todo add name: String?
     func startRecording() async throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
@@ -51,6 +52,16 @@ extension RecordingManager {
 
         do {
             try await workoutManager.startWatchWorkout()
+            Task {
+                let recordingBackgroundDataHandler = RecordingBackgroundDataHandler(
+                    modelContainer: database.getModelContainer()
+                )
+
+                try await recordingBackgroundDataHandler.addNewRecording(
+                    name: nil,
+                    startTimestamp: Date()
+                )
+            }
         } catch {
             Logger.shared.log(
                 "Failed to start cycling on the paired watch."

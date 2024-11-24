@@ -37,6 +37,6 @@ struct tricorderApp: App {
                 // todo maybe show list
                 Text("Cannot Start Workouts from iPad")
             }
-        }
+        }.modelContainer(database.getModelContainer())
     }
 }

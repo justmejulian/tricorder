@@ -42,9 +42,7 @@ struct StartView: View {
                     },
                 trailing:
                     HStack {
-                        Button(action: {
-                            print("Info button tapped!")
-                        }) {
+                        NavigationLink(destination: RecordingListView()) {
                             Image(systemName: "list.bullet")
                         }
                     }

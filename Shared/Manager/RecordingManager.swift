@@ -7,12 +7,15 @@
 
 import Foundation
 import HealthKit
+import SwiftData
 import SwiftUICore
 import os
 
 @MainActor
 class RecordingManager: ObservableObject {
     let eventManager = EventManager.shared
+
+    let modelContainer: ModelContainer
 
     var motionManager = MotionManager()
     var distanceManager = ObservableValueManager<DistanceValue>()
@@ -31,8 +34,10 @@ class RecordingManager: ObservableObject {
         var monitoringManager = MonitoringManager()
     #endif
 
-    init() {
+    init(modelContainer: ModelContainer) {
         Logger.shared.debug("called on Thread \(Thread.current)")
+
+        self.modelContainer = modelContainer
 
         Task {
             Logger.shared.debug(

@@ -145,8 +145,8 @@ extension RecordingManager {
                 from: dataObject.data
             )
             await motionManager.update(
-                sensorName: motionSensor.name,
-                newValues: motionSensor.values
+                sensorName: motionSensor.sensorName,
+                newValues: motionSensor.batch
             )
             return nil
 

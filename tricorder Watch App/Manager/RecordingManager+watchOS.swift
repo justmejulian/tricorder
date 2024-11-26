@@ -169,7 +169,6 @@ extension RecordingManager {
 
                     // todo finish sync
                     // maybe use a HKWorkoutSessionState
-
                     try await workoutManager.endWorkout(date: change.date)
                 } catch {
                     Logger.shared.error(
@@ -222,12 +221,13 @@ extension RecordingManager {
 
         Task {
             await motionManager.update(
-                sensorName: motionSensor.name,
-                newValues: motionSensor.values
+                sensorName: motionSensor.sensorName,
+                newValues: motionSensor.batch
             )
 
             do {
                 try await sendMotionUpdate(motionSensor)
+                // todo persist on fail
                 await monitoringManager.addMotioUpdateSendSuccess(true)
             } catch {
                 Logger.shared.error("\(#function): Failed to archive data: \(error)")
@@ -240,12 +240,12 @@ extension RecordingManager {
     nonisolated func handleCollectedStatistics(_ data: Sendable) throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        guard let heartRateSensor = data as? HeartRateSensor, heartRateSensor.values.isEmpty else {
+        guard let heartRateSensor = data as? HeartRateSensor, heartRateSensor.batch.isEmpty else {
             Logger.shared.error("\(#function): Invalid data type")
             return
         }
 
-        guard let value = heartRateSensor.values.first else {
+        guard let value = heartRateSensor.batch.first else {
             Logger.shared.error("\(#function): No heart rate values")
             return
         }

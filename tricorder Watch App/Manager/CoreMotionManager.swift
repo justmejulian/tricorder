@@ -154,33 +154,33 @@ extension CoreMotionManager {
         // todo store these keys in enum
         handleUpdate(
             MotionSensor(
-                name: "rotationRate",
+                sensorName: .rotationRate,
                 recordingStart: recordingStart,
-                values: rotationRateValues
+                batch: rotationRateValues
             )
         )
 
         handleUpdate(
             MotionSensor(
-                name: "userAcceleration",
+                sensorName: .userAcceleration,
                 recordingStart: recordingStart,
-                values: userAccelerationValues
+                batch: userAccelerationValues
             )
         )
 
         handleUpdate(
             MotionSensor(
-                name: "gravity",
+                sensorName: .gravity,
                 recordingStart: recordingStart,
-                values: gravityValues
+                batch: gravityValues
             )
         )
 
         handleUpdate(
             MotionSensor(
-                name: "quaternion",
+                sensorName: .quaternion,
                 recordingStart: recordingStart,
-                values: quaternionValues
+                batch: quaternionValues
             )
         )
     }
@@ -211,9 +211,9 @@ extension CoreMotionManager {
 
         handleUpdate(
             MotionSensor(
-                name: "acceleration",
+                sensorName: .acceleration,
                 recordingStart: recordingStart,
-                values: values
+                batch: values
             )
         )
     }

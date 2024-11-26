@@ -8,10 +8,10 @@ import Foundation
 
 struct DistanceSensor: Sensor {
     let recordingStart: Date
-    var values: [DistanceValue]
+    var batch: [DistanceValue]
 
-    init(recordingStart: Date, values: [DistanceValue]) {
+    init(recordingStart: Date, batch: [DistanceValue]) {
         self.recordingStart = recordingStart
-        self.values = values
+        self.batch = batch
     }
 }

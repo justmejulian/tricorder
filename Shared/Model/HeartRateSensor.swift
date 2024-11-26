@@ -8,10 +8,10 @@ import Foundation
 
 struct HeartRateSensor: Sensor {
     let recordingStart: Date
-    var values: [HeartRateValue]
+    var batch: [HeartRateValue]
 
-    init(recordingStart: Date, values: [HeartRateValue]) {
+    init(recordingStart: Date, batch: [HeartRateValue]) {
         self.recordingStart = recordingStart
-        self.values = values
+        self.batch = batch
     }
 }

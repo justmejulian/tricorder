@@ -7,24 +7,33 @@
 import Foundation
 
 struct MotionSensor: Sensor {
-    let name: String
+    let sensorName: SensorName
     let recordingStart: Date
-    var values: [MotionValue]
+    var batch: [MotionValue]
+}
+extension MotionSensor {
+    enum SensorName: String, Codable {
+        case acceleration
+        case rotationRate
+        case userAcceleration
+        case gravity
+        case quaternion
+    }
 }
 
 extension MotionSensor {
     func chunked(into size: Int) throws -> [MotionSensor] {
-        if values.count < size {
+        if batch.count < size {
             return [self]
         }
 
-        let chunks = values.chunked(into: size)
+        let chunks = batch.chunked(into: size)
 
         return chunks.map {
             return MotionSensor(
-                name: name,
+                sensorName: sensorName,
                 recordingStart: recordingStart,
-                values: $0
+                batch: $0
             )
         }
 

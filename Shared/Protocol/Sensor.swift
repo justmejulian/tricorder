@@ -10,7 +10,5 @@ protocol Sensor: Codable {
     associatedtype T: Value
 
     var recordingStart: Date { get }
-    var values: [T] { get set }
+    var batch: [T] { get set }
 }
-
-// todo add enum with names

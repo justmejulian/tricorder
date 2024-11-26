@@ -1,5 +1,5 @@
 //
-//  HeartRateSensorDatabaseModel.swift
+//  DistanceSensorBatchDatabaseModel.swift
 //
 //  Created by Julian Visser on 24.11.2024.
 //
@@ -8,11 +8,11 @@ import Foundation
 import SwiftData
 
 @Model
-class HeartRateSensorDatabaseModel {
+class DistanceSensorBatchDatabaseModel {
     var recordingId: PersistentIdentifier
-    var value: HeartRateValue
+    var value: DistanceValue
 
-    init(recordingId: PersistentIdentifier, value: HeartRateValue) {
+    init(recordingId: PersistentIdentifier, value: DistanceValue) {
         self.recordingId = recordingId
         self.value = value
     }

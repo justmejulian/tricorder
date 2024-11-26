@@ -7,18 +7,19 @@
 import Foundation
 import SwiftData
 
-protocol MotionSensorDatabaseModel {
-    var recordingId: PersistentIdentifier { get set }
-    var values: [MotionValue] { get set }
-}
-
 @Model
-class rotationSensorDatabaseModel: MotionSensorDatabaseModel {
+class MotionSensorBatchDatabaseModel {
     var recordingId: PersistentIdentifier
+    var sensorName: MotionSensor.SensorName
     var values: [MotionValue]
 
-    init(recordingId: PersistentIdentifier, values: [MotionValue]) {
+    init(
+        recordingId: PersistentIdentifier,
+        sensorName: MotionSensor.SensorName,
+        values: [MotionValue]
+    ) {
         self.recordingId = recordingId
+        self.sensorName = sensorName
         self.values = values
     }
 }

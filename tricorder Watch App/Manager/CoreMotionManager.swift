@@ -150,6 +150,8 @@ extension CoreMotionManager {
                 )
             )
         }
+        let test = SensorUpdate.motion(.rotationRate, values: rotationRateValues)
+        test.getValues().
 
         // todo store these keys in enum
         handleUpdate(

@@ -275,6 +275,7 @@ extension RecordingManager {
             do {
                 // todo change to handle recording start
                 let archivedStatistics = try archiveSendable(value)
+                // todo also send via connectivityManager
                 try await workoutManager.sendCodable(key: "statistics", data: archivedStatistics)
             } catch {
                 Logger.shared.error("\(#function): Failed to send data: \(error)")

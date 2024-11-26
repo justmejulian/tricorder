@@ -31,10 +31,20 @@ extension StatisticsManager {
                 return
             }
 
+            Logger.shared.debug("\(statistics.startDate)")
+
             Task {
                 await eventManager.trigger(
                     key: .collectedStatistics,
-                    data: HeartRateValue(value: mostRecentHeartRate, timestamp: Date())
+                    data: HeartRateSensor(
+                        recordingStart: statistics.startDate,
+                        values: [
+                            HeartRateValue(
+                                value: mostRecentHeartRate,
+                                timestamp: Date()
+                            )
+                        ]
+                    )
                 ) as Void
             }
 

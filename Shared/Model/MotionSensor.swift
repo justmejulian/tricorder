@@ -8,6 +8,7 @@ import Foundation
 
 struct MotionSensor: Sensor {
     let name: String
+    let recordingStart: Date
     var values: [MotionValue]
 }
 
@@ -20,7 +21,11 @@ extension MotionSensor {
         let chunks = values.chunked(into: size)
 
         return chunks.map {
-            return MotionSensor(name: name, values: $0)
+            return MotionSensor(
+                name: name,
+                recordingStart: recordingStart,
+                values: $0
+            )
         }
 
     }

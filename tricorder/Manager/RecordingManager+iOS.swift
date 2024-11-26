@@ -140,8 +140,14 @@ extension RecordingManager {
             return token
 
         case "motionUpdate":
-            let motionSensor = try JSONDecoder().decode(MotionSensor.self, from: dataObject.data)
-            await motionManager.update(motionSensor: motionSensor)
+            let motionSensor = try JSONDecoder().decode(
+                MotionSensor.self,
+                from: dataObject.data
+            )
+            await motionManager.update(
+                sensorName: motionSensor.name,
+                newValues: motionSensor.values
+            )
             return nil
 
         default:

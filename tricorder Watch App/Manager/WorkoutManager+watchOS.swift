@@ -31,7 +31,7 @@ extension WorkoutManager {
         }
     }
 
-    func startWorkout() async throws {
+    func startWorkout() async throws -> Date {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         let configuration = HKWorkoutConfiguration()
@@ -64,6 +64,7 @@ extension WorkoutManager {
         do {
             try await session.startMirroringToCompanionDevice()
         } catch {
+            // todo what about when no iphone?
             fatalError(
                 "Unable to start the mirrored workout: \(error.localizedDescription)"
             )
@@ -74,6 +75,8 @@ extension WorkoutManager {
         let startDate = Date()
         session.startActivity(with: startDate)
         try await builder?.beginCollection(at: startDate)
+
+        return startDate
     }
 
     func endWorkout(date: Date) async throws {

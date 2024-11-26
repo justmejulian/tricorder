@@ -15,7 +15,7 @@ struct DistanceValue: Value {
         return roundToDecimal(avg, decimals: 1)
     }
 
-    let timestamp: Date
+    var timestamp: Date
 
     init(values: [Double], timestamp: Date) {
         self.values = values.map { roundToDecimal($0, decimals: 1) }

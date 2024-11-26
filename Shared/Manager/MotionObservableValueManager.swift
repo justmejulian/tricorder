@@ -34,10 +34,6 @@ extension MotionManager {
             observableValueManager.update(newValue)
         }
     }
-
-    func update(motionSensor: MotionSensor) {
-        update(sensorName: motionSensor.name, newValues: motionSensor.values)
-    }
 }
 extension MotionManager {
     private func getOrCreateObservableValueManager(for sensorName: String)

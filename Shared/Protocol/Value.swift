@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import SwiftData
 
 protocol Value: Codable {
     var timestamp: Date { get }

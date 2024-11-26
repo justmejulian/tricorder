@@ -8,6 +8,5 @@ import Foundation
 
 struct HeartRateValue: Value {
     let value: Double
-
-    let timestamp: Date
+    var timestamp: Date
 }

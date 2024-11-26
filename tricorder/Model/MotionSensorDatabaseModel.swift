@@ -8,18 +8,18 @@ import Foundation
 import SwiftData
 
 @Model
-class MotionSensorBatchDatabaseModel {
+class MotionSensorDatabaseModel {
     var recordingId: PersistentIdentifier
-    var sensorName: MotionSensor.SensorName
-    var values: [MotionValue]
+    var sensorName: SensorName
+    var batch: [MotionValue]
 
     init(
         recordingId: PersistentIdentifier,
-        sensorName: MotionSensor.SensorName,
-        values: [MotionValue]
+        sensorName: SensorName,
+        batch: [MotionValue]
     ) {
         self.recordingId = recordingId
         self.sensorName = sensorName
-        self.values = values
+        self.batch = batch
     }
 }

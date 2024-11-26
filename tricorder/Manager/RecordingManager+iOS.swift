@@ -148,6 +148,10 @@ extension RecordingManager {
                 sensorName: motionSensor.sensorName,
                 newValues: motionSensor.batch
             )
+
+            try await MotionSensorBackgroundDataHandler(modelContainer: modelContainer)
+                .add(motionSensor: motionSensor)
+
             return nil
 
         default:

@@ -8,7 +8,7 @@ import Foundation
 import SwiftData
 
 @Model
-class HeartRateSensorBatchDatabaseModel {
+class HeartRateSensorDatabaseModel {
     var recordingId: PersistentIdentifier
     var value: HeartRateValue
 

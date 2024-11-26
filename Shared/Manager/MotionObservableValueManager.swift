@@ -24,7 +24,7 @@ extension MotionManager {
         motionObservableValueManagers = [:]
     }
 
-    func update(sensorName: MotionSensor.SensorName, newValues: [MotionValue]) {
+    func update(sensorName: SensorName, newValues: [MotionValue]) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         let observableValueManager = getOrCreateObservableValueManager(for: sensorName)
@@ -36,7 +36,7 @@ extension MotionManager {
     }
 }
 extension MotionManager {
-    private func getOrCreateObservableValueManager(for sensorName: MotionSensor.SensorName)
+    private func getOrCreateObservableValueManager(for sensorName: SensorName)
         -> ObservableValueManager<MotionValue>
     {
         let sensorName = sensorName.rawValue

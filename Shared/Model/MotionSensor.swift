@@ -11,15 +11,6 @@ struct MotionSensor: Sensor {
     let recordingStart: Date
     var batch: [MotionValue]
 }
-extension MotionSensor {
-    enum SensorName: String, Codable {
-        case acceleration
-        case rotationRate
-        case userAcceleration
-        case gravity
-        case quaternion
-    }
-}
 
 extension MotionSensor {
     func chunked(into size: Int) throws -> [MotionSensor] {
@@ -38,4 +29,12 @@ extension MotionSensor {
         }
 
     }
+}
+
+enum SensorName: String, Codable {
+    case acceleration
+    case rotationRate
+    case userAcceleration
+    case gravity
+    case quaternion
 }

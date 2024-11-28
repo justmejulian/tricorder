@@ -24,12 +24,10 @@ actor MotionSensorBackgroundDataHandler {
     func add(motionSensor: MotionSensor) async throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        let recordingId = try await recordingBackgroundDataHandler.getRecordingPersistentIdentifier(
-            startTimestamp: motionSensor.recordingStart
-        )
+        // get if recording exists
 
         let motionSensorBatchDatabaseModel = MotionSensorDatabaseModel(
-            recordingId: recordingId,
+            recordingStart: motionSensor.recordingStart,
             sensorName: motionSensor.sensorName,
             batch: motionSensor.batch
         )
@@ -37,14 +35,14 @@ actor MotionSensorBackgroundDataHandler {
         try await backgroundDataHandler.appendData(motionSensorBatchDatabaseModel)
     }
 
-    func getMotionSensorPersistentIdentifiers(recordingId: PersistentIdentifier) async throws
+    func getMotionSensorPersistentIdentifiers(recordingStart: Date) async throws
         -> [PersistentIdentifier]
     {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         let descriptor = FetchDescriptor<MotionSensorDatabaseModel>(
             predicate: #Predicate<MotionSensorDatabaseModel> {
-                $0.recordingId == recordingId
+                $0.recordingStart == recordingStart
             }
         )
 

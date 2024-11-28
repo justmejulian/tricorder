@@ -9,16 +9,16 @@ import SwiftData
 
 @Model
 class MotionSensorDatabaseModel {
-    var recordingId: PersistentIdentifier
+    var recordingStart: Date
     var sensorName: SensorName
     var batch: [MotionValue]
 
     init(
-        recordingId: PersistentIdentifier,
+        recordingStart: Date,
         sensorName: SensorName,
         batch: [MotionValue]
     ) {
-        self.recordingId = recordingId
+        self.recordingStart = recordingStart
         self.sensorName = sensorName
         self.batch = batch
     }

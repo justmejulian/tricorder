@@ -240,7 +240,7 @@ extension RecordingManager {
     nonisolated func handleCollectedStatistics(_ data: Sendable) throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        guard let heartRateSensor = data as? HeartRateSensor, heartRateSensor.batch.isEmpty else {
+        guard let heartRateSensor = data as? HeartRateSensor, !heartRateSensor.batch.isEmpty else {
             Logger.shared.error("\(#function): Invalid data type")
             return
         }

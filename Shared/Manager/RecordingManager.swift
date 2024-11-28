@@ -56,6 +56,10 @@ extension RecordingManager {
         self.recordingState = newState
     }
 
+    func getRecordingState() -> HKWorkoutSessionState {
+        return recordingState
+    }
+
     func setStartDate(_ date: Date) {
         Logger.shared.debug("with: \(date) on called on Thread \(Thread.current)")
 

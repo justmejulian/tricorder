@@ -52,16 +52,7 @@ extension RecordingManager {
 
         do {
             try await workoutManager.startWatchWorkout()
-            Task {
-                let recordingBackgroundDataHandler = RecordingBackgroundDataHandler(
-                    modelContainer: modelContainer
-                )
 
-                try await recordingBackgroundDataHandler.addNewRecording(
-                    name: nil,
-                    startTimestamp: Date()
-                )
-            }
         } catch {
             Logger.shared.log(
                 "Failed to start cycling on the paired watch."
@@ -116,9 +107,16 @@ extension RecordingManager {
         )
 
         Task {
+            let currentState = await getRecordingState()
+
+            if change.newState == currentState {
+                return
+            }
+
             if change.newState == .running {
                 await reset()
             }
+
             await setRecordingState(newState: change.newState)
         }
 
@@ -167,15 +165,27 @@ extension RecordingManager {
 
         // todo move these keys into and enum, so I know what is possible
         switch dataObject.key {
+
+        // todo can I replace this with the changeState?
         case "startDate":
             Task {
-                await setStartDate(
-                    try JSONDecoder().decode(
-                        Date.self,
-                        from: dataObject.data
+                let date = try JSONDecoder().decode(
+                    Date.self,
+                    from: dataObject.data
 
-                    )
                 )
+
+                let recordingBackgroundDataHandler = RecordingBackgroundDataHandler(
+                    modelContainer: modelContainer
+                )
+
+                // todo use recordingname
+                try await recordingBackgroundDataHandler.addNewRecording(
+                    name: nil,
+                    startTimestamp: date
+                )
+
+                await setStartDate(date)
             }
 
         case "statistics":

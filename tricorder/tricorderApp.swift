@@ -17,7 +17,8 @@ struct tricorderApp: App {
     init() {
         do {
             let schema = Schema([
-                RecordingDatabaseModel.self
+                RecordingDatabaseModel.self,
+                MotionSensorDatabaseModel.self,
             ])
             self.database = Database(modelContainer: try ModelContainer(for: schema))
 

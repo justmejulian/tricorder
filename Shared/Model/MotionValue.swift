@@ -9,12 +9,12 @@ import Foundation
 
 // todo can I do some type magic?
 struct MotionValue: Value {
-    let x: Double
-    let y: Double
-    let z: Double
-    let w: Double?
+    var x: Double
+    var y: Double
+    var z: Double
+    var w: Double?
 
-    let timestamp: Date
+    var timestamp: Date
 
     // Values may have 3 or 4 Datapoints
     init(x: Double, y: Double, z: Double, timestamp: Date) {

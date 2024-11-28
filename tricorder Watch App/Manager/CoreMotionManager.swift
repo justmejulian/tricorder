@@ -23,7 +23,7 @@ extension CoreMotionManager {
         motionManager.stopDeviceMotionUpdates()
     }
 
-    func startUpdates() throws {
+    func startUpdates(recordingStart: Date) throws {
         Logger.shared.debug("MotinManager: startUpdates called on Thread \(Thread.current)")
 
         guard
@@ -51,7 +51,10 @@ extension CoreMotionManager {
                 )
                 return
             }
-            self.consumeAccelerometerUpdates(batchedData: batchedData)
+            self.consumeAccelerometerUpdates(
+                batchedData: batchedData,
+                recordingStart: recordingStart
+            )
         })
 
         motionManager.startDeviceMotionUpdates(handler: {
@@ -72,7 +75,10 @@ extension CoreMotionManager {
                 )
                 return
             }
-            self.consumeDeviceMotionUpdates(batchedData: batchedData)
+            self.consumeDeviceMotionUpdates(
+                batchedData: batchedData,
+                recordingStart: recordingStart
+            )
         })
     }
 }
@@ -93,7 +99,10 @@ extension CoreMotionManager {
         }
     }
 
-    nonisolated func consumeDeviceMotionUpdates(batchedData: [CMDeviceMotion]) {
+    nonisolated func consumeDeviceMotionUpdates(
+        batchedData: [CMDeviceMotion],
+        recordingStart: Date
+    ) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         // todo make this more reusable
@@ -143,16 +152,43 @@ extension CoreMotionManager {
         }
 
         // todo store these keys in enum
-        handleUpdate(MotionSensor(name: "rotationRate", values: rotationRateValues))
+        handleUpdate(
+            MotionSensor(
+                sensorName: .rotationRate,
+                recordingStart: recordingStart,
+                batch: rotationRateValues
+            )
+        )
 
-        handleUpdate(MotionSensor(name: "userAcceleration", values: userAccelerationValues))
+        handleUpdate(
+            MotionSensor(
+                sensorName: .userAcceleration,
+                recordingStart: recordingStart,
+                batch: userAccelerationValues
+            )
+        )
 
-        handleUpdate(MotionSensor(name: "gravity", values: gravityValues))
+        handleUpdate(
+            MotionSensor(
+                sensorName: .gravity,
+                recordingStart: recordingStart,
+                batch: gravityValues
+            )
+        )
 
-        handleUpdate(MotionSensor(name: "quaternion", values: quaternionValues))
+        handleUpdate(
+            MotionSensor(
+                sensorName: .quaternion,
+                recordingStart: recordingStart,
+                batch: quaternionValues
+            )
+        )
     }
 
-    nonisolated func consumeAccelerometerUpdates(batchedData: [CMAccelerometerData]) {
+    nonisolated func consumeAccelerometerUpdates(
+        batchedData: [CMAccelerometerData],
+        recordingStart: Date
+    ) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         var values: [MotionValue] = []
@@ -173,7 +209,13 @@ extension CoreMotionManager {
             )
         }
 
-        handleUpdate(MotionSensor(name: "acceleration", values: values))
+        handleUpdate(
+            MotionSensor(
+                sensorName: .acceleration,
+                recordingStart: recordingStart,
+                batch: values
+            )
+        )
     }
 }
 

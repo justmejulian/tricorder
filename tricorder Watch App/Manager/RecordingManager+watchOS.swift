@@ -67,7 +67,9 @@ extension RecordingManager {
 
         await reset()
 
-        try await startWorkout()
+        let recordingStart = try await startWorkout()
+
+        await sendRecordingStartToCompanion(recordingStart: recordingStart)
 
         do {
             try await initNIDiscoveryToken()
@@ -76,22 +78,21 @@ extension RecordingManager {
             Logger.shared.error("Failed to start Nearby Interaction: \(error)")
         }
 
-        try await startUpdates()
+        try await startUpdates(recordingStart: recordingStart)
     }
 
-    func startWorkout() async throws {
+    func startWorkout() async throws -> Date {
         do {
-            try await workoutManager.startWorkout()
-
+            return try await workoutManager.startWorkout()
         } catch {
             Logger.shared.error("Failed to start startWorkout: \(error)")
             throw RecordingManagerError.startWorkout
         }
     }
 
-    func startUpdates() async throws {
+    func startUpdates(recordingStart: Date) async throws {
         do {
-            try await coreMotionManager.startUpdates()
+            try await coreMotionManager.startUpdates(recordingStart: recordingStart)
         } catch {
             Logger.shared.error("Failed to start Motion Updates: \(error)")
             throw RecordingManagerError.startWorkout
@@ -168,7 +169,6 @@ extension RecordingManager {
 
                     // todo finish sync
                     // maybe use a HKWorkoutSessionState
-
                     try await workoutManager.endWorkout(date: change.date)
                 } catch {
                     Logger.shared.error(
@@ -220,18 +220,14 @@ extension RecordingManager {
         let motionSensor = data as! MotionSensor
 
         Task {
-            await motionManager.update(motionSensor: motionSensor)
+            await motionManager.update(
+                sensorName: motionSensor.sensorName,
+                newValues: motionSensor.batch
+            )
 
             do {
-                let archiveMotionValueArrays = try archiveSendableArray(
-                    motionSensor.chunked(into: MAXCHUNKSIZE)
-                )
-
-                try await connectivityManager.sendDataArray(
-                    key: "motionUpdate",
-                    dataArray: archiveMotionValueArrays
-                ) as Void
-
+                try await sendMotionUpdate(motionSensor)
+                // todo persist on fail
                 await monitoringManager.addMotioUpdateSendSuccess(true)
             } catch {
                 Logger.shared.error("\(#function): Failed to archive data: \(error)")
@@ -244,27 +240,59 @@ extension RecordingManager {
     nonisolated func handleCollectedStatistics(_ data: Sendable) throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        guard let statistics = data as? HeartRateValue else {
+        guard let heartRateSensor = data as? HeartRateSensor, !heartRateSensor.batch.isEmpty else {
             Logger.shared.error("\(#function): Invalid data type")
             return
         }
 
-        Task {
-            await heartRateManager.update(statistics)
+        guard let value = heartRateSensor.batch.first else {
+            Logger.shared.error("\(#function): No heart rate values")
+            return
+        }
 
-            do {
-                let archivedStatistics = try archiveSendable(statistics)
-                try await workoutManager.sendCodable(key: "statistics", data: archivedStatistics)
-            } catch {
-                Logger.shared.error("\(#function): Failed to send data: \(error)")
-            }
+        Task {
+            await heartRateManager.update(value)
+            await sendHeartRate(value)
         }
 
     }
 }
-// MARK: -  RecordingManager Helper functions
+// MARK: -  RecordingManager nonisolated functions
 //
 extension RecordingManager {
+    nonisolated func sendHeartRate(_ heartRate: HeartRateValue) async {
+        do {
+            // todo change to handle recording start
+            let archivedStatistics = try archiveSendable(heartRate)
+            // todo use connectivityManager.sendData
+            try await workoutManager.sendCodable(key: "statistics", data: archivedStatistics)
+        } catch {
+            Logger.shared.error("\(#function): Failed to send data: \(error)")
+        }
+    }
+
+    nonisolated func sendMotionUpdate(_ motionSensor: MotionSensor) async throws {
+        let archiveMotionValueArrays = try archiveSendableArray(
+            motionSensor.chunked(into: MAXCHUNKSIZE)
+        )
+
+        try await connectivityManager.sendDataArray(
+            key: "motionUpdate",
+            dataArray: archiveMotionValueArrays
+        ) as Void
+    }
+
+    nonisolated func sendRecordingStartToCompanion(recordingStart: Date) async {
+        do {
+            try await connectivityManager.sendData(
+                key: "recordingStartTimestamp",
+                data: try JSONEncoder().encode(recordingStart)
+            ) as Void
+        } catch {
+            Logger.shared.error("Failed to send recordingStart to Companion: \(error)")
+        }
+    }
+
     nonisolated func archiveSendable(_ data: Codable) throws -> Data {
         Logger.shared.debug("called on Thread \(Thread.current)")
 

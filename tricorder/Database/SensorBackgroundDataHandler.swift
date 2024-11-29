@@ -28,12 +28,8 @@ actor SensorBackgroundDataHandler {
 
         let sensorData = try getSensoData(sensor: sensor)
 
-        guard let sensorName = SensorDatabaseModel.SensorName(rawValue: sensorData.name) else {
-            throw SensorBackgroundDataHandlerError.notFound
-        }
-
         let motionSensorBatchDatabaseModel = SensorDatabaseModel(
-            sensorName: sensorName,
+            sensorName: sensorData.name,
             recordingStart: sensorData.recordingStartDate,
             data: sensorData.data
         )

@@ -19,7 +19,7 @@ class RecordingManager: ObservableObject {
 
     var motionManager = MotionManager()
     var distanceManager = ObservableValueManager<DistanceValue>()
-    var heartRateManager = ObservableValueManager<HeartRateValue>()
+    var heartRateManager = ObservableValueManager<StatisticValue>()
 
     var workoutManager = WorkoutManager()
     var nearbyInteractionManager = NearbyInteractionManager()

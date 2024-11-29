@@ -87,14 +87,14 @@ extension CoreMotionManager {
 //
 extension CoreMotionManager {
     nonisolated private func handleUpdate(
-        _ motionSensor: MotionSensor
+        _ sensor: Sensor
     ) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         Task {
             await eventManager.trigger(
-                key: .collectedMotionValues,
-                data: motionSensor
+                key: .collectedSensorValues,
+                data: sensor
             ) as Void
         }
     }
@@ -151,35 +151,31 @@ extension CoreMotionManager {
             )
         }
 
-        // todo store these keys in enum
         handleUpdate(
-            MotionSensor(
-                sensorName: .rotationRate,
-                recordingStart: recordingStart,
+            Sensor.motion(
+                .rotationRate,
+                recordingStartDate: recordingStart,
                 batch: rotationRateValues
             )
         )
-
         handleUpdate(
-            MotionSensor(
-                sensorName: .userAcceleration,
-                recordingStart: recordingStart,
+            Sensor.motion(
+                .userAcceleration,
+                recordingStartDate: recordingStart,
                 batch: userAccelerationValues
             )
         )
-
         handleUpdate(
-            MotionSensor(
-                sensorName: .gravity,
-                recordingStart: recordingStart,
+            Sensor.motion(
+                .gravity,
+                recordingStartDate: recordingStart,
                 batch: gravityValues
             )
         )
-
         handleUpdate(
-            MotionSensor(
-                sensorName: .quaternion,
-                recordingStart: recordingStart,
+            Sensor.motion(
+                .quaternion,
+                recordingStartDate: recordingStart,
                 batch: quaternionValues
             )
         )
@@ -208,11 +204,10 @@ extension CoreMotionManager {
                 )
             )
         }
-
         handleUpdate(
-            MotionSensor(
-                sensorName: .acceleration,
-                recordingStart: recordingStart,
+            Sensor.motion(
+                .acceleration,
+                recordingStartDate: recordingStart,
                 batch: values
             )
         )

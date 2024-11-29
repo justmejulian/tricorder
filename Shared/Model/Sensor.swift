@@ -8,8 +8,8 @@ import Foundation
 
 enum Sensor: Codable {
     case motion(MotionSensorName, recordingStartDate: Date, batch: [MotionValue])
-    case statistic(StatisticSensorName, recordingStartDate: Date, batch: [StatisticValue])
-    case distance(DistanceSensorName, recordingStartDate: Date, batch: [DistanceValue])
+    case statistic(StatisticSensorName, recordingStartDate: Date, batch: StatisticValue)
+    case distance(DistanceSensorName, recordingStartDate: Date, batch: DistanceValue)
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -53,12 +53,12 @@ enum Sensor: Codable {
             self = .motion(name, recordingStartDate: recordingStartDate, batch: batch)
         case .statistic:
             let name = try container.decode(StatisticSensorName.self, forKey: .name)
-            let batch = try container.decode([StatisticValue].self, forKey: .batch)
+            let batch = try container.decode(StatisticValue.self, forKey: .batch)
             let recordingStartDate = try container.decode(Date.self, forKey: .recordingStartDate)
             self = .statistic(name, recordingStartDate: recordingStartDate, batch: batch)
         case .distance:
             let name = try container.decode(DistanceSensorName.self, forKey: .name)
-            let batch = try container.decode([DistanceValue].self, forKey: .batch)
+            let batch = try container.decode(DistanceValue.self, forKey: .batch)
             let recordingStartDate = try container.decode(Date.self, forKey: .recordingStartDate)
             self = .distance(name, recordingStartDate: recordingStartDate, batch: batch)
         }
@@ -87,6 +87,7 @@ enum Sensor: Codable {
         }
     }
 
+    // diveds a Sensor with batches into [Sensor] with chunks of the batches
     func chunked(into size: Int) throws -> [Sensor] {
         switch self {
         case .motion(let name, let recordingStartDate, let batch):
@@ -98,25 +99,9 @@ enum Sensor: Codable {
             return chunks.map {
                 return Sensor.motion(name, recordingStartDate: recordingStartDate, batch: $0)
             }
-        case .statistic(let name, let recordingStartDate, let batch):
-            if batch.count < size {
-                return [self]
-            }
 
-            let chunks = batch.chunked(into: size)
-            return chunks.map {
-                return Sensor.statistic(name, recordingStartDate: recordingStartDate, batch: $0)
-            }
-        case .distance(let name, let recordingStartDate, let batch):
-            if batch.count < size {
-                return [self]
-            }
-
-            let chunks = batch.chunked(into: size)
-            return chunks.map {
-                return Sensor.distance(name, recordingStartDate: recordingStartDate, batch: $0)
-            }
+        case .statistic, .distance:
+            return [self]
         }
-
     }
 }

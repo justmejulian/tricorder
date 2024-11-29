@@ -35,15 +35,14 @@ extension StatisticsManager {
 
             Task {
                 await eventManager.trigger(
-                    key: .collectedStatistics,
-                    data: HeartRateSensor(
-                        recordingStart: statistics.startDate,
-                        batch: [
-                            HeartRateValue(
-                                value: mostRecentHeartRate,
-                                timestamp: Date()
-                            )
-                        ]
+                    key: .collectedSensorValues,
+                    data: Sensor.statistic(
+                        .heartRate,
+                        recordingStartDate: statistics.startDate,
+                        batch: StatisticValue(
+                            value: mostRecentHeartRate,
+                            timestamp: Date()
+                        )
                     )
                 ) as Void
             }

@@ -33,7 +33,7 @@ extension RecordingDetailView {
     nonisolated func getMotionDataCount(recordingStart: Date) async -> Int {
         do {
             let modelContainer = await recordingManager.modelContainer
-            let handler = MotionSensorBackgroundDataHandler(modelContainer: modelContainer)
+            let handler = SensorBackgroundDataHandler(modelContainer: modelContainer)
             let ids = try await handler.getMotionSensorPersistentIdentifiers(
                 recordingStart: recordingStart
             )

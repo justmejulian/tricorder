@@ -137,20 +137,33 @@ extension RecordingManager {
             await nearbyInteractionManager.start()
             return token
 
-        case "motionUpdate":
-            let motionSensor = try JSONDecoder().decode(
-                MotionSensor.self,
+        case "sensorUpdate":
+            //            await heartRateManager.update(
+            let sensor = try JSONDecoder().decode(
+                Sensor.self,
                 from: dataObject.data
             )
-            await motionManager.update(
-                sensorName: motionSensor.sensorName,
-                newValues: motionSensor.batch
-            )
 
-            try await MotionSensorBackgroundDataHandler(modelContainer: modelContainer)
-                .add(motionSensor: motionSensor)
+            let handler = SensorBackgroundDataHandler(modelContainer: modelContainer)
+            try await handler.add(sensor: sensor)
 
-            return nil
+            switch sensor {
+            case .motion(let name, _, let batch):
+                await motionManager.update(
+                    sensorName: name,
+                    newValues: batch
+                )
+                return nil
+
+            case .statistic(_, _, let batch):
+                await heartRateManager.update(batch)
+                return nil
+
+            default:
+                // todo throw error
+                Logger.shared.info("Did not hanlder: \(dataObject.data)")
+                return nil
+            }
 
         default:
             throw RecordingManagerError.noKey
@@ -186,16 +199,6 @@ extension RecordingManager {
                 )
 
                 await setStartDate(date)
-            }
-
-        case "statistics":
-            Task {
-                await heartRateManager.update(
-                    data: try JSONDecoder().decode(
-                        HeartRateValue.self,
-                        from: dataObject.data
-                    )
-                )
             }
 
         default:

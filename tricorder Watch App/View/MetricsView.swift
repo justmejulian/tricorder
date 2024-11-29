@@ -10,7 +10,7 @@ import SwiftUI
 
 struct MetricsView: View {
     @ObservedObject
-    var heartRateManager: ObservableValueManager<HeartRateValue>
+    var heartRateManager: ObservableValueManager<StatisticValue>
 
     @ObservedObject
     var distanceManager: ObservableValueManager<DistanceValue>

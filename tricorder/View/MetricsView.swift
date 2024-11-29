@@ -11,7 +11,7 @@ struct MetricsView: View {
     @EnvironmentObject var recordingManager: RecordingManager
 
     @ObservedObject
-    var heartRateManager: ObservableValueManager<HeartRateValue>
+    var heartRateManager: ObservableValueManager<StatisticValue>
 
     @ObservedObject
     var distanceManager: ObservableValueManager<DistanceValue>

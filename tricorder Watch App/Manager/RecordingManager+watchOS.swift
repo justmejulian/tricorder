@@ -27,13 +27,8 @@ extension RecordingManager {
         )
 
         await eventManager.register(
-            key: .collectedStatistics,
-            handleData: self.handleCollectedStatistics
-        )
-
-        await eventManager.register(
-            key: .collectedMotionValues,
-            handleData: self.handleCollecteMotionValues
+            key: .collectedSensorValues,
+            handleData: self.handleSensorUpdate
         )
 
         await eventManager.register(
@@ -116,6 +111,22 @@ extension RecordingManager {
         }
 
         try await self.nearbyInteractionManager.setDiscoveryToken(partnerDiscoveryToken)
+    }
+
+    func updateObservableValueManagers(_ sensor: Sensor) async {
+        switch sensor {
+        case .motion(let name, let recordingStartDate, let batch):
+            motionManager.update(
+                sensorName: name,
+                newValues: batch
+            )
+
+        case .statistic(_, let recordingStartDate, let batch):
+            heartRateManager.update(data: batch)
+
+        case .distance(_, let recordingStartDate, let batch):
+            distanceManager.update(data: batch)
+        }
     }
 }
 
@@ -214,45 +225,20 @@ extension RecordingManager {
     }
 
     @Sendable
-    nonisolated func handleCollecteMotionValues(_ data: Sendable) {
+    nonisolated func handleSensorUpdate(_ data: Sendable) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        let motionSensor = data as! MotionSensor
+        let sensor = data as! Sensor
 
         Task {
-            await motionManager.update(
-                sensorName: motionSensor.sensorName,
-                newValues: motionSensor.batch
-            )
-
             do {
-                try await sendMotionUpdate(motionSensor)
                 // todo persist on fail
+                try await sendSensorUpdate(sensor)
                 await monitoringManager.addMotioUpdateSendSuccess(true)
             } catch {
                 Logger.shared.error("\(#function): Failed to archive data: \(error)")
                 await monitoringManager.addMotioUpdateSendSuccess(false)
             }
-        }
-    }
-
-    @Sendable
-    nonisolated func handleCollectedStatistics(_ data: Sendable) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
-        guard let heartRateSensor = data as? HeartRateSensor, !heartRateSensor.batch.isEmpty else {
-            Logger.shared.error("\(#function): Invalid data type")
-            return
-        }
-
-        guard let value = heartRateSensor.batch.first else {
-            Logger.shared.error("\(#function): No heart rate values")
-            return
-        }
-
-        Task {
-            await heartRateManager.update(value)
-            await sendHeartRate(value)
         }
 
     }
@@ -260,25 +246,14 @@ extension RecordingManager {
 // MARK: -  RecordingManager nonisolated functions
 //
 extension RecordingManager {
-    nonisolated func sendHeartRate(_ heartRate: HeartRateValue) async {
-        do {
-            // todo change to handle recording start
-            let archivedStatistics = try archiveSendable(heartRate)
-            // todo use connectivityManager.sendData
-            try await workoutManager.sendCodable(key: "statistics", data: archivedStatistics)
-        } catch {
-            Logger.shared.error("\(#function): Failed to send data: \(error)")
-        }
-    }
-
-    nonisolated func sendMotionUpdate(_ motionSensor: MotionSensor) async throws {
-        let archiveMotionValueArrays = try archiveSendableArray(
-            motionSensor.chunked(into: MAXCHUNKSIZE)
+    nonisolated func sendSensorUpdate(_ sensor: Sensor) async throws {
+        let archive = try archiveSendableArray(
+            sensor.chunked(into: MAXCHUNKSIZE)
         )
 
         try await connectivityManager.sendDataArray(
-            key: "motionUpdate",
-            dataArray: archiveMotionValueArrays
+            key: "sensorUpdate",
+            dataArray: archive
         ) as Void
     }
 

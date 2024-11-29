@@ -66,13 +66,13 @@ enum EventManagerError: Error {
     case noListenerFound
 }
 
+// todo add types of data
 enum EventListenerKey: String, CaseIterable {
     case startedRecording
     case endedRecroding
     case companionStartedRecording
     case sessionStateChanged
-    case collectedStatistics
-    case collectedMotionValues
+    case collectedSensorValues
     case collectedDistance
     case receivedData
     case receivedWorkoutData

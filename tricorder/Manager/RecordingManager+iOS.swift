@@ -92,6 +92,8 @@ extension RecordingManager {
     }
 }
 
+// MARK: -  RecordingManager handlers
+//
 extension RecordingManager {
     @Sendable
     nonisolated func handleSessionStateChange(_ data: Sendable) throws {
@@ -144,27 +146,12 @@ extension RecordingManager {
                 from: dataObject.data
             )
 
-            let handler = SensorBackgroundDataHandler(modelContainer: modelContainer)
-            try await handler.add(sensor: sensor)
+            try await storeSensor(sensor)
 
-            switch sensor {
-            case .motion(let name, _, let batch):
-                await motionManager.update(
-                    sensorName: name,
-                    newValues: batch
-                )
-                return nil
+            await updateObservableManagers(sensor: sensor)
 
-            case .statistic(_, _, let batch):
-                await heartRateManager.update(batch)
-                return nil
-
-            default:
-                // todo throw error
-                Logger.shared.info("Did not hanlder: \(dataObject.data)")
-                return nil
-            }
-
+            // todo return something better
+            return nil
         default:
             throw RecordingManagerError.noKey
         }
@@ -188,15 +175,7 @@ extension RecordingManager {
 
                 )
 
-                let recordingBackgroundDataHandler = RecordingBackgroundDataHandler(
-                    modelContainer: modelContainer
-                )
-
-                // todo use recordingname
-                try await recordingBackgroundDataHandler.addNewRecording(
-                    name: nil,
-                    startTimestamp: date
-                )
+                try await storeRecording(name: nil, date: date)
 
                 await setStartDate(date)
             }
@@ -204,6 +183,69 @@ extension RecordingManager {
         default:
             Logger.shared.error("\(#function): Unknown dataObject key: \(dataObject.key)")
         }
+    }
 
+    @Sendable
+    nonisolated func handleReceivedDistance(_ data: Sendable) throws {
+        Logger.shared.debug("called on Thread \(Thread.current)")
+        Task {
+            guard let recordingStartDate = await startDate else {
+                Logger.shared.error("Tried to set distance, but start date is nil.")
+                return
+            }
+
+            guard let distanceValue = data as? DistanceValue else {
+                Logger.shared.error("\(#function): Invalid data type")
+                return
+            }
+
+            let sensor = Sensor.distance(
+                .distance,
+                recordingStartDate: recordingStartDate,
+                batch: distanceValue
+            )
+
+            try await storeSensor(sensor)
+
+            await distanceManager.update(data: data)
+        }
+    }
+}
+
+// MARK: -  RecordingManager Data handlers
+//
+extension RecordingManager {
+    func storeSensor(_ sensor: Sensor) async throws {
+        let handler = SensorBackgroundDataHandler(modelContainer: modelContainer)
+        try await handler.add(sensor: sensor)
+    }
+
+    func storeRecording(name: String?, date: Date) async throws {
+        let recordingBackgroundDataHandler = RecordingBackgroundDataHandler(
+            modelContainer: modelContainer
+        )
+
+        // todo use recordingname
+        try await recordingBackgroundDataHandler.addNewRecording(
+            name: name,
+            startTimestamp: date
+        )
+    }
+
+    func updateObservableManagers(sensor: Sensor) {
+        switch sensor {
+        case .motion(let name, _, let batch):
+            motionManager.update(
+                sensorName: name,
+                newValues: batch
+            )
+
+        case .statistic(_, _, let batch):
+            heartRateManager.update(batch)
+
+        default:
+            // todo throw error
+            Logger.shared.info("Did not hanlde: \(String(describing: sensor))")
+        }
     }
 }

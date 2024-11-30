@@ -24,7 +24,7 @@ struct RecordingDetailView: View {
 
             if let values {
                 List(values.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                    Text("\(key): \(value)")
+                    Text("\(key): \(value) bytes")
                 }
             } else {
                 Text("No Sensor Data")

@@ -92,7 +92,10 @@ extension SensorBackgroundDataHandler {
     func getSensorValueBytes(recordingStart: Date) async throws -> [String: Int] {
         let sensorValues = try await getSensorsData(recordingStart: recordingStart)
         return sensorValues.reduce(into: [:]) { result, sensorValue in
-            let bytes = sensorValue.value.count
+            let bytes = sensorValue.value.reduce(0) { result, value in
+                result + value.count
+            }
+
             result[sensorValue.key, default: 0] += bytes
         }
     }

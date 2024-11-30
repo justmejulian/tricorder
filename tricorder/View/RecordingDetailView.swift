@@ -45,7 +45,7 @@ extension RecordingDetailView {
                 recordingStart: recordingStart
             )
         } catch {
-            Logger.shared.error("Failed to fecht motion data count: \(error.localizedDescription)")
+            Logger.shared.error("Failed to fecht bytes for: \(recordingStart) \(error)")
             return nil
         }
     }

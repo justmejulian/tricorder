@@ -1,6 +1,5 @@
 //
-//  RecordingManager+watchOs.swift
-//  tricorder
+//  RecordingManager+iOS.swift
 //
 //  Created by Julian Visser on 01.11.2024.
 //

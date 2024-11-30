@@ -8,18 +8,11 @@ import Foundation
 import SwiftData
 import os
 
-actor SensorBackgroundDataHandler {
-    let backgroundDataHandler: BackgroundDataHandler
-    let recordingBackgroundDataHandler: RecordingBackgroundDataHandler
+@ModelActor
+actor SensorBackgroundDataHandler: BackgroundDataHandlerProtocol {
+}
 
-    init(modelContainer: ModelContainer) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
-        self.backgroundDataHandler = BackgroundDataHandler(modelContainer: modelContainer)
-        self.recordingBackgroundDataHandler = RecordingBackgroundDataHandler(
-            modelContainer: modelContainer
-        )
-    }
+extension SensorBackgroundDataHandler {
 
     func add(sensor: Sensor) async throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
@@ -34,7 +27,7 @@ actor SensorBackgroundDataHandler {
             data: sensorData.data
         )
 
-        try await backgroundDataHandler.appendData(motionSensorBatchDatabaseModel)
+        try self.appendData(motionSensorBatchDatabaseModel)
     }
 
     private func getSensoData(sensor: Sensor) throws -> (
@@ -60,7 +53,7 @@ actor SensorBackgroundDataHandler {
         }
     }
 
-    func getMotionSensorPersistentIdentifiers(recordingStart: Date) async throws
+    func getSensorPersistentIdentifiers(recordingStart: Date) throws
         -> [PersistentIdentifier]
     {
         Logger.shared.debug("called on Thread \(Thread.current)")
@@ -71,13 +64,44 @@ actor SensorBackgroundDataHandler {
             }
         )
 
-        let persistentIdentifiers = try await backgroundDataHandler.fetchPersistentIdentifiers(
+        let persistentIdentifiers = try fetchPersistentIdentifiers(
             descriptor: descriptor
         )
 
         return persistentIdentifiers
     }
 
+    func getSensorsData(recordingStart: Date) async throws -> [String: [Data]] {
+        let descriptor = FetchDescriptor<SensorDatabaseModel>(
+            predicate: #Predicate<SensorDatabaseModel> {
+                $0.recordingStart == recordingStart
+            }
+        )
+        let modelContext = createModelContext(
+            modelContainer: modelContainer
+        )
+        let sensorData = try modelContext.fetch(descriptor)
+
+        let sensorValues: [String: [Data]] = sensorData.reduce(into: [:]) { result, sensor in
+            result[sensor.sensorName, default: []].append(sensor.data)
+        }
+
+        return sensorValues
+    }
+
+    func getSensorValueBytes(recordingStart: Date) async throws -> [String: Int] {
+        let sensorValues = try await getSensorsData(recordingStart: recordingStart)
+        return sensorValues.reduce(into: [:]) { result, sensorValue in
+            let bytes = sensorValue.value.reduce(0) { result, value in
+                result + value.count
+            }
+
+            result[sensorValue.key, default: 0] += bytes
+        }
+    }
+}
+
+extension SensorBackgroundDataHandler {
 }
 
 enum SensorBackgroundDataHandlerError: Error {

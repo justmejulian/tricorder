@@ -240,7 +240,14 @@ extension RecordingManager {
                 await monitoringManager.addMotioUpdateSendSuccess(false)
             }
         }
+    }
 
+    @Sendable
+    nonisolated func handleReceivedDistance(_ data: Sendable) throws {
+        Logger.shared.debug("called on Thread \(Thread.current)")
+        Task {
+            await distanceManager.update(data: data)
+        }
     }
 }
 // MARK: -  RecordingManager nonisolated functions

@@ -43,7 +43,6 @@ actor WorkoutManager: NSObject {
     func getSession() -> HKWorkoutSession? {
         return session
     }
-
 }
 
 // MARK: - Workout session management

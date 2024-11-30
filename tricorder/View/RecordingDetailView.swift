@@ -15,32 +15,38 @@ struct RecordingDetailView: View {
     let recordingStartTime: Date
 
     @State
-    var motionDataCount = 0
+    var values: [String: Int]?
 
     // todo replace with backgorund fetch
     var body: some View {
         VStack {
-            Text(recordingStartTime.ISO8601Format())
-            Text("# Motion Data: \(motionDataCount)")
+            Text(recordingStartTime.ISO8601Format()).font(.headline)
+
+            if let values {
+                List(values.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                    Text("\(key): \(value) bytes")
+                }
+            } else {
+                Text("No Sensor Data")
+            }
         }
         .task {
-            self.motionDataCount = await getMotionDataCount(recordingStart: recordingStartTime)
+            self.values = await getSensorValueBytes(recordingStart: recordingStartTime)
         }
     }
 }
 
 extension RecordingDetailView {
-    nonisolated func getMotionDataCount(recordingStart: Date) async -> Int {
+    nonisolated func getSensorValueBytes(recordingStart: Date) async -> [String: Int]? {
         do {
             let modelContainer = await recordingManager.modelContainer
             let handler = SensorBackgroundDataHandler(modelContainer: modelContainer)
-            let ids = try await handler.getMotionSensorPersistentIdentifiers(
+            return try await handler.getSensorValueBytes(
                 recordingStart: recordingStart
             )
-            return ids.count
         } catch {
             Logger.shared.error("Failed to fecht motion data count: \(error.localizedDescription)")
-            return 0
+            return nil
         }
     }
 }

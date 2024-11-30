@@ -8,28 +8,24 @@ import Foundation
 import SwiftData
 import os
 
-actor RecordingBackgroundDataHandler {
-    let backgroundDataHandler: BackgroundDataHandler
+@ModelActor
+actor RecordingBackgroundDataHandler: BackgroundDataHandlerProtocol {
+}
 
-    init(modelContainer: ModelContainer) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
-        self.backgroundDataHandler = BackgroundDataHandler(modelContainer: modelContainer)
-    }
-
+extension RecordingBackgroundDataHandler {
     func addNewRecording(name: String?, startTimestamp: Date = Date()) async throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         let name = name ?? "Recording - \(startTimestamp.ISO8601Format())"
 
         let recording = RecordingDatabaseModel(name: name, startTimestamp: startTimestamp)
-        try await backgroundDataHandler.appendData(recording)
+        try appendData(recording)
     }
 
     func fetchAllRecordingPersistentIdentifiers() async throws -> [PersistentIdentifier] {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        return try await backgroundDataHandler.fetchPersistentIdentifiers(
+        return try fetchPersistentIdentifiers(
             for: RecordingDatabaseModel.self
         )
     }
@@ -44,7 +40,7 @@ actor RecordingBackgroundDataHandler {
                 $0.startTimestamp == startTimestamp
             }
         )
-        let persistentIdentifiers = try await backgroundDataHandler.fetchPersistentIdentifiers(
+        let persistentIdentifiers = try fetchPersistentIdentifiers(
             descriptor: descriptor
         )
 

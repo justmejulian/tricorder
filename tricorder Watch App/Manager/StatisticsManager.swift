@@ -13,6 +13,12 @@ actor StatisticsManager {
     var eventManager = EventManager.shared
 
     let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
+
+    let recordingStartDate: Date
+
+    init(recordingStartDate: Date) {
+        self.recordingStartDate = recordingStartDate
+    }
 }
 
 extension StatisticsManager {
@@ -20,6 +26,7 @@ extension StatisticsManager {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         switch statistics.quantityType {
+        // Handle HeartRate
         case HKQuantityType.quantityType(forIdentifier: .heartRate):
             let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
             guard
@@ -38,7 +45,7 @@ extension StatisticsManager {
                     key: .collectedSensorValues,
                     data: Sensor.statistic(
                         .heartRate,
-                        recordingStartDate: statistics.startDate,
+                        recordingStartDate: recordingStartDate,
                         batch: StatisticValue(
                             value: mostRecentHeartRate,
                             timestamp: Date()
@@ -46,6 +53,9 @@ extension StatisticsManager {
                     )
                 ) as Void
             }
+
+        //  timestamp: 2024-11-30 11:41:30 +0000))
+        // 2024-11-30 11:41:44 +0000
 
         default:
             return

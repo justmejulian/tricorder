@@ -13,9 +13,9 @@ struct DotsView: View {
 
     var body: some View {
 
-        let sendCount = monitoringManager.motionUpdateSendSuccessCount
-        let successSendCount = monitoringManager.motionUpdateSendSuccessTrueCount
-        let last10 = monitoringManager.last10MotionUpdateSendSuccess
+        let sendCount = monitoringManager.updateSendSuccessTrueCount
+        let successSendCount = monitoringManager.updateSendSuccessTrueCount
+        let last10 = monitoringManager.last10UpdateSendSuccess
 
         VStack {
             HStack(spacing: 4) {

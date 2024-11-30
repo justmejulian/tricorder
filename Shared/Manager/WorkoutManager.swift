@@ -30,7 +30,7 @@ actor WorkoutManager: NSObject {
 
     #if os(watchOS)
         var builder: HKLiveWorkoutBuilder?
-        var statisticsManager = StatisticsManager()
+        var statisticsManager: StatisticsManager?
     #else
     #endif
 
@@ -51,10 +51,10 @@ extension WorkoutManager {
     func reset() {
         #if os(watchOS)
             builder = nil
+            statisticsManager = nil
         #endif
         workout = nil
         session = nil
-
     }
 
     func stop() {

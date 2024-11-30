@@ -76,6 +76,8 @@ extension WorkoutManager {
         session.startActivity(with: startDate)
         try await builder?.beginCollection(at: startDate)
 
+        statisticsManager = StatisticsManager(recordingStartDate: startDate)
+
         return startDate
     }
 
@@ -143,6 +145,11 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
          */
         Task { @MainActor in
             Logger.shared.debug("Task called on Thread \(Thread.current)")
+
+            guard let statisticsManager = await statisticsManager else {
+                Logger.shared.error("Recieved didCollectDataOf while statisticsManager is nil")
+                return
+            }
 
             for type in collectedTypes {
                 if let quantityType = type as? HKQuantityType,

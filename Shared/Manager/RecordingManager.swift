@@ -90,6 +90,22 @@ extension RecordingManager {
 // MARK: -  Shared functions
 //
 extension RecordingManager {
+    func updateObservableManagers(sensor: Sensor) {
+        switch sensor {
+        case .motion(let name, _, let batch):
+            motionManager.update(
+                sensorName: name,
+                newValues: batch
+            )
+
+        case .statistic(_, _, let batch):
+            heartRateManager.update(batch)
+
+        default:
+            // todo throw error
+            Logger.shared.info("Did not hanlde: \(String(describing: sensor))")
+        }
+    }
 }
 
 // MARK: -  RecordingManagerError

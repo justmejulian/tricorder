@@ -16,6 +16,7 @@ extension SensorBackgroundDataHandler {
 
     func add(sensor: Sensor) async throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
+        Logger.shared.debug("\(String.init(describing: sensor))")
 
         // tood make sure recording exists
 

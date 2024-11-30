@@ -1,6 +1,5 @@
 //
-//  RecordingManager+watchOs.swift
-//  tricorder
+//  RecordingManager+iOS.swift
 //
 //  Created by Julian Visser on 01.11.2024.
 //
@@ -230,22 +229,5 @@ extension RecordingManager {
             name: name,
             startTimestamp: date
         )
-    }
-
-    func updateObservableManagers(sensor: Sensor) {
-        switch sensor {
-        case .motion(let name, _, let batch):
-            motionManager.update(
-                sensorName: name,
-                newValues: batch
-            )
-
-        case .statistic(_, _, let batch):
-            heartRateManager.update(batch)
-
-        default:
-            // todo throw error
-            Logger.shared.info("Did not hanlde: \(String(describing: sensor))")
-        }
     }
 }

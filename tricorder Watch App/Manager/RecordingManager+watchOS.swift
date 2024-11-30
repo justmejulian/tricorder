@@ -232,12 +232,13 @@ extension RecordingManager {
 
         Task {
             do {
-                // todo persist on fail
+                await updateObservableManagers(sensor: sensor)
                 try await sendSensorUpdate(sensor)
                 await monitoringManager.addUpdateSendSuccess(true)
             } catch {
-                Logger.shared.error("\(#function): Failed to archive data: \(error)")
+                Logger.shared.error("\(#function): Failed to send data: \(error)")
                 await monitoringManager.addUpdateSendSuccess(false)
+                // todo persist on fail
             }
         }
     }

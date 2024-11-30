@@ -21,7 +21,7 @@ struct RecordingDetailView: View {
     var body: some View {
         VStack {
             Text(recordingStartTime.ISO8601Format()).font(.headline)
-
+            // todo make into something better looking
             if let values {
                 List(values.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
                     Text("\(key): \(value) bytes")

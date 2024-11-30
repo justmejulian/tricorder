@@ -8,12 +8,12 @@ import Foundation
 import OSLog
 import SwiftData
 
-@ModelActor
-actor BackgroundDataHandler {
+protocol BackgroundDataHandlerProtocol: Actor {
+    nonisolated var modelExecutor: any SwiftData.ModelExecutor { get }
+    nonisolated var modelContainer: SwiftData.ModelContainer { get }
 }
-
-extension BackgroundDataHandler {
-    private func createModelContext(modelContainer: ModelContainer) -> ModelContext {
+extension BackgroundDataHandlerProtocol {
+    func createModelContext(modelContainer: ModelContainer) -> ModelContext {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         let modelContext = ModelContext(modelContainer)
@@ -50,6 +50,8 @@ extension BackgroundDataHandler {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         let descriptor = FetchDescriptor<T>()
+
+        let modelContext = createModelContext(modelContainer: modelContainer)
         return try modelContext.fetchCount(descriptor)
     }
 
@@ -64,8 +66,7 @@ extension BackgroundDataHandler {
         -> [PersistentIdentifier] where T: PersistentModel
     {
         Logger.shared.debug("called on Thread \(Thread.current)")
-
-        return try self.modelContext.fetchIdentifiers(descriptor)
+        let modelContext = createModelContext(modelContainer: modelContainer)
+        return try modelContext.fetchIdentifiers(descriptor)
     }
-
 }

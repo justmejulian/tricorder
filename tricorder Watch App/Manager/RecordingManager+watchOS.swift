@@ -234,10 +234,10 @@ extension RecordingManager {
             do {
                 // todo persist on fail
                 try await sendSensorUpdate(sensor)
-                await monitoringManager.addMotioUpdateSendSuccess(true)
+                await monitoringManager.addUpdateSendSuccess(true)
             } catch {
                 Logger.shared.error("\(#function): Failed to archive data: \(error)")
-                await monitoringManager.addMotioUpdateSendSuccess(false)
+                await monitoringManager.addUpdateSendSuccess(false)
             }
         }
     }

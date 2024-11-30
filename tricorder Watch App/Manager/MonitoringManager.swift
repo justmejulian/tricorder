@@ -10,32 +10,32 @@ import os
 
 @MainActor
 class MonitoringManager: ObservableObject {
-    @Published var motionUpdateSendSuccess: [Success] = []
+    @Published var updateSendSuccess: [Success] = []
 
-    @Published var motionUpdateSendSuccessTrueCount: Int = 0
+    @Published var updateSendSuccessTrueCount: Int = 0
 
-    var motionUpdateSendSuccessCount: Int {
-        return motionUpdateSendSuccess.count
+    var updateSendSuccessCount: Int {
+        return updateSendSuccess.count
     }
 
-    var last10MotionUpdateSendSuccess: [Success] {
-        return motionUpdateSendSuccess.suffix(10)
+    var last10UpdateSendSuccess: [Success] {
+        return updateSendSuccess.suffix(10)
     }
 
     func reset() {
         Logger.shared.debug("called on Thread \(Thread.current)")
-        self.motionUpdateSendSuccess = []
-        self.motionUpdateSendSuccessTrueCount = 0
+        self.updateSendSuccess = []
+        self.updateSendSuccessTrueCount = 0
     }
 
-    func addMotioUpdateSendSuccess(_ success: Bool) {
+    func addUpdateSendSuccess(_ success: Bool) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         if success {
-            motionUpdateSendSuccessTrueCount += 1
+            updateSendSuccessTrueCount += 1
         }
 
-        motionUpdateSendSuccess.append(Success(state: success))
+        updateSendSuccess.append(Success(state: success))
     }
 }
 

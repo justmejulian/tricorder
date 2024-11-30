@@ -20,6 +20,7 @@ extension StatisticsManager {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         switch statistics.quantityType {
+        // Handle HeartRate
         case HKQuantityType.quantityType(forIdentifier: .heartRate):
             let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
             guard

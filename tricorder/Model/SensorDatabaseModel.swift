@@ -19,3 +19,22 @@ class SensorDatabaseModel {
         self.data = data
     }
 }
+
+extension SensorDatabaseModel {
+    // Used to pass around
+    struct Struct {
+        let sensorName: String
+        let recordingStart: Date
+        let data: Data
+
+        init(sensor: SensorDatabaseModel) {
+            self.sensorName = sensor.sensorName
+            self.recordingStart = sensor.recordingStart
+            self.data = sensor.data
+        }
+    }
+    
+    func toStruct() -> Struct {
+        return Struct(sensor: self)
+    }
+}

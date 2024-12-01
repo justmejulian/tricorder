@@ -23,3 +23,20 @@ class RecordingDatabaseModel {
         self.startTimestamp = startTimestamp
     }
 }
+
+extension RecordingDatabaseModel {
+    // Used to pass around
+    struct Struct {
+        let name: String
+        let startTimestamp: Date
+
+        init(recording: RecordingDatabaseModel) {
+            self.name = recording.name
+            self.startTimestamp = recording.startTimestamp
+        }
+    }
+    
+    func toStruct() -> Struct {
+        return Struct(recording: self)
+    }
+}

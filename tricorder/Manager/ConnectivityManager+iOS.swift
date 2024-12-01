@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import WatchConnectivity
 import OSLog
+import WatchConnectivity
 
 extension ConnectivityManager {
     nonisolated func sessionWatchStateDidChange(_ session: WCSession) {

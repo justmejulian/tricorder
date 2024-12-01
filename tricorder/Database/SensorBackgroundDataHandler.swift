@@ -5,8 +5,8 @@
 //
 
 import Foundation
-import SwiftData
 import OSLog
+import SwiftData
 
 @ModelActor
 actor SensorBackgroundDataHandler: BackgroundDataHandlerProtocol {
@@ -22,7 +22,7 @@ extension SensorBackgroundDataHandler {
 
         // tood make sure recording exists
 
-        let sensorData = try getSensoData(sensor: sensor)
+        let sensorData = try getSensorData(sensor: sensor)
 
         let motionSensorBatchDatabaseModel = SensorDatabaseModel(
             sensorName: sensorData.name,
@@ -33,7 +33,7 @@ extension SensorBackgroundDataHandler {
         try self.appendData(motionSensorBatchDatabaseModel)
     }
 
-    private func getSensoData(sensor: Sensor) throws -> (
+    private func getSensorData(sensor: Sensor) throws -> (
         name: String, recordingStartDate: Date, data: Data
     ) {
         switch sensor {
@@ -74,7 +74,7 @@ extension SensorBackgroundDataHandler {
         return persistentIdentifiers
     }
 
-    func getSensorsData(recordingStart: Date) async throws -> [String: [Data]] {
+    func getSensorData(recordingStart: Date) async throws -> [SensorDatabaseModel.Struct] {
         let descriptor = FetchDescriptor<SensorDatabaseModel>(
             predicate: #Predicate<SensorDatabaseModel> {
                 $0.recordingStart == recordingStart
@@ -85,21 +85,25 @@ extension SensorBackgroundDataHandler {
         )
         let sensorData = try modelContext.fetch(descriptor)
 
-        let sensorValues: [String: [Data]] = sensorData.reduce(into: [:]) { result, sensor in
-            result[sensor.sensorName, default: []].append(sensor.data)
-        }
+        let sensorValues: [SensorDatabaseModel.Struct] = sensorData.map { $0.toStruct() }
 
         return sensorValues
     }
 
-    func getSensorValueBytes(recordingStart: Date) async throws -> [String: Int] {
-        let sensorValues = try await getSensorsData(recordingStart: recordingStart)
-        return sensorValues.reduce(into: [:]) { result, sensorValue in
-            let bytes = sensorValue.value.reduce(0) { result, value in
-                result + value.count
-            }
+    func getMergedSensorData(recordingStart: Date) async throws -> [String: [Data]] {
+        let sensorValues = try await getSensorData(recordingStart: recordingStart)
+        let mergedSensorValues = sensorValues.reduce(into: [:]) { result, sensorValue in
+            result[sensorValue.sensorName, default: []].append(sensorValue.data)
+        }
 
-            result[sensorValue.key, default: 0] += bytes
+        return mergedSensorValues
+    }
+
+    func getSensorValueBytes(recordingStart: Date) async throws -> [String: Int] {
+        let sensorValues = try await getSensorData(recordingStart: recordingStart)
+        return sensorValues.reduce(into: [:]) { result, sensorValue in
+            let bytes = sensorValue.data.count
+            result[sensorValue.sensorName, default: 0] += bytes
         }
     }
 }

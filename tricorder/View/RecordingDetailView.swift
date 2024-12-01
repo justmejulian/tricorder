@@ -5,9 +5,9 @@
 //
 
 import Foundation
+import OSLog
 import SwiftData
 import SwiftUI
-import OSLog
 
 struct RecordingDetailView: View {
     @EnvironmentObject var recordingManager: RecordingManager

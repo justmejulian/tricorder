@@ -35,7 +35,7 @@ extension RecordingDatabaseModel {
             self.startTimestamp = recording.startTimestamp
         }
     }
-    
+
     func toStruct() -> Struct {
         return Struct(recording: self)
     }

@@ -33,7 +33,7 @@ extension SensorDatabaseModel {
             self.data = sensor.data
         }
     }
-    
+
     func toStruct() -> Struct {
         return Struct(sensor: self)
     }

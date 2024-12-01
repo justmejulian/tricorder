@@ -4,8 +4,8 @@
 //  Created by Julian Visser on 01.12.2024.
 //
 
-import SwiftUI
 import OSLog
+import SwiftUI
 
 struct ClearAllConfirmationButton<Label: View>: View {
     @EnvironmentObject var recordingManager: RecordingManager

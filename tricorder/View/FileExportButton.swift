@@ -4,15 +4,16 @@
 //  Created by Julian Visser on 01.12.2024.
 //
 
-import SwiftUI
 import OSLog
+import SwiftUI
 
 struct FileExportButton: View {
+    @EnvironmentObject var recordingManager: RecordingManager
 
     let recordingStartDate: Date
 
     var fileName: String {
-        "\(recordingStartDate.formatted(.dateTime)).json"
+        "\(recordingStartDate.ISO8601Format())"
     }
 
     @State private var isExporting = false
@@ -22,9 +23,7 @@ struct FileExportButton: View {
     var body: some View {
         Button("Export File") {
             Task {
-                let data = ["helo", "world"]
-                self.file = try await FileCreator().generateJsonFile(fileName: fileName, data: data)
-
+                self.file = try await generateFile(recordingStartDate: recordingStartDate)
                 // Trigger the export action
                 self.isExporting = true
             }
@@ -32,7 +31,7 @@ struct FileExportButton: View {
         .fileExporter(
             isPresented: $isExporting,
             document: file,
-            contentType: .json,  // Specify the file type
+            contentType: .json,
             defaultFilename: fileName
         ) { result in
             switch result {
@@ -43,5 +42,39 @@ struct FileExportButton: View {
                 print("Failed to export file: \(error)")
             }
         }
+    }
+}
+
+extension FileExportButton {
+    func generateFile(recordingStartDate: Date) async throws -> File? {
+
+        let modelContainer = recordingManager.modelContainer
+        let recordingBackgroundDataHandler = RecordingBackgroundDataHandler(
+            modelContainer: modelContainer
+        )
+        let sensorBackgroundDataHandler = SensorBackgroundDataHandler(
+            modelContainer: modelContainer
+        )
+
+        let recording = try await recordingBackgroundDataHandler.getRecording(
+            recordingStart: recordingStartDate
+        )
+        let sensorData = try await sensorBackgroundDataHandler.getMergedSensorData(
+            recordingStart: recordingStartDate
+        )
+
+        let file = FileModel(
+            name: recording.name,
+            startDate: recording.startTimestamp,
+            data: sensorData
+        )
+
+        return try await FileCreator().generateJsonFile(fileName: fileName, data: file)
+    }
+
+    struct FileModel: Codable {
+        let name: String
+        let startDate: Date
+        let data: [String: [Data]]
     }
 }

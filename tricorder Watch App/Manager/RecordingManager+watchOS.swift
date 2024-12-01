@@ -127,6 +127,10 @@ extension RecordingManager {
             distanceManager.update(data: batch)
         }
     }
+
+    func clearAllFromDatabase() async throws {
+        // todo clear all
+    }
 }
 
 // MARK: -  RecordingManager Handlers

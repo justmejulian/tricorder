@@ -10,10 +10,13 @@ import os
 
 @ModelActor
 actor RecordingBackgroundDataHandler: BackgroundDataHandlerProtocol {
+    func clear() throws {
+        try deleteAllInstances(of: RecordingDatabaseModel.self)
+    }
 }
 
 extension RecordingBackgroundDataHandler {
-    func addNewRecording(name: String?, startTimestamp: Date = Date()) async throws {
+    func addNewRecording(name: String?, startTimestamp: Date = Date()) throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         let name = name ?? "Recording - \(startTimestamp.ISO8601Format())"
@@ -30,7 +33,7 @@ extension RecordingBackgroundDataHandler {
         )
     }
 
-    func getRecordingPersistentIdentifier(startTimestamp: Date) async throws
+    func getRecordingPersistentIdentifier(startTimestamp: Date) throws
         -> PersistentIdentifier
     {
         Logger.shared.debug("called on Thread \(Thread.current)")
@@ -54,7 +57,6 @@ extension RecordingBackgroundDataHandler {
 
         return persistentIdentifier
     }
-
 }
 
 enum RecordingBackgroundDataHandlerError: Error {

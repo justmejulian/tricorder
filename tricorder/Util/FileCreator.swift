@@ -1,0 +1,45 @@
+//
+//  FileCreator.swift
+//
+//  Created by Julian Visser on 01.12.2024.
+//
+
+import SwiftUI
+import UniformTypeIdentifiers
+
+struct FileCreator {
+    func generateJsonFile(fileName: String, data: Encodable) async throws -> File {
+        let jsonData = try JSONEncoder().encode(data)
+        return File(fileName: fileName, fileData: jsonData)
+    }
+}
+
+struct File: FileDocument {
+    static var readableContentTypes: [UTType] {
+        [.json]
+    }
+
+    var fileData: Data
+    var fileName: String
+
+    init(fileName: String, fileData: Data) {
+        self.fileData = fileData
+        self.fileName = fileName
+    }
+
+    init(configuration: ReadConfiguration) throws {
+        guard let data = configuration.file.regularFileContents else {
+            throw FileCreatorError.FileInitializationError
+        }
+        self.fileData = data
+        self.fileName = "Untitled.json"
+    }
+
+    func fileWrapper(configuration: FileDocumentWriteConfiguration) throws -> FileWrapper {
+        return FileWrapper(regularFileWithContents: fileData)
+    }
+}
+
+enum FileCreatorError: Error {
+    case FileInitializationError
+}

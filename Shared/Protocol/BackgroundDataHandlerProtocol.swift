@@ -11,6 +11,8 @@ import SwiftData
 protocol BackgroundDataHandlerProtocol: Actor {
     nonisolated var modelExecutor: any SwiftData.ModelExecutor { get }
     nonisolated var modelContainer: SwiftData.ModelContainer { get }
+
+    func clear() throws
 }
 extension BackgroundDataHandlerProtocol {
     func createModelContext(modelContainer: ModelContainer) -> ModelContext {
@@ -68,5 +70,20 @@ extension BackgroundDataHandlerProtocol {
         Logger.shared.debug("called on Thread \(Thread.current)")
         let modelContext = createModelContext(modelContainer: modelContainer)
         return try modelContext.fetchIdentifiers(descriptor)
+    }
+
+    func deleteAllInstances<T: PersistentModel>(of modelType: T.Type) throws {
+        let modelContext = createModelContext(modelContainer: modelContainer)
+
+        let fetchDescriptor = FetchDescriptor<T>()
+        let results = try modelContext.fetch(fetchDescriptor)
+
+        // Delete each instance
+        for object in results {
+            modelContext.delete(object)
+        }
+
+        // Save the changes to persist the deletions
+        try modelContext.save()
     }
 }

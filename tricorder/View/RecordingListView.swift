@@ -9,6 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct RecordingListView: View {
+
     // todo replace with backgorund fetch
     @Query(sort: \RecordingDatabaseModel.startTimestamp) var recordings: [RecordingDatabaseModel]
 
@@ -23,6 +24,12 @@ struct RecordingListView: View {
                 }
             }
         }
+        .navigationBarItems(
+            trailing:
+                ClearAllConfirmationButton {
+                    Image(systemName: "xmark.bin")
+                }
+        )
         .overlay {
             if recordings.isEmpty {
                 ContentUnavailableView(

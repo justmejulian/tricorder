@@ -29,6 +29,8 @@ struct RecordingDetailView: View {
             } else {
                 Text("No Sensor Data")
             }
+
+            FileExportButton(recordingStartDate: recordingStartTime)
         }
         .task {
             self.values = await getSensorValueBytes(recordingStart: recordingStartTime)

@@ -5,6 +5,7 @@
 //
 
 import SwiftUI
+import OSLog
 
 struct FileExportButton: View {
 
@@ -36,8 +37,9 @@ struct FileExportButton: View {
         ) { result in
             switch result {
             case .success(let url):
-                print("File exported to \(url)")
+                Logger.shared.info("File exported to \(url)")
             case .failure(let error):
+                Logger.shared.error("Failed to export file: \(error)")
                 print("Failed to export file: \(error)")
             }
         }

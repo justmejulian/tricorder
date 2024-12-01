@@ -7,7 +7,7 @@
 
 import CoreMotion
 import Foundation
-import os
+import OSLog
 
 actor CoreMotionManager {
     let eventManager = EventManager.shared

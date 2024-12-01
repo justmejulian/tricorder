@@ -6,7 +6,7 @@
 
 import Foundation
 import HealthKit
-import os
+import OSLog
 
 @MainActor
 class ObservableValueManager<T: Value>: ObservableObject {

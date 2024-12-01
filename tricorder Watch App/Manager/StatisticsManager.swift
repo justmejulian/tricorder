@@ -7,7 +7,7 @@
 
 import Foundation
 import HealthKit
-import os
+import OSLog
 
 actor StatisticsManager {
     var eventManager = EventManager.shared

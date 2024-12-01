@@ -6,7 +6,7 @@ An extension that provides a shared logger.
 */
 
 import Foundation
-import os
+import OSLog
 
 extension Logger {
     private static let subsystem = Bundle.main.bundleIdentifier!

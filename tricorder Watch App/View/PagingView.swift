@@ -6,7 +6,7 @@ A SwiftUI view that shows the workout metric and controls as two pages.
 */
 
 import SwiftUI
-import os
+import OSLog
 
 struct PagingView: View {
     @EnvironmentObject var recordingManager: RecordingManager

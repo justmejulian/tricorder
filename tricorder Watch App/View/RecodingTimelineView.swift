@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import os
+import OSLog
 
 struct RecodingTimelineView: View {
     @EnvironmentObject var recordingManager: RecordingManager

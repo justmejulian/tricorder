@@ -7,7 +7,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
-import os
+import OSLog
 
 struct RecordingDetailView: View {
     @EnvironmentObject var recordingManager: RecordingManager

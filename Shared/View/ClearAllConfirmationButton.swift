@@ -5,7 +5,7 @@
 //
 
 import SwiftUI
-import os
+import OSLog
 
 struct ClearAllConfirmationButton<Label: View>: View {
     @EnvironmentObject var recordingManager: RecordingManager

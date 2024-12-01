@@ -6,7 +6,7 @@
 
 import Foundation
 import SwiftData
-import os
+import OSLog
 
 @ModelActor
 actor SensorBackgroundDataHandler: BackgroundDataHandlerProtocol {

@@ -7,7 +7,7 @@ An extension that wraps workout operations specific to iOS.
 
 import Foundation
 import HealthKit
-import os
+import OSLog
 
 // MARK: - Workout session management
 //

@@ -6,7 +6,7 @@
 
 import Foundation
 import HealthKit
-import os
+import OSLog
 
 // todo can this be bigger?
 let MAXCHUNKSIZE = 300

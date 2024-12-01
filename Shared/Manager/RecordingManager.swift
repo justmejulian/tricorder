@@ -9,7 +9,7 @@ import Foundation
 import HealthKit
 import SwiftData
 import SwiftUICore
-import os
+import OSLog
 
 @MainActor
 class RecordingManager: ObservableObject {

@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import os
+import OSLog
 
 struct StartStopRecordingButton: View {
     // todo do I need this or can it be passed down?

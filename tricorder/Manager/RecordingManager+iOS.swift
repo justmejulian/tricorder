@@ -89,6 +89,18 @@ extension RecordingManager {
             Logger.shared.error("Failed to send request for recording state: \(error)")
         }
     }
+
+    func clearAllFromDatabase() async throws {
+        let recordingBackgroundDataHandler = RecordingBackgroundDataHandler(
+            modelContainer: modelContainer
+        )
+        let sensorBackgroundDataHandler = SensorBackgroundDataHandler(
+            modelContainer: modelContainer
+        )
+
+        try await sensorBackgroundDataHandler.clear()
+        try await recordingBackgroundDataHandler.clear()
+    }
 }
 
 // MARK: -  RecordingManager handlers

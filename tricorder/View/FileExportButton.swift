@@ -12,10 +12,6 @@ struct FileExportButton: View {
 
     let recordingStartDate: Date
 
-    var fileName: String {
-        "\(recordingStartDate.ISO8601Format())"
-    }
-
     @State private var isExporting = false
 
     @State private var file: File?
@@ -32,7 +28,7 @@ struct FileExportButton: View {
             isPresented: $isExporting,
             document: file,
             contentType: .json,
-            defaultFilename: fileName
+            defaultFilename: file?.fileName ?? "Untitled.json"
         ) { result in
             switch result {
             case .success(let url):
@@ -65,16 +61,14 @@ extension FileExportButton {
 
         let file = FileModel(
             name: recording.name,
-            startDate: recording.startTimestamp,
-            data: sensorData
+            startDate: recording.startTimestamp
         )
 
-        return try await FileCreator().generateJsonFile(fileName: fileName, data: file)
+        return try await FileCreator().generateJsonFile(fileName: recording.name, data: file)
     }
 
     struct FileModel: Codable {
         let name: String
         let startDate: Date
-        let data: [String: [Data]]
     }
 }

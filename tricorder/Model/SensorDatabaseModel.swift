@@ -7,34 +7,80 @@
 import Foundation
 import SwiftData
 
+protocol SensorDatabaseModel: PersistentModel {
+    associatedtype T: Value
+    
+    var sensorName: String { get }
+    var recordingStart: Date { get }
+    var data: T { get }
+}
+extension SensorDatabaseModel {
+    // Used to pass around
+    func toStruct<T>() throws -> SensorDatabaseModelStruct<T> {
+        return try SensorDatabaseModelStruct<T>(sensor: self)
+    }
+}
+
 @Model
-class SensorDatabaseModel {
+class MotionSensorDatabaseModel: SensorDatabaseModel {
     var sensorName: String
     var recordingStart: Date
-    var data: Data
+    var data: MotionValue
 
-    init(sensorName: String, recordingStart: Date, data: Data) {
+    init(sensorName: String, recordingStart: Date, data: MotionValue) {
         self.sensorName = sensorName
         self.recordingStart = recordingStart
         self.data = data
     }
-}
-
-extension SensorDatabaseModel {
-    // Used to pass around
-    struct Struct {
-        let sensorName: String
-        let recordingStart: Date
-        let data: Data
-
-        init(sensor: SensorDatabaseModel) {
-            self.sensorName = sensor.sensorName
-            self.recordingStart = sensor.recordingStart
-            self.data = sensor.data
-        }
-    }
-
-    func toStruct() -> Struct {
-        return Struct(sensor: self)
+    
+    func toStruct() throws -> SensorDatabaseModelStruct<MotionValue> {
+        return try toStruct<MotionValue>()
     }
 }
+
+@Model
+class StatisticSensorDatabaseModel: SensorDatabaseModel {
+    var sensorName: String
+    var recordingStart: Date
+    var data: StatisticValue
+
+    init(sensorName: String, recordingStart: Date, data: StatisticValue) {
+        self.sensorName = sensorName
+        self.recordingStart = recordingStart
+        self.data = data
+    }
+    
+    func toStruct() throws -> SensorDatabaseModelStruct<StatisticValue> {
+        return try toStruct<StatisticValue>()
+    }
+}
+
+@Model
+class DistanceSensorDatabaseModel: SensorDatabaseModel {
+    var sensorName: String
+    var recordingStart: Date
+    var data: DistanceValue
+
+    init(sensorName: String, recordingStart: Date, data: DistanceValue) {
+        self.sensorName = sensorName
+        self.recordingStart = recordingStart
+        self.data = data
+    }
+    
+    func toStruct() throws -> SensorDatabaseModelStruct<DistanceValue> {
+        return try toStruct<DistanceValue>()
+    }
+}
+
+struct SensorDatabaseModelStruct<T: Value> {
+    let sensorName: String
+    let recordingStart: Date
+    let data: T
+
+    init(sensor: any SensorDatabaseModel) throws {
+        self.sensorName = sensor.sensorName
+        self.recordingStart = sensor.recordingStart
+        self.data = sensor.data as! T
+    }
+}
+

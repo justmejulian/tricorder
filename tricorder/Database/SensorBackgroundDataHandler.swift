@@ -22,81 +22,87 @@ extension SensorBackgroundDataHandler {
 
         // tood make sure recording exists
 
-        let sensorData = try getSensorData(sensor: sensor)
-
-        let motionSensorBatchDatabaseModel = SensorDatabaseModel(
-            sensorName: sensorData.name,
-            recordingStart: sensorData.recordingStartDate,
-            data: sensorData.data
-        )
-
-        try self.appendData(motionSensorBatchDatabaseModel)
-    }
-
-    private func getSensorData(sensor: Sensor) throws -> (
-        name: String, recordingStartDate: Date, data: Data
-    ) {
         switch sensor {
         case .motion(let name, let recordingStartDate, let batch):
-            return (
-                name: name.rawValue, recordingStartDate: recordingStartDate,
-                data: try JSONEncoder().encode(batch)
-            )
+            let sensorDatabaseModels = batch.map {
+                MotionSensorDatabaseModel(
+                    sensorName: name.rawValue,
+                    recordingStart: recordingStartDate,
+                    data: $0
+                )
+            }
+            try appendData(sensorDatabaseModels)
 
         case .statistic(let name, let recordingStartDate, let batch):
-            return (
-                name: name.rawValue, recordingStartDate: recordingStartDate,
-                data: try JSONEncoder().encode(batch)
+            let sensorDatabaseModels = StatisticSensorDatabaseModel(
+                sensorName: name.rawValue,
+                recordingStart: recordingStartDate,
+                data: batch
             )
+            try appendData(sensorDatabaseModels)
+
         case .distance(let name, let recordingStartDate, let batch):
-            return (
-                name: name.rawValue, recordingStartDate: recordingStartDate,
-                data: try JSONEncoder().encode(batch)
+            let sensorDatabaseModels = DistanceSensorDatabaseModel(
+                sensorName: name.rawValue,
+                recordingStart: recordingStartDate,
+                data: batch
             )
+            try appendData(sensorDatabaseModels)
         }
     }
 
-    func getSensorPersistentIdentifiers(recordingStart: Date) throws
-        -> [PersistentIdentifier]
+    func getMotionSensorStructs(recordingStart: Date) throws
+        -> [MergedSensorDatabaseModelStruct<MotionValue>]
     {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        let descriptor = FetchDescriptor<SensorDatabaseModel>(
-            predicate: #Predicate<SensorDatabaseModel> {
+        let descriptor = FetchDescriptor<MotionSensorDatabaseModel>(
+            predicate: #Predicate<MotionSensorDatabaseModel> {
                 $0.recordingStart == recordingStart
             }
         )
 
-        let persistentIdentifiers = try fetchPersistentIdentifiers(
-            descriptor: descriptor
-        )
-
-        return persistentIdentifiers
-    }
-
-    func getSensorData(recordingStart: Date) async throws -> [SensorDatabaseModel.Struct] {
-        let descriptor = FetchDescriptor<SensorDatabaseModel>(
-            predicate: #Predicate<SensorDatabaseModel> {
-                $0.recordingStart == recordingStart
-            }
-        )
         let modelContext = createModelContext(
             modelContainer: modelContainer
         )
-        let sensorData = try modelContext.fetch(descriptor)
 
-        let sensorValues: [SensorDatabaseModel.Struct] = sensorData.map { $0.toStruct() }
+        let sensorPersistentModels = try modelContext.fetch(descriptor)
 
-        return sensorValues
-    }
-
-    func getMergedSensorData(recordingStart: Date) async throws -> [String: [Data]] {
-        let sensorValues = try await getSensorData(recordingStart: recordingStart)
-        let mergedSensorValues = sensorValues.reduce(into: [:]) { result, sensorValue in
-            result[sensorValue.sensorName, default: []].append(sensorValue.data)
+        let sensorStructs: [SensorDatabaseModelStruct<MotionValue>] = try sensorPersistentModels.map
+        {
+            try $0.toStruct()
         }
 
-        return mergedSensorValues
+        let mergedSensorStructs = try getMergedSensorStructs(sensorStructs: sensorStructs)
+        
+        return mergedSensorStructs.sorted { $0.recordingStart < $1.recordingStart }
+    }
+
+    
+    struct MergedSensorDatabaseModelStruct<T: Value> {
+        let sensorName: String
+        let recordingStart: Date
+        let data: [T]
+    }
+    
+    func getMergedSensorStructs<T>(sensorStructs: [SensorDatabaseModelStruct<T>]) throws -> [MergedSensorDatabaseModelStruct<T>]
+    {
+        
+        guard let recordingStart = sensorStructs.first?.recordingStart else {
+            throw SensorBackgroundDataHandlerError.empty
+        }
+        
+        let mergedSensorBatches = sensorStructs.reduce(into: [:]) { result, sensorStruct in
+            result[sensorStruct.sensorName, default: []].append(sensorStruct.data)
+        }
+        
+        return mergedSensorBatches.map {
+            MergedSensorDatabaseModelStruct(
+                    sensorName: $0.key,
+                    recordingStart: recordingStart,
+                    data: $0.value
+                )
+        }
     }
 
     func getSensorValueBytes(recordingStart: Date) async throws -> [String: Int] {
@@ -113,4 +119,5 @@ extension SensorBackgroundDataHandler {
 
 enum SensorBackgroundDataHandlerError: Error {
     case notFound
+    case empty
 }

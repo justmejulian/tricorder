@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ClearAllConfirmationButton<Label: View>: View {
     @EnvironmentObject var recordingManager: RecordingManager
+    @Environment(\.dismiss) private var dismiss
 
     @ViewBuilder let label: Label
 
@@ -32,6 +33,8 @@ struct ClearAllConfirmationButton<Label: View>: View {
                     } catch {
                         Logger.shared.error("\(error)")
                     }
+                    // go back to home
+                    dismiss()
                 }
             }
             Button("Cancel", role: .cancel) {}

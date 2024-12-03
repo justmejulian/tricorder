@@ -5,16 +5,20 @@
 //
 
 import Foundation
+import OSLog
 import SwiftData
 import SwiftUI
 
 struct RecordingListView: View {
+    @EnvironmentObject var recordingManager: RecordingManager
 
-    // todo replace with backgorund fetch
-    @Query(sort: \RecordingDatabaseModel.startTimestamp) var recordings: [RecordingDatabaseModel]
+    @State
+    var recordings: [RecordingDatabaseModel.Struct] = []
+    @State
+    var loading = false
 
     var body: some View {
-        List(recordings) { recording in
+        List(recordings, id: \.startTimestamp) { recording in
             NavigationLink {
                 RecordingDetailView(recordingStartTime: recording.startTimestamp)
             } label: {
@@ -24,6 +28,13 @@ struct RecordingListView: View {
                 }
             }
         }
+        .onAppear {
+            Task {
+                loading = true
+                recordings = await getRecordings()
+                loading = false
+            }
+        }
         .navigationBarItems(
             trailing:
                 ClearAllConfirmationButton {
@@ -31,12 +42,28 @@ struct RecordingListView: View {
                 }
         )
         .overlay {
-            if recordings.isEmpty {
+            if loading {
+                SpinnerView(text: "Loading")
+            }
+            if !loading && recordings.isEmpty {
                 ContentUnavailableView(
                     "No recordings yet",
                     systemImage: "recordingtape"
                 )
             }
+        }
+    }
+}
+
+extension RecordingListView {
+    func getRecordings() async -> [RecordingDatabaseModel.Struct] {
+        do {
+            let modelContainer = recordingManager.modelContainer
+            let handler = RecordingBackgroundDataHandler(modelContainer: modelContainer)
+            return try await handler.getRecordings()
+        } catch {
+            Logger.shared.error("Failed to fecht recordings: \(error)")
+            return []
         }
     }
 }

@@ -121,10 +121,10 @@ extension RecordingManager {
             )
 
         case .statistic(_, _, let batch):
-            heartRateManager.update(data: batch)
+            heartRateManager.update(batch)
 
         case .distance(_, _, let batch):
-            distanceManager.update(data: batch)
+            distanceManager.update(batch)
         }
     }
 
@@ -250,7 +250,11 @@ extension RecordingManager {
     nonisolated func handleReceivedDistance(_ data: Sendable) throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
         Task {
-            await distanceManager.update(data: data)
+            guard let newValues = data as? DistanceValue else {
+                Logger.shared.error("\(#function): Invalid data type")
+                return
+            }
+            await distanceManager.update([newValues])
         }
     }
 }

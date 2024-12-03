@@ -25,21 +25,10 @@ extension ObservableValueManager {
         mostRecent = nil
     }
 
-    func update(_ newValue: T) {
+    func update(_ newValues: [T]) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        count += 1
-        mostRecent = newValue
-    }
-
-    func update(data: Sendable) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
-        guard let newValue = data as? T else {
-            Logger.shared.error("\(#function): Invalid data type")
-            return
-        }
-
-        update(newValue)
+        count += newValues.count
+        mostRecent = newValues.last
     }
 }

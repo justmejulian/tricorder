@@ -55,7 +55,7 @@ extension FileExportButton {
         let recording = try await recordingBackgroundDataHandler.getRecording(
             recordingStart: recordingStartDate
         )
-        let sensorData = try await sensorBackgroundDataHandler.getMergedSensorData(
+        let sensorData = try await sensorBackgroundDataHandler.getSensors(
             recordingStart: recordingStartDate
         )
 

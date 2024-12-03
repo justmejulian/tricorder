@@ -30,7 +30,7 @@ extension BackgroundDataHandlerProtocol {
             try modelContext.save()
         }
     }
-    
+
     func appendData<T>(_ dataArray: [T]) throws where T: PersistentModel {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
@@ -57,7 +57,7 @@ extension BackgroundDataHandlerProtocol {
         modelContext.delete(model)
         try save(modelContext: modelContext)
     }
-    
+
     func fetchDataCount<T: PersistentModel>(for _: T.Type) throws -> Int {
         Logger.shared.debug("called on Thread \(Thread.current)")
 

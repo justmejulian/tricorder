@@ -147,7 +147,7 @@ func mergeSensorValues(a: Sensor, b: Sensor) throws -> Sensor {
             throw SensorError.differentSensors
         }
         let mergedRecordingStartDate = min(dateA, dateB)
-        let mergedBatch = valuesA + valuesB  // Combine the valueses
+        let mergedBatch = valuesA + valuesB
         return .motion(
             sensorNameA,
             recordingStartDate: mergedRecordingStartDate,
@@ -159,7 +159,7 @@ func mergeSensorValues(a: Sensor, b: Sensor) throws -> Sensor {
             throw SensorError.differentSensors
         }
         let mergedRecordingStartDate = min(dateA, dateB)
-        let mergedBatch = valuesA + valuesB  // Combine the valueses
+        let mergedBatch = valuesA + valuesB
         return .statistic(
             sensorNameA,
             recordingStartDate: mergedRecordingStartDate,
@@ -171,7 +171,7 @@ func mergeSensorValues(a: Sensor, b: Sensor) throws -> Sensor {
             throw SensorError.differentSensors
         }
         let mergedRecordingStartDate = min(dateA, dateB)
-        let mergedBatch = valuesA + valuesB  // Combine the valueses
+        let mergedBatch = valuesA + valuesB
         return .distance(
             sensorNameA,
             recordingStartDate: mergedRecordingStartDate,

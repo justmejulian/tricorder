@@ -5,9 +5,9 @@
 //
 
 import Foundation
+import OSLog
 import SwiftData
 import SwiftUI
-import os
 
 struct RecordingDetailView: View {
     @EnvironmentObject var recordingManager: RecordingManager
@@ -24,24 +24,26 @@ struct RecordingDetailView: View {
             // todo make into something better looking
             if let values {
                 List(values.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                    Text("\(key): \(value) bytes")
+                    Text("# \(key): \(value)")
                 }
             } else {
                 Text("No Sensor Data")
             }
+
+            FileExportButton(recordingStartDate: recordingStartTime)
         }
         .task {
-            self.values = await getSensorValueBytes(recordingStart: recordingStartTime)
+            self.values = await getSensorValueCounts(recordingStart: recordingStartTime)
         }
     }
 }
 
 extension RecordingDetailView {
-    nonisolated func getSensorValueBytes(recordingStart: Date) async -> [String: Int]? {
+    nonisolated func getSensorValueCounts(recordingStart: Date) async -> [String: Int]? {
         do {
             let modelContainer = await recordingManager.modelContainer
             let handler = SensorBackgroundDataHandler(modelContainer: modelContainer)
-            return try await handler.getSensorValueBytes(
+            return try await handler.getSensorValueCounts(
                 recordingStart: recordingStart
             )
         } catch {

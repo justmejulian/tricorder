@@ -6,8 +6,8 @@ A SwiftUI view that shows the workout controls.
 */
 
 import HealthKit
+import OSLog
 import SwiftUI
-import os
 
 struct ControlsView: View {
     @EnvironmentObject var recordingManager: RecordingManager

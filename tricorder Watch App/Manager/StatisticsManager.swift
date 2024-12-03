@@ -7,7 +7,7 @@
 
 import Foundation
 import HealthKit
-import os
+import OSLog
 
 actor StatisticsManager {
     var eventManager = EventManager.shared
@@ -46,10 +46,12 @@ extension StatisticsManager {
                     data: Sensor.statistic(
                         .heartRate,
                         recordingStartDate: recordingStartDate,
-                        batch: StatisticValue(
-                            value: mostRecentHeartRate,
-                            timestamp: Date()
-                        )
+                        values: [
+                            StatisticValue(
+                                value: mostRecentHeartRate,
+                                timestamp: Date()
+                            )
+                        ]
                     )
                 ) as Void
             }

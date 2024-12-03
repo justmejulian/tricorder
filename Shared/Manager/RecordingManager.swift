@@ -7,9 +7,9 @@
 
 import Foundation
 import HealthKit
+import OSLog
 import SwiftData
 import SwiftUICore
-import os
 
 @MainActor
 class RecordingManager: ObservableObject {
@@ -92,14 +92,14 @@ extension RecordingManager {
 extension RecordingManager {
     func updateObservableManagers(sensor: Sensor) {
         switch sensor {
-        case .motion(let name, _, let batch):
+        case .motion(let name, _, let values):
             motionManager.update(
                 sensorName: name,
-                newValues: batch
+                newValues: values
             )
 
-        case .statistic(_, _, let batch):
-            heartRateManager.update(batch)
+        case .statistic(_, _, let values):
+            heartRateManager.update(values)
 
         default:
             // todo throw error

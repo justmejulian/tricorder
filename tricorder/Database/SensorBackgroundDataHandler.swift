@@ -5,8 +5,8 @@
 //
 
 import Foundation
+import OSLog
 import SwiftData
-import os
 
 @ModelActor
 actor SensorBackgroundDataHandler: BackgroundDataHandlerProtocol {
@@ -18,46 +18,19 @@ actor SensorBackgroundDataHandler: BackgroundDataHandlerProtocol {
 extension SensorBackgroundDataHandler {
     func add(sensor: Sensor) async throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
-        Logger.shared.debug("\(String.init(describing: sensor))")
 
         // tood make sure recording exists
 
-        let sensorData = try getSensoData(sensor: sensor)
-
-        let motionSensorBatchDatabaseModel = SensorDatabaseModel(
-            sensorName: sensorData.name,
-            recordingStart: sensorData.recordingStartDate,
-            data: sensorData.data
+        let sensorDatabaseModel = try SensorDatabaseModel(
+            recordingStart: sensor.recordingStartDate,
+            sensor: sensor
         )
 
-        try self.appendData(motionSensorBatchDatabaseModel)
+        try appendData(sensorDatabaseModel)
     }
 
-    private func getSensoData(sensor: Sensor) throws -> (
-        name: String, recordingStartDate: Date, data: Data
-    ) {
-        switch sensor {
-        case .motion(let name, let recordingStartDate, let batch):
-            return (
-                name: name.rawValue, recordingStartDate: recordingStartDate,
-                data: try JSONEncoder().encode(batch)
-            )
-
-        case .statistic(let name, let recordingStartDate, let batch):
-            return (
-                name: name.rawValue, recordingStartDate: recordingStartDate,
-                data: try JSONEncoder().encode(batch)
-            )
-        case .distance(let name, let recordingStartDate, let batch):
-            return (
-                name: name.rawValue, recordingStartDate: recordingStartDate,
-                data: try JSONEncoder().encode(batch)
-            )
-        }
-    }
-
-    func getSensorPersistentIdentifiers(recordingStart: Date) throws
-        -> [PersistentIdentifier]
+    func getSensors(recordingStart: Date) throws
+        -> [Sensor]
     {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
@@ -67,46 +40,70 @@ extension SensorBackgroundDataHandler {
             }
         )
 
-        let persistentIdentifiers = try fetchPersistentIdentifiers(
-            descriptor: descriptor
-        )
-
-        return persistentIdentifiers
-    }
-
-    func getSensorsData(recordingStart: Date) async throws -> [String: [Data]] {
-        let descriptor = FetchDescriptor<SensorDatabaseModel>(
-            predicate: #Predicate<SensorDatabaseModel> {
-                $0.recordingStart == recordingStart
-            }
-        )
         let modelContext = createModelContext(
             modelContainer: modelContainer
         )
-        let sensorData = try modelContext.fetch(descriptor)
 
-        let sensorValues: [String: [Data]] = sensorData.reduce(into: [:]) { result, sensor in
-            result[sensor.sensorName, default: []].append(sensor.data)
+        let sensorPersistentModels = try modelContext.fetch(descriptor)
+
+        let sensors = sensorPersistentModels.compactMap { $0.sensor }
+
+        let countDiff = sensorPersistentModels.count - sensors.count
+
+        if countDiff > 0 {
+            Logger.shared.error("\(countDiff) sensor values were nil in sensorPersistentModels.")
         }
 
-        return sensorValues
+        let mergedSensors = try mergeSensors(
+            sensors: sensors,
+            recordingStart: recordingStart
+        )
+
+        return mergedSensors
     }
 
-    func getSensorValueBytes(recordingStart: Date) async throws -> [String: Int] {
-        let sensorValues = try await getSensorsData(recordingStart: recordingStart)
-        return sensorValues.reduce(into: [:]) { result, sensorValue in
-            let bytes = sensorValue.value.reduce(0) { result, value in
-                result + value.count
-            }
+    func getSensorValueCounts(recordingStart: Date) throws
+        -> [String: Int]
+    {
+        Logger.shared.debug("called on Thread \(Thread.current)")
 
-            result[sensorValue.key, default: 0] += bytes
+        let sensors = try getSensors(recordingStart: recordingStart)
+        return sensors.reduce(into: [:]) { result, sensor in
+            result[sensor.name] = sensor.valuesCount
         }
     }
 }
 
 extension SensorBackgroundDataHandler {
+
+    private func mergeSensors(sensors: [Sensor], recordingStart: Date) throws
+        -> [Sensor]
+    {
+        guard sensors.count > 0 else { return [] }
+
+        let motionSensor = getEmpytSensorOfEach(recordingStart: recordingStart)
+
+        let mergedSensorBatches = sensors.reduce(into: motionSensor) { result, sensor in
+            guard let pastSensor = result[sensor.name] else {
+                Logger.shared.error(
+                    "Could not find sensor name \(sensor.name) in getEmpytSensorOfEach"
+                )
+                return
+            }
+
+            do {
+                result[sensor.name] = try mergeSensorValues(a: pastSensor, b: sensor)
+            } catch {
+                Logger.shared.error("Could not merge sensor values. \(error.localizedDescription)")
+            }
+        }
+
+        return mergedSensorBatches.values.map { $0 }
+    }
+
 }
 
 enum SensorBackgroundDataHandlerError: Error {
     case notFound
+    case empty
 }

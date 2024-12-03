@@ -7,7 +7,7 @@
 
 import Combine
 import NearbyInteraction
-import os
+import OSLog
 
 actor NearbyInteractionManager: NSObject {
     let eventManager = EventManager.shared

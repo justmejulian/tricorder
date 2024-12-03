@@ -5,8 +5,8 @@
 //
 
 import Foundation
+import OSLog
 import SwiftData
-import os
 
 @ModelActor
 actor RecordingBackgroundDataHandler: BackgroundDataHandlerProtocol {
@@ -56,6 +56,30 @@ extension RecordingBackgroundDataHandler {
         }
 
         return persistentIdentifier
+    }
+
+    func getRecording(recordingStart: Date) async throws -> RecordingDatabaseModel.Struct {
+        let descriptor = FetchDescriptor<RecordingDatabaseModel>(
+            predicate: #Predicate<RecordingDatabaseModel> {
+                $0.startTimestamp == recordingStart
+            }
+        )
+
+        let modelContext = createModelContext(
+            modelContainer: modelContainer
+        )
+
+        let recordings = try modelContext.fetch(descriptor)
+
+        if recordings.count > 1 {
+            Logger.shared.error("Multiple recordings found for \(recordingStart).")
+        }
+
+        guard let recording = recordings.first else {
+            throw RecordingBackgroundDataHandlerError.noRecordingFound
+        }
+
+        return recording.toStruct()
     }
 }
 

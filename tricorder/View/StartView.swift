@@ -7,8 +7,8 @@ A SwiftUI view that shows a button to start the watchOS app.
 
 import HealthKit
 import HealthKitUI
+import OSLog
 import SwiftUI
-import os
 
 struct StartView: View {
     @EnvironmentObject var recordingManager: RecordingManager

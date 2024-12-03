@@ -8,14 +8,25 @@ import Foundation
 import SwiftData
 
 @Model
-class SensorDatabaseModel {
-    var sensorName: String
+final public class SensorDatabaseModel {
     var recordingStart: Date
-    var data: Data
+    var sensorJson: Data
 
-    init(sensorName: String, recordingStart: Date, data: Data) {
-        self.sensorName = sensorName
+    var sensor: Sensor {
+        do {
+            return try JSONDecoder().decode(Sensor.self, from: sensorJson)
+        } catch {
+            fatalError("Could not decode Sensor from JSON: \(error)")
+        }
+    }
+
+    init(recordingStart: Date, sensorJson: Data) {
         self.recordingStart = recordingStart
-        self.data = data
+        self.sensorJson = sensorJson
+    }
+
+    init(recordingStart: Date, sensor: Sensor) throws {
+        self.recordingStart = recordingStart
+        self.sensorJson = try JSONEncoder().encode(sensor)
     }
 }

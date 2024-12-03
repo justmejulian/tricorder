@@ -5,8 +5,8 @@
 //  Created by Julian Visser on 03.11.2024.
 //
 
+import OSLog
 import SwiftUI
-import os
 
 struct RecodingTimelineView: View {
     @EnvironmentObject var recordingManager: RecordingManager

@@ -5,8 +5,8 @@ Abstract:
 A SwiftUI view that shows the workout metric and controls as two pages.
 */
 
+import OSLog
 import SwiftUI
-import os
 
 struct PagingView: View {
     @EnvironmentObject var recordingManager: RecordingManager

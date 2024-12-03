@@ -6,7 +6,7 @@
 
 import Foundation
 import HealthKit
-import os
+import OSLog
 
 extension RecordingManager {
     func registerListeners() async {
@@ -210,15 +210,17 @@ extension RecordingManager {
                 return
             }
 
+            let values = [distanceValue]
+
             let sensor = Sensor.distance(
                 .distance,
                 recordingStartDate: recordingStartDate,
-                batch: distanceValue
+                values: values
             )
 
             try await storeSensor(sensor)
 
-            await distanceManager.update(data: data)
+            await distanceManager.update(values)
         }
     }
 }

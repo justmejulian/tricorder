@@ -6,7 +6,7 @@
 
 import Foundation
 import HealthKit
-import os
+import OSLog
 
 // todo can this be bigger?
 let MAXCHUNKSIZE = 300
@@ -114,17 +114,17 @@ extension RecordingManager {
 
     func updateObservableValueManagers(_ sensor: Sensor) async {
         switch sensor {
-        case .motion(let name, _, let batch):
+        case .motion(let name, _, let values):
             motionManager.update(
                 sensorName: name,
-                newValues: batch
+                newValues: values
             )
 
-        case .statistic(_, _, let batch):
-            heartRateManager.update(data: batch)
+        case .statistic(_, _, let values):
+            heartRateManager.update(values)
 
-        case .distance(_, _, let batch):
-            distanceManager.update(data: batch)
+        case .distance(_, _, let values):
+            distanceManager.update(values)
         }
     }
 
@@ -250,7 +250,11 @@ extension RecordingManager {
     nonisolated func handleReceivedDistance(_ data: Sendable) throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
         Task {
-            await distanceManager.update(data: data)
+            guard let newValues = data as? DistanceValue else {
+                Logger.shared.error("\(#function): Invalid data type")
+                return
+            }
+            await distanceManager.update([newValues])
         }
     }
 }

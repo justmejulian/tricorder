@@ -7,7 +7,7 @@ Extensions that wrap workout operations specific to watchOS.
 
 import Foundation
 import HealthKit
-import os
+import OSLog
 
 // MARK: - Workout session management
 //

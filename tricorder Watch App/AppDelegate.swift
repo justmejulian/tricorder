@@ -6,9 +6,9 @@ The app delegate that receives and handles the workout configuration.
 */
 
 import HealthKit
+import OSLog
 import SwiftUI
 import WatchKit
-import os
 
 class AppDelegate: NSObject, WKApplicationDelegate {
 

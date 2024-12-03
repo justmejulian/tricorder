@@ -7,7 +7,7 @@ A class that wraps the data and operations related to workout.
 
 import Foundation
 import HealthKit
-import os
+import OSLog
 
 actor WorkoutManager: NSObject {
     var workout: HKWorkout?

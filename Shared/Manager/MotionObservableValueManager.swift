@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import os
+import OSLog
 
 @MainActor
 class MotionManager: ObservableObject {
@@ -29,10 +29,9 @@ extension MotionManager {
 
         let observableValueManager = getOrCreateObservableValueManager(for: sensorName)
 
-        for newValue in newValues {
-            count += 1
-            observableValueManager.update(newValue)
-        }
+        count += newValues.count
+
+        observableValueManager.update(newValues)
     }
 }
 extension MotionManager {

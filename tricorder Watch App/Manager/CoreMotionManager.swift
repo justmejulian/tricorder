@@ -7,7 +7,7 @@
 
 import CoreMotion
 import Foundation
-import os
+import OSLog
 
 actor CoreMotionManager {
     let eventManager = EventManager.shared
@@ -34,7 +34,7 @@ extension CoreMotionManager {
         }
 
         motionManager.startAccelerometerUpdates(handler: {
-            @Sendable (batchedData, error) in
+            @Sendable (valuesedData, error) in
 
             Logger.shared.debug("called on Thread \(Thread.current)")
 
@@ -45,20 +45,20 @@ extension CoreMotionManager {
                 return
             }
 
-            guard let batchedData = batchedData else {
+            guard let valuesedData = valuesedData else {
                 Logger.shared.error(
                     "Error starting AccelerometerUpdates: did not recive any data"
                 )
                 return
             }
             self.consumeAccelerometerUpdates(
-                batchedData: batchedData,
+                valuesedData: valuesedData,
                 recordingStart: recordingStart
             )
         })
 
         motionManager.startDeviceMotionUpdates(handler: {
-            @Sendable (batchedData, error) in
+            @Sendable (valuesedData, error) in
 
             Logger.shared.debug("called on Thread \(Thread.current)")
 
@@ -69,14 +69,14 @@ extension CoreMotionManager {
                 return
             }
 
-            guard let batchedData = batchedData else {
+            guard let valuesedData = valuesedData else {
                 Logger.shared.error(
                     "Error starting DeviceMotionUpdate: did not recive any data"
                 )
                 return
             }
             self.consumeDeviceMotionUpdates(
-                batchedData: batchedData,
+                valuesedData: valuesedData,
                 recordingStart: recordingStart
             )
         })
@@ -100,7 +100,7 @@ extension CoreMotionManager {
     }
 
     nonisolated func consumeDeviceMotionUpdates(
-        batchedData: [CMDeviceMotion],
+        valuesedData: [CMDeviceMotion],
         recordingStart: Date
     ) {
         Logger.shared.debug("called on Thread \(Thread.current)")
@@ -112,7 +112,7 @@ extension CoreMotionManager {
         var gravityValues: [MotionValue] = []
         var quaternionValues: [MotionValue] = []
 
-        batchedData.forEach { data in
+        valuesedData.forEach { data in
             let dataDate = Date(
                 timeIntervalSince1970: data.timestamp.timeIntervalSince1970
             )
@@ -155,41 +155,41 @@ extension CoreMotionManager {
             Sensor.motion(
                 .rotationRate,
                 recordingStartDate: recordingStart,
-                batch: rotationRateValues
+                values: rotationRateValues
             )
         )
         handleUpdate(
             Sensor.motion(
                 .userAcceleration,
                 recordingStartDate: recordingStart,
-                batch: userAccelerationValues
+                values: userAccelerationValues
             )
         )
         handleUpdate(
             Sensor.motion(
                 .gravity,
                 recordingStartDate: recordingStart,
-                batch: gravityValues
+                values: gravityValues
             )
         )
         handleUpdate(
             Sensor.motion(
                 .quaternion,
                 recordingStartDate: recordingStart,
-                batch: quaternionValues
+                values: quaternionValues
             )
         )
     }
 
     nonisolated func consumeAccelerometerUpdates(
-        batchedData: [CMAccelerometerData],
+        valuesedData: [CMAccelerometerData],
         recordingStart: Date
     ) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         var values: [MotionValue] = []
 
-        batchedData.forEach { data in
+        valuesedData.forEach { data in
             values.append(
                 MotionValue(
                     x: data.acceleration.x,
@@ -208,7 +208,7 @@ extension CoreMotionManager {
             Sensor.motion(
                 .acceleration,
                 recordingStartDate: recordingStart,
-                batch: values
+                values: values
             )
         )
     }

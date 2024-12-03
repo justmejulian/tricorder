@@ -61,7 +61,8 @@ extension FileExportButton {
 
         let file = FileModel(
             name: recording.name,
-            startDate: recording.startTimestamp
+            startDate: recording.startTimestamp,
+            data: sensorData
         )
 
         return try await FileCreator().generateJsonFile(fileName: recording.name, data: file)
@@ -70,5 +71,6 @@ extension FileExportButton {
     struct FileModel: Codable {
         let name: String
         let startDate: Date
+        let data: [Sensor]
     }
 }

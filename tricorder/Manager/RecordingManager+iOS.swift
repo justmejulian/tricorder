@@ -210,17 +210,17 @@ extension RecordingManager {
                 return
             }
 
-            let batch = [distanceValue]
+            let values = [distanceValue]
 
             let sensor = Sensor.distance(
                 .distance,
                 recordingStartDate: recordingStartDate,
-                batch: batch
+                values: values
             )
 
             try await storeSensor(sensor)
 
-            await distanceManager.update(batch)
+            await distanceManager.update(values)
         }
     }
 }

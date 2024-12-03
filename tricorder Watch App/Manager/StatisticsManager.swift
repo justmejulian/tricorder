@@ -46,7 +46,7 @@ extension StatisticsManager {
                     data: Sensor.statistic(
                         .heartRate,
                         recordingStartDate: recordingStartDate,
-                        batch: [
+                        values: [
                             StatisticValue(
                                 value: mostRecentHeartRate,
                                 timestamp: Date()

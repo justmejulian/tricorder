@@ -69,7 +69,7 @@ extension SensorBackgroundDataHandler {
 
         let sensors = try getSensors(recordingStart: recordingStart)
         return sensors.reduce(into: [:]) { result, sensor in
-            result[sensor.name] = sensor.batchCount
+            result[sensor.name] = sensor.valuesCount
         }
     }
 }

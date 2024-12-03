@@ -7,9 +7,9 @@
 import Foundation
 
 enum Sensor: Codable {
-    case motion(MotionSensorName, recordingStartDate: Date, batch: [MotionValue])
-    case statistic(StatisticSensorName, recordingStartDate: Date, batch: [StatisticValue])
-    case distance(DistanceSensorName, recordingStartDate: Date, batch: [DistanceValue])
+    case motion(MotionSensorName, recordingStartDate: Date, values: [MotionValue])
+    case statistic(StatisticSensorName, recordingStartDate: Date, values: [StatisticValue])
+    case distance(DistanceSensorName, recordingStartDate: Date, values: [DistanceValue])
 
     var name: String {
         switch self {
@@ -34,14 +34,14 @@ enum Sensor: Codable {
         }
     }
 
-    var batchCount: Int {
+    var valuesCount: Int {
         switch self {
-        case .motion(_, _, let batch):
-            return batch.count
-        case .statistic(_, _, let batch):
-            return batch.count
-        case .distance(_, _, let batch):
-            return batch.count
+        case .motion(_, _, let values):
+            return values.count
+        case .statistic(_, _, let values):
+            return values.count
+        case .distance(_, _, let values):
+            return values.count
         }
     }
 
@@ -49,7 +49,7 @@ enum Sensor: Codable {
         case type
         case name
         case recordingStartDate
-        case batch
+        case values
     }
 
     private enum SensorType: String, Codable {
@@ -82,19 +82,19 @@ enum Sensor: Codable {
         switch type {
         case .motion:
             let name = try container.decode(MotionSensorName.self, forKey: .name)
-            let batch = try container.decode([MotionValue].self, forKey: .batch)
+            let values = try container.decode([MotionValue].self, forKey: .values)
             let recordingStartDate = try container.decode(Date.self, forKey: .recordingStartDate)
-            self = .motion(name, recordingStartDate: recordingStartDate, batch: batch)
+            self = .motion(name, recordingStartDate: recordingStartDate, values: values)
         case .statistic:
             let name = try container.decode(StatisticSensorName.self, forKey: .name)
-            let batch = try container.decode([StatisticValue].self, forKey: .batch)
+            let values = try container.decode([StatisticValue].self, forKey: .values)
             let recordingStartDate = try container.decode(Date.self, forKey: .recordingStartDate)
-            self = .statistic(name, recordingStartDate: recordingStartDate, batch: batch)
+            self = .statistic(name, recordingStartDate: recordingStartDate, values: values)
         case .distance:
             let name = try container.decode(DistanceSensorName.self, forKey: .name)
-            let batch = try container.decode([DistanceValue].self, forKey: .batch)
+            let values = try container.decode([DistanceValue].self, forKey: .values)
             let recordingStartDate = try container.decode(Date.self, forKey: .recordingStartDate)
-            self = .distance(name, recordingStartDate: recordingStartDate, batch: batch)
+            self = .distance(name, recordingStartDate: recordingStartDate, values: values)
         }
     }
 
@@ -103,35 +103,35 @@ enum Sensor: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         switch self {
-        case .motion(let name, let recordingStartDate, let batch):
+        case .motion(let name, let recordingStartDate, let values):
             try container.encode(SensorType.motion, forKey: .type)
             try container.encode(name, forKey: .name)
             try container.encode(recordingStartDate, forKey: .recordingStartDate)
-            try container.encode(batch, forKey: .batch)
-        case .statistic(let name, let recordingStartDate, let batch):
+            try container.encode(values, forKey: .values)
+        case .statistic(let name, let recordingStartDate, let values):
             try container.encode(SensorType.statistic, forKey: .type)
             try container.encode(name, forKey: .name)
             try container.encode(recordingStartDate, forKey: .recordingStartDate)
-            try container.encode(batch, forKey: .batch)
-        case .distance(let name, let recordingStartDate, let batch):
+            try container.encode(values, forKey: .values)
+        case .distance(let name, let recordingStartDate, let values):
             try container.encode(SensorType.distance, forKey: .type)
             try container.encode(name, forKey: .name)
             try container.encode(recordingStartDate, forKey: .recordingStartDate)
-            try container.encode(batch, forKey: .batch)
+            try container.encode(values, forKey: .values)
         }
     }
 
-    // diveds a Sensor with batches into [Sensor] with chunks of the batches
+    // diveds a Sensor with valueses into [Sensor] with chunks of the valueses
     func chunked(into size: Int) throws -> [Sensor] {
         switch self {
-        case .motion(let name, let recordingStartDate, let batch):
-            if batch.count < size {
+        case .motion(let name, let recordingStartDate, let values):
+            if values.count < size {
                 return [self]
             }
 
-            let chunks = batch.chunked(into: size)
+            let chunks = values.chunked(into: size)
             return chunks.map {
-                return Sensor.motion(name, recordingStartDate: recordingStartDate, batch: $0)
+                return Sensor.motion(name, recordingStartDate: recordingStartDate, values: $0)
             }
 
         case .statistic, .distance:
@@ -142,40 +142,40 @@ enum Sensor: Codable {
 
 func mergeSensorValues(a: Sensor, b: Sensor) throws -> Sensor {
     switch (a, b) {
-    case let (.motion(sensorNameA, dateA, batchA), .motion(sensorNameB, dateB, batchB)):
+    case let (.motion(sensorNameA, dateA, valuesA), .motion(sensorNameB, dateB, valuesB)):
         guard sensorNameA == sensorNameB else {
             throw SensorError.differentSensors
         }
         let mergedRecordingStartDate = min(dateA, dateB)
-        let mergedBatch = batchA + batchB  // Combine the batches
+        let mergedBatch = valuesA + valuesB  // Combine the valueses
         return .motion(
             sensorNameA,
             recordingStartDate: mergedRecordingStartDate,
-            batch: mergedBatch
+            values: mergedBatch
         )
 
-    case let (.statistic(sensorNameA, dateA, batchA), .statistic(sensorNameB, dateB, batchB)):
+    case let (.statistic(sensorNameA, dateA, valuesA), .statistic(sensorNameB, dateB, valuesB)):
         guard sensorNameA == sensorNameB else {
             throw SensorError.differentSensors
         }
         let mergedRecordingStartDate = min(dateA, dateB)
-        let mergedBatch = batchA + batchB  // Combine the batches
+        let mergedBatch = valuesA + valuesB  // Combine the valueses
         return .statistic(
             sensorNameA,
             recordingStartDate: mergedRecordingStartDate,
-            batch: mergedBatch
+            values: mergedBatch
         )
 
-    case let (.distance(sensorNameA, dateA, batchA), .distance(sensorNameB, dateB, batchB)):
+    case let (.distance(sensorNameA, dateA, valuesA), .distance(sensorNameB, dateB, valuesB)):
         guard sensorNameA == sensorNameB else {
             throw SensorError.differentSensors
         }
         let mergedRecordingStartDate = min(dateA, dateB)
-        let mergedBatch = batchA + batchB  // Combine the batches
+        let mergedBatch = valuesA + valuesB  // Combine the valueses
         return .distance(
             sensorNameA,
             recordingStartDate: mergedRecordingStartDate,
-            batch: mergedBatch
+            values: mergedBatch
         )
 
     default:
@@ -185,15 +185,15 @@ func mergeSensorValues(a: Sensor, b: Sensor) throws -> Sensor {
 
 func getEmpytSensorOfEach(recordingStart: Date) -> [String: Sensor] {
     let motionSensors = Sensor.MotionSensorName.allCases.map {
-        Sensor.motion($0, recordingStartDate: recordingStart, batch: [])
+        Sensor.motion($0, recordingStartDate: recordingStart, values: [])
     }
 
     let statisticSensors = Sensor.StatisticSensorName.allCases.map {
-        Sensor.statistic($0, recordingStartDate: recordingStart, batch: [])
+        Sensor.statistic($0, recordingStartDate: recordingStart, values: [])
     }
 
     let distanceSensors = Sensor.DistanceSensorName.allCases.map {
-        Sensor.distance($0, recordingStartDate: recordingStart, batch: [])
+        Sensor.distance($0, recordingStartDate: recordingStart, values: [])
     }
 
     let merged = motionSensors + statisticSensors + distanceSensors

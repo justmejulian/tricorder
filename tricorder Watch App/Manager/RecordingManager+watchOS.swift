@@ -114,17 +114,17 @@ extension RecordingManager {
 
     func updateObservableValueManagers(_ sensor: Sensor) async {
         switch sensor {
-        case .motion(let name, _, let batch):
+        case .motion(let name, _, let values):
             motionManager.update(
                 sensorName: name,
-                newValues: batch
+                newValues: values
             )
 
-        case .statistic(_, _, let batch):
-            heartRateManager.update(batch)
+        case .statistic(_, _, let values):
+            heartRateManager.update(values)
 
-        case .distance(_, _, let batch):
-            distanceManager.update(batch)
+        case .distance(_, _, let values):
+            distanceManager.update(values)
         }
     }
 

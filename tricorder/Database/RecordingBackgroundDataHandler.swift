@@ -81,6 +81,19 @@ extension RecordingBackgroundDataHandler {
 
         return recording.toStruct()
     }
+
+    func getRecordings() async throws -> [RecordingDatabaseModel.Struct] {
+        let descriptor = FetchDescriptor<RecordingDatabaseModel>()
+        let modelContext = createModelContext(
+            modelContainer: modelContainer
+        )
+
+        let recordingPersistentModels = try modelContext.fetch(descriptor)
+
+        let recordings = recordingPersistentModels.map { $0.toStruct() }
+
+        return recordings
+    }
 }
 
 enum RecordingBackgroundDataHandlerError: Error {

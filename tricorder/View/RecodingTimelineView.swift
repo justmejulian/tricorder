@@ -36,9 +36,7 @@ struct RecodingTimelineView: View {
             Spacer()
 
             MetricsView(
-                heartRateManager: recordingManager.classifierManager.heartRateManager,
-                distanceManager: recordingManager.classifierManager.distanceManager,
-                motionManager: recordingManager.classifierManager.motionManager
+                classifierManager: recordingManager.classifierManager
             )
         }
     }

@@ -18,33 +18,35 @@ actor TopAccelerationClassifier {
         let averageResultantAcceleration = accelerationValues.values.map { values in
             return self.averageResultantAcceleration(values)
         }
-        
+
         let sortedAverageResultantAcceleration = averageResultantAcceleration.sorted()
-        
+
         guard let updateTopAcceleration = sortedAverageResultantAcceleration.last else {
             return topAcceleration ?? 0
         }
-        
+
         guard let currentTopAcceleration = topAcceleration else {
             topAcceleration = updateTopAcceleration
             return updateTopAcceleration
         }
-        
+
         if updateTopAcceleration > currentTopAcceleration {
             topAcceleration = updateTopAcceleration
             return updateTopAcceleration
         }
-       
+
         return currentTopAcceleration
     }
-    
+
     private func averageResultantAcceleration(_ values: [MotionValue]) -> Double {
         let (sumX, sumY, sumZ) = values.reduce(into: (0.0, 0.0, 0.0)) { result, value in
             result.0 += value.x
             result.1 += value.y
             result.2 += value.z
         }
-        let (averageX, averageY, averageZ) = (sumX / Double(values.count), sumY / Double(values.count), sumZ / Double(values.count))
+        let (averageX, averageY, averageZ) = (
+            sumX / Double(values.count), sumY / Double(values.count), sumZ / Double(values.count)
+        )
 
         return sqrt(
             pow(averageX, 2)
@@ -68,7 +70,7 @@ actor TopAccelerationClassifier {
 
             // rounded down
             let numberOfIntervalsSinceStartTime = floor(elapsedInterval / invterval)
-            
+
             let chunkStartTime = startTime.addingTimeInterval(
                 numberOfIntervalsSinceStartTime * invterval
             )

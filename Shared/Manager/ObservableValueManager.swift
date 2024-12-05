@@ -27,7 +27,6 @@ extension ObservableValueManager {
     func update(_ newValues: [T]) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-
         count += newValues.count
         mostRecent = newValues.last
     }

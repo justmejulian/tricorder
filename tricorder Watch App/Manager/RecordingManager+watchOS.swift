@@ -112,22 +112,6 @@ extension RecordingManager {
         try await self.nearbyInteractionManager.setDiscoveryToken(partnerDiscoveryToken)
     }
 
-    func updateObservableValueManagers(_ sensor: Sensor) async {
-        switch sensor {
-        case .motion(let name, _, let values):
-            motionManager.update(
-                sensorName: name,
-                newValues: values
-            )
-
-        case .statistic(_, _, let values):
-            heartRateManager.update(values)
-
-        case .distance(_, _, let values):
-            distanceManager.update(values)
-        }
-    }
-
     func clearAllFromDatabase() async throws {
         // todo clear all
     }
@@ -203,9 +187,7 @@ extension RecordingManager {
         case "recordingState":
             let recordingObject = await RecordingObject(
                 recordingState: self.recordingState.rawValue,
-                startTime: self.workoutManager.getStartDate()?.timeIntervalSince1970,
-                motionDataCount: self.motionManager.count,
-                statisticCount: self.heartRateManager.count
+                startTime: self.workoutManager.getStartDate()?.timeIntervalSince1970
             )
             return try JSONEncoder().encode(recordingObject)
 
@@ -235,7 +217,7 @@ extension RecordingManager {
 
         Task {
             do {
-                await updateObservableManagers(sensor: sensor)
+                await classifierManager.update(sensor)
                 try await sendSensorUpdate(sensor)
                 await monitoringManager.addUpdateSendSuccess(true)
             } catch {
@@ -254,7 +236,14 @@ extension RecordingManager {
                 Logger.shared.error("\(#function): Invalid data type")
                 return
             }
-            await distanceManager.update([newValues])
+
+            await classifierManager.update(
+                Sensor.distance(
+                    .distance,
+                    recordingStartDate: Date(),
+                    values: [newValues]
+                )
+            )
         }
     }
 }

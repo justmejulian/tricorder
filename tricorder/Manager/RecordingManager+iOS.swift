@@ -159,7 +159,7 @@ extension RecordingManager {
 
             try await storeSensor(sensor)
 
-            await updateObservableManagers(sensor: sensor)
+            await classifierManager.update(sensor)
 
             // todo return something better
             return nil
@@ -220,7 +220,7 @@ extension RecordingManager {
 
             try await storeSensor(sensor)
 
-            await distanceManager.update(values)
+            await classifierManager.update(sensor)
         }
     }
 }

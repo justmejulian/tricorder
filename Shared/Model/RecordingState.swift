@@ -8,6 +8,4 @@
 struct RecordingObject: Codable {
     let recordingState: Int
     let startTime: Double?
-    let motionDataCount: Int?
-    let statisticCount: Int?
 }

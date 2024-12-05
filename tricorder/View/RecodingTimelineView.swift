@@ -17,12 +17,13 @@ struct RecodingTimelineView: View {
             isPaused: recordingManager.recordingState
                 == .ended
         )
+
         TimelineView(schedule) { context in
             VStack {
                 RecordingElapsedTimeView(context: context)
                 Spacer()
                 Spacer()
-                LineChart()
+                LineChart(dataPoints: recordingManager.classifierManager.distanceChartValues)
                 Spacer()
             }
             .padding()
@@ -35,9 +36,9 @@ struct RecodingTimelineView: View {
             Spacer()
 
             MetricsView(
-                heartRateManager: recordingManager.heartRateManager,
-                distanceManager: recordingManager.distanceManager,
-                motionManager: recordingManager.motionManager
+                heartRateManager: recordingManager.classifierManager.heartRateManager,
+                distanceManager: recordingManager.classifierManager.distanceManager,
+                motionManager: recordingManager.classifierManager.motionManager
             )
         }
     }

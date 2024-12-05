@@ -23,8 +23,8 @@ struct RecodingTimelineView: View {
                 monitoringManager: recordingManager.monitoringManager
             )
             MetricsView(
-                heartRateManager: recordingManager.heartRateManager,
-                distanceManager: recordingManager.distanceManager
+                heartRateManager: recordingManager.classifierManager.heartRateManager,
+                distanceManager: recordingManager.classifierManager.distanceManager
             )
         }
         .scenePadding()

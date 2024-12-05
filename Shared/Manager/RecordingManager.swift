@@ -17,9 +17,7 @@ class RecordingManager: ObservableObject {
 
     let modelContainer: ModelContainer
 
-    var motionManager = MotionManager()
-    var distanceManager = ObservableValueManager<DistanceValue>()
-    var heartRateManager = ObservableValueManager<StatisticValue>()
+    let classifierManager = ClassifierManager()
 
     var workoutManager = WorkoutManager()
     var nearbyInteractionManager = NearbyInteractionManager()
@@ -72,9 +70,7 @@ extension RecordingManager {
         recordingState = .notStarted
         startDate = nil
 
-        distanceManager.reset()
-        heartRateManager.reset()
-        motionManager.reset()
+        classifierManager.reset()
 
         await connectivityManager.reset()
 
@@ -90,22 +86,6 @@ extension RecordingManager {
 // MARK: -  Shared functions
 //
 extension RecordingManager {
-    func updateObservableManagers(sensor: Sensor) {
-        switch sensor {
-        case .motion(let name, _, let values):
-            motionManager.update(
-                sensorName: name,
-                newValues: values
-            )
-
-        case .statistic(_, _, let values):
-            heartRateManager.update(values)
-
-        default:
-            // todo throw error
-            Logger.shared.info("Did not hanlde: \(String(describing: sensor))")
-        }
-    }
 }
 
 // MARK: -  RecordingManagerError

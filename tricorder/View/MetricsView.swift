@@ -11,44 +11,38 @@ struct MetricsView: View {
     @EnvironmentObject var recordingManager: RecordingManager
 
     @ObservedObject
-    var heartRateManager: ObservableValueManager<StatisticValue>
-
-    @ObservedObject
-    var distanceManager: ObservableValueManager<DistanceValue>
-
-    @ObservedObject
-    var motionManager: MotionManager
+    var classifierManager: ClassifierManager
 
     var body: some View {
         VStack {
             HStack {
                 MetricsBox(
                     title: "Heart Rate",
-                    value: formatHeartRate(heartRateManager.mostRecent?.value)
+                    value: formatHeartRate(classifierManager.heartRateManager.mostRecent?.value)
                 )
                 MetricsBox(
                     title: "# Heart Rate",
-                    value: String(heartRateManager.count)
+                    value: String(classifierManager.heartRateManager.count)
                 )
             }
             HStack {
                 MetricsBox(
                     title: "Distance",
-                    value: formatDistance(distanceManager.mostRecent?.avg)
+                    value: formatDistance(classifierManager.distanceManager.mostRecent?.avg)
                 )
                 MetricsBox(
                     title: "# Distance",
-                    value: String(distanceManager.count)
+                    value: String(classifierManager.distanceManager.count)
                 )
             }
             HStack {
                 MetricsBox(
-                    title: "Top Speed",
-                    value: "42 km/h"
+                    title: "Top Acceleration",
+                    value: "\(classifierManager.topAcceleration) m/s^2"
                 )
                 MetricsBox(
                     title: "# Motion Data",
-                    value: String(motionManager.count)
+                    value: String(classifierManager.motionManager.count)
                 )
             }
         }
@@ -68,7 +62,7 @@ extension MetricsView {
                 Text(String(value))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .font(
-                        .system(.title, design: .rounded).monospaced()
+                        .system(.title3, design: .rounded).monospaced()
                             .lowercaseSmallCaps()
                     )
             }

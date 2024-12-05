@@ -12,6 +12,6 @@ protocol BaseClassifierManager: ObservableObject {
     var distanceManager: ObservableValueManager<DistanceValue> { get }
     var heartRateManager: ObservableValueManager<StatisticValue> { get }
 
-    func reset()
-    func update(_ sensor: Sensor)
+    func reset() async
+    func update(_ sensor: Sensor) async
 }

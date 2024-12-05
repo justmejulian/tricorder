@@ -70,7 +70,7 @@ extension RecordingManager {
         recordingState = .notStarted
         startDate = nil
 
-        classifierManager.reset()
+        await classifierManager.reset()
 
         await connectivityManager.reset()
 

@@ -13,24 +13,28 @@ class ClassifierManager: BaseClassifierManager {
     var distanceManager = ObservableValueManager<DistanceValue>()
     var heartRateManager = ObservableValueManager<StatisticValue>()
 
+    var topAccelerationClassifier = TopAccelerationClassifier()
+
     @Published
     var distanceChartValues: [LineChart.DataPoint] = []
 
     @Published
-    var topSpeed: Double = 0
+    var topAcceleration: Double = 0
 
-    func reset() {
+    func reset() async {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         distanceManager.reset()
         heartRateManager.reset()
         motionManager.reset()
 
+        await topAccelerationClassifier.reset()
+
         distanceChartValues = []
-        topSpeed = 0
+        topAcceleration = 0
     }
 
-    func update(_ sensor: Sensor) {
+    func update(_ sensor: Sensor) async {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         switch sensor {
@@ -39,6 +43,10 @@ class ClassifierManager: BaseClassifierManager {
                 sensorName: name,
                 newValues: values
             )
+
+            if name == .userAcceleration {
+                topAcceleration = await topAccelerationClassifier.handleAccelerationUpdate(values)
+            }
 
         case .statistic(_, _, let values):
             heartRateManager.update(values)

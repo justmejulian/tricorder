@@ -7,10 +7,10 @@
 import Foundation
 
 actor TopAccelerationClassifier {
-    private var topAcceleration: Double? = nil
+    private var topAcceleration: Double = 0
 
     func reset() {
-        topAcceleration = nil
+        topAcceleration = 0
     }
 
     func handleAccelerationUpdate(_ accelerationValues: [MotionValue]) -> Double {
@@ -19,23 +19,23 @@ actor TopAccelerationClassifier {
             return self.averageResultantAcceleration(values)
         }
 
-        let sortedAverageResultantAcceleration = averageResultantAcceleration.sorted()
+        let newTopAcceleration = getNewTopAcceleration(averageResultantAcceleration)
+
+        topAcceleration = newTopAcceleration
+
+        return topAcceleration
+    }
+
+    private func getNewTopAcceleration(_ accelerationValues: [Double]) -> Double {
+        let sortedAverageResultantAcceleration = accelerationValues.sorted()
 
         guard let updateTopAcceleration = sortedAverageResultantAcceleration.last else {
-            return topAcceleration ?? 0
+            return topAcceleration
         }
 
-        guard let currentTopAcceleration = topAcceleration else {
-            topAcceleration = updateTopAcceleration
-            return updateTopAcceleration
-        }
+        let roundedUpdateTopAcceleration = roundToDecimal(updateTopAcceleration, decimals: 2)
 
-        if updateTopAcceleration > currentTopAcceleration {
-            topAcceleration = updateTopAcceleration
-            return updateTopAcceleration
-        }
-
-        return currentTopAcceleration
+        return max(roundedUpdateTopAcceleration, topAcceleration)
     }
 
     private func averageResultantAcceleration(_ values: [MotionValue]) -> Double {

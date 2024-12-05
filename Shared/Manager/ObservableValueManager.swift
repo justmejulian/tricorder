@@ -10,31 +10,25 @@ import OSLog
 
 @MainActor
 class ObservableValueManager<T: Value>: ObservableObject {
-    // todo remove to save ram
-    @Published
-    var values: [T] = []
-
     @Published
     var mostRecent: T?
 
-    var count: Int {
-        values.count
-    }
+    var count = 0
 }
 
 extension ObservableValueManager {
     func reset() {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        values = []
+        count = 0
         mostRecent = nil
     }
 
     func update(_ newValues: [T]) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        values.append(contentsOf: newValues)
 
+        count += newValues.count
         mostRecent = newValues.last
     }
 }

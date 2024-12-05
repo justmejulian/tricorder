@@ -15,7 +15,8 @@ class MotionManager: ObservableObject {
     var count = 0
 
     @Published
-    var motionObservableValueManagers: [String: ObservableValueManager<MotionValue>] = [:]
+    var motionObservableValueManagers:
+        [Sensor.MotionSensorName: ObservableValueManager<MotionValue>] = [:]
 }
 
 extension MotionManager {
@@ -38,7 +39,6 @@ extension MotionManager {
     private func getOrCreateObservableValueManager(for sensorName: Sensor.MotionSensorName)
         -> ObservableValueManager<MotionValue>
     {
-        let sensorName = sensorName.rawValue
         guard let observableValueManager = motionObservableValueManagers[sensorName] else {
             let observableValueManager = ObservableValueManager<MotionValue>()
             motionObservableValueManagers[sensorName] = observableValueManager

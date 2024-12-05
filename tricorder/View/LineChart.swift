@@ -8,23 +8,10 @@
 import Charts
 import SwiftUI
 
-private let data: [LineData] = [
-    LineData(time: 0, speed: 0),
-    LineData(time: 1, speed: 0),
-    LineData(time: 1.5, speed: 100),
-    LineData(time: 2, speed: 10),
-    LineData(time: 4, speed: 100),
-    LineData(time: 4.5, speed: 0),
-    LineData(time: 5, speed: 20),
-    LineData(time: 6, speed: 10),
-    LineData(time: 6.5, speed: 180),
-    LineData(time: 7, speed: 100),
-    LineData(time: 8, speed: 0),
-    LineData(time: 9, speed: 10),
-    LineData(time: 10, speed: 0),
-]
-
 struct LineChart: View {
+
+    let dataPoints: [DataPoint]
+
     var body: some View {
         let curColor = Color.blue
         let curGradient = LinearGradient(
@@ -39,17 +26,17 @@ struct LineChart: View {
             endPoint: .bottom
         )
 
-        Chart(data) {
+        Chart(dataPoints, id: \.timestamp) {
             LineMark(
-                x: .value("Time", $0.time),
-                y: .value("Speed", $0.speed)
+                x: .value("Time", $0.timestamp),
+                y: .value("Value", $0.value)
             )
             .lineStyle(.init(lineWidth: 2))
             .interpolationMethod(.cardinal)
 
             AreaMark(
-                x: .value("Time", $0.time),
-                y: .value("Speed", $0.speed)
+                x: .value("Time", $0.timestamp),
+                y: .value("Value", $0.value)
             )
             .interpolationMethod(.cardinal)
             .foregroundStyle(curGradient)
@@ -59,15 +46,9 @@ struct LineChart: View {
     }
 }
 
-struct LineData: Identifiable {
-    var id: UUID
-
-    var time: Double
-    var speed: Double
-
-    init(time: Double, speed: Double) {
-        self.id = UUID()
-        self.time = time
-        self.speed = speed
+extension LineChart {
+    struct DataPoint {
+        let timestamp: Date
+        let value: Double
     }
 }

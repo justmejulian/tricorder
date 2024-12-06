@@ -19,6 +19,7 @@ class RecordingManager: ObservableObject {
 
     let classifierManager = ClassifierManager()
 
+    // todo are these on main thread?
     var workoutManager = WorkoutManager()
     var nearbyInteractionManager = NearbyInteractionManager()
     var connectivityManager = ConnectivityManager()

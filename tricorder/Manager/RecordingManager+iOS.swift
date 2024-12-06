@@ -159,9 +159,10 @@ extension RecordingManager {
 
             try await storeSensor(sensor)
 
-            await classifierManager.update(sensor)
+            if await startDate != nil {
+                await classifierManager.update(sensor)
+            }  // todo else check if workout is running
 
-            // todo return something better
             return nil
         default:
             throw RecordingManagerError.noKey
@@ -229,8 +230,18 @@ extension RecordingManager {
 //
 extension RecordingManager {
     func storeSensor(_ sensor: Sensor) async throws {
-        let handler = SensorBackgroundDataHandler(modelContainer: modelContainer)
-        try await handler.add(sensor: sensor)
+        let recordingBackgroundDataHandler = RecordingBackgroundDataHandler(
+            modelContainer: modelContainer
+        )
+        let sensorBackgroundDataHandler = SensorBackgroundDataHandler(
+            modelContainer: modelContainer
+        )
+
+        try await recordingBackgroundDataHandler.conditionallyAddRecording(
+            startTimestamp: sensor.recordingStartDate
+        )
+
+        try await sensorBackgroundDataHandler.add(sensor: sensor)
     }
 
     func storeRecording(name: String?, date: Date) async throws {

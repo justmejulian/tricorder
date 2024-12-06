@@ -47,6 +47,8 @@ class RecordingManager: ObservableObject {
     }
 }
 
+// MARK: -  Shared functions
+//
 extension RecordingManager {
     func setRecordingState(newState: HKWorkoutSessionState) {
         Logger.shared.debug("called on Thread \(Thread.current)")
@@ -79,11 +81,6 @@ extension RecordingManager {
 }
 
 // MARK: -  Shared handlers
-//
-extension RecordingManager {
-}
-
-// MARK: -  Shared functions
 //
 extension RecordingManager {
 }

@@ -26,14 +26,14 @@ class ClassifierManager: ObservableObject {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         switch sensor {
-        case .motion(let name, let recordingStart, let values):
+        case .motion(let name, _, let values):
             motionManager.update(
                 sensorName: name,
                 newValues: values
             )
-        case .statistic(let name, let recordingStart, let values):
+        case .statistic(_, _, let values):
             heartRateManager.update(values)
-        case .distance(let name, let recordingStart, let values):
+        case .distance(_, _, let values):
             distanceManager.update(values)
         }
     }

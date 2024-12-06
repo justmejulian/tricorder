@@ -122,7 +122,7 @@ enum Sensor: Codable {
     }
 
     // diveds a Sensor with valueses into [Sensor] with chunks of the valueses
-    func chunked(into size: Int) throws -> [Sensor] {
+    func chunked(into size: Int) -> [Sensor] {
         switch self {
         case .motion(let name, let recordingStartDate, let values):
             if values.count < size {

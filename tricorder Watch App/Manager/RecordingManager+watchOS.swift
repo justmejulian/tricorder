@@ -215,15 +215,30 @@ extension RecordingManager {
 
         let sensor = data as! Sensor
 
+        let archive = archiveSendableArray(
+            sensor.chunked(into: MAXCHUNKSIZE)
+        )
+
+        if archive.isEmpty {
+            fatalError("\(#function): No data to send")
+        }
+
         Task {
             do {
                 await classifierManager.update(sensor)
-                try await sendSensorUpdate(sensor)
+                try await sendSensorUpdate(archive)
                 await monitoringManager.addUpdateSendSuccess(true)
             } catch {
                 Logger.shared.error("\(#function): Failed to send data: \(error)")
                 await monitoringManager.addUpdateSendSuccess(false)
-                // todo persist on fail
+
+                do {
+                    try await PersistedDataHandler(modelContainer: modelContainer).add(
+                        dataArray: archive
+                    )
+                } catch {
+                    fatalError("Failed to persist data")
+                }
             }
         }
     }
@@ -250,11 +265,7 @@ extension RecordingManager {
 // MARK: -  RecordingManager nonisolated functions
 //
 extension RecordingManager {
-    nonisolated func sendSensorUpdate(_ sensor: Sensor) async throws {
-        let archive = try archiveSendableArray(
-            sensor.chunked(into: MAXCHUNKSIZE)
-        )
-
+    nonisolated func sendSensorUpdate(_ archive: [Data]) async throws {
         try await connectivityManager.sendDataArray(
             key: "sensorUpdate",
             dataArray: archive
@@ -278,10 +289,15 @@ extension RecordingManager {
         return try JSONEncoder().encode(data)
     }
 
-    nonisolated func archiveSendableArray(_ data: [Codable]) throws -> [Data] {
+    nonisolated func archiveSendableArray(_ data: [Codable]) -> [Data] {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        return try data.map(archiveSendable(_:))
+        do {
+            return try data.map(archiveSendable(_:))
+        } catch {
+            Logger.shared.error("Failed to encode data: \(error)")
+            return []
+        }
     }
 
 }

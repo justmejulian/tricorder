@@ -1,5 +1,5 @@
 //
-//  PersistedData.swift
+//  PersistedDatabaseModel.swift
 //
 //  Created by Julian Visser on 24.11.2024.
 //
@@ -8,7 +8,7 @@ import Foundation
 import SwiftData
 
 @Model
-class PersistedData {
+class PersistedDatabaseModel {
     var data: Data
 
     init(data: Data) {

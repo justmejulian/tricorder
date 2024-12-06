@@ -14,7 +14,7 @@ class ClassifierManager: ObservableObject {
     var distanceManager = ObservableValueManager<DistanceValue>()
     var heartRateManager = ObservableValueManager<StatisticValue>()
 
-    func reset() {
+    func reset() async {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         distanceManager.reset()

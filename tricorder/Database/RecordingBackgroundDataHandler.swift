@@ -10,6 +10,9 @@ import SwiftData
 
 @ModelActor
 actor RecordingBackgroundDataHandler: BackgroundDataHandlerProtocol {
+
+    var cache: [Date: PersistentIdentifier] = [:]
+
     func clear() throws {
         try deleteAllInstances(of: RecordingDatabaseModel.self)
     }
@@ -33,10 +36,23 @@ extension RecordingBackgroundDataHandler {
         )
     }
 
+    func conditionallyAddRecording(startTimestamp: Date) throws {
+        if (try getRecordingPersistentIdentifier(startTimestamp: startTimestamp)) != nil {
+            return
+        }
+
+        try addNewRecording(name: nil, startTimestamp: startTimestamp)
+    }
+
     func getRecordingPersistentIdentifier(startTimestamp: Date) throws
-        -> PersistentIdentifier
+        -> PersistentIdentifier?
     {
         Logger.shared.debug("called on Thread \(Thread.current)")
+
+        // Check cache
+        if let persistentIdentifier = cache[startTimestamp] {
+            return persistentIdentifier
+        }
 
         let descriptor = FetchDescriptor<RecordingDatabaseModel>(
             predicate: #Predicate<RecordingDatabaseModel> {
@@ -52,8 +68,10 @@ extension RecordingBackgroundDataHandler {
         }
 
         guard let persistentIdentifier = persistentIdentifiers.first else {
-            throw RecordingBackgroundDataHandlerError.noRecordingFound
+            return nil
         }
+
+        cache[startTimestamp] = persistentIdentifier
 
         return persistentIdentifier
     }

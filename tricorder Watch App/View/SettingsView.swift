@@ -9,6 +9,12 @@ import SwiftUI
 
 struct SettingsView: View {
     var body: some View {
-        Text("Settings")
+        NavigationView {
+            NavigationLink {
+                PersistedView()
+            } label: {
+                Text("Persisted")
+            }
+        }
     }
 }

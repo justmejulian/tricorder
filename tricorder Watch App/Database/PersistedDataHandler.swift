@@ -32,12 +32,29 @@ extension PersistedDataHandler {
         }
     }
 
-    func fetchAllRecordingPersistentIdentifiers() async throws -> [PersistentIdentifier] {
+    func fetchAllPersistentIdentifiers() async throws -> [PersistentIdentifier] {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         return try fetchPersistentIdentifiers(
             for: PersistedDatabaseModel.self
         )
+    }
+
+    func getData(for identifier: PersistentIdentifier) async throws -> Data {
+        let descriptor = FetchDescriptor<PersistedDatabaseModel>(
+            predicate: #Predicate<PersistedDatabaseModel> {
+                $0.id == identifier
+            }
+        )
+        let modelContext = createModelContext(
+            modelContainer: modelContainer
+        )
+
+        guard let first = try modelContext.fetch(descriptor).first else {
+            throw PersistedDataHandlerError.notFound
+        }
+
+        return first.data
     }
 
     func getData() async throws -> [Data] {
@@ -54,6 +71,6 @@ extension PersistedDataHandler {
     }
 }
 
-enum RecordingBackgroundDataHandlerError: Error {
-    case noRecordingFound
+enum PersistedDataHandlerError: Error {
+    case notFound
 }

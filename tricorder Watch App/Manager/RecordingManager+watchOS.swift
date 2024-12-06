@@ -113,7 +113,8 @@ extension RecordingManager {
     }
 
     func clearAllFromDatabase() async throws {
-        // todo clear all
+        let handler = PersistedDataHandler(modelContainer: modelContainer)
+        try await handler.clear()
     }
 }
 
@@ -300,4 +301,18 @@ extension RecordingManager {
         }
     }
 
+    nonisolated func sendUnsyced() async throws {
+        let handler = PersistedDataHandler(modelContainer: modelContainer)
+        let ids = try await handler.fetchAllPersistentIdentifiers()
+
+        for id in ids {
+            let data = try await handler.getData(for: id)
+            do {
+                try await sendSensorUpdate([data])
+                try await handler.removeData(identifier: id)
+            } catch {
+                Logger.shared.error("Failed during sync: \(error)")
+            }
+        }
+    }
 }

@@ -22,7 +22,7 @@ actor Debouncer {
         let task = Task {
             try await Task.sleep(for: duration)
         }
-        
+
         currentTask = task
 
         // Await the task completion or cancellation

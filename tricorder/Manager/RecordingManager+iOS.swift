@@ -164,7 +164,7 @@ extension RecordingManager {
             }  // todo else check if workout is running
 
             return nil
-            
+
         default:
             throw RecordingManagerError.noKey
         }
@@ -240,8 +240,10 @@ extension RecordingManager {
         )
 
         // Check if recording exists
-        let recordingId = try await recordingBackgroundDataHandler.getRecordingPersistentIdentifier(startTimestamp: sensor.recordingStartDate)
-        
+        let recordingId = try await recordingBackgroundDataHandler.getRecordingPersistentIdentifier(
+            startTimestamp: sensor.recordingStartDate
+        )
+
         if recordingId == nil {
             try await recordingBackgroundDataHandler.addNewRecording(
                 name: nil,

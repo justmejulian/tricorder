@@ -56,7 +56,9 @@ extension ConnectivityMetaInfoManager {
             // Only continue if no more updates
             guard await debouncer.sleep() else { return }
 
-            Logger.shared.debug("lastUpdateTimeInterval: \(String(describing: lastDidReceiveDataDate?.timeIntervalSinceNow))")
+            Logger.shared.debug(
+                "lastUpdateTimeInterval: \(String(describing: lastDidReceiveDataDate?.timeIntervalSinceNow))"
+            )
             isLastDidReceiveDataDateTooRecent = false
         }
     }

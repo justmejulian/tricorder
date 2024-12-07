@@ -41,20 +41,15 @@ extension PersistedDataHandler {
     }
 
     func getData(for identifier: PersistentIdentifier) async throws -> Data {
-        let descriptor = FetchDescriptor<PersistedDatabaseModel>(
-            predicate: #Predicate<PersistedDatabaseModel> {
-                $0.id == identifier
-            }
-        )
         let modelContext = createModelContext(
             modelContainer: modelContainer
         )
-
-        guard let first = try modelContext.fetch(descriptor).first else {
+        
+        guard let model = modelContext.model(for: identifier) as? PersistedDatabaseModel else {
             throw PersistedDataHandlerError.notFound
         }
-
-        return first.data
+        
+        return model.data
     }
 
     func getData() async throws -> [Data] {

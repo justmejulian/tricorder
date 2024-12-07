@@ -21,15 +21,14 @@ struct StartStopRecordingButton: View {
 
     var body: some View {
         let isActive = recordingManager.recordingState.isActive
-        let isReceivingData =
-            !isActive && connectivityMetaInfoManager.isLastDidReceiveDataDateTooRecent
+        let isReceivingData = connectivityMetaInfoManager.isLastDidReceiveDataDateTooRecent
 
         var title: String {
-            if isReceivingData {
-                return "Receiving Data"
-            }
             if isActive {
                 return "Stop Recording"
+            }
+            if isReceivingData {
+                return "Receiving Data"
             }
             return "Start Recording"
         }
@@ -47,7 +46,7 @@ struct StartStopRecordingButton: View {
             tint: isActive ? .red : .blue,
             action: isActive ? stopRecording : startRecording
         )
-        .disabled(loading || isReceivingData)
+        .disabled(loading || (!isActive && isReceivingData))
         .alert(errorMessage, isPresented: $showAlert) {
             Button("Dismiss", role: .cancel) {
                 reset()

@@ -63,7 +63,14 @@ extension RecordingManager {
 
         let recordingStart = try await startWorkout()
 
-        await sendRecordingStartToCompanion(recordingStart: recordingStart)
+        // todo needed?
+        // Force SessionStateChange
+        workoutManager.handleSessionSateChange(
+            SessionStateChange(
+                newState: .running,
+                date: recordingStart
+            )
+        )
 
         do {
             try await initNIDiscoveryToken()
@@ -72,6 +79,7 @@ extension RecordingManager {
             Logger.shared.error("Failed to start Nearby Interaction: \(error)")
         }
 
+        // todo make sure these are actually started
         try await startUpdates(recordingStart: recordingStart)
     }
 
@@ -273,17 +281,6 @@ extension RecordingManager {
         ) as Void
     }
 
-    nonisolated func sendRecordingStartToCompanion(recordingStart: Date) async {
-        do {
-            try await connectivityManager.sendData(
-                key: "recordingStartTimestamp",
-                data: try JSONEncoder().encode(recordingStart)
-            ) as Void
-        } catch {
-            Logger.shared.error("Failed to send recordingStart to Companion: \(error)")
-        }
-    }
-
     nonisolated func archiveSendable(_ data: Codable) throws -> Data {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
@@ -301,18 +298,4 @@ extension RecordingManager {
         }
     }
 
-    nonisolated func sendUnsyced() async throws {
-        let handler = PersistedDataHandler(modelContainer: modelContainer)
-        let ids = try await handler.fetchAllPersistentIdentifiers()
-
-        for id in ids {
-            let data = try await handler.getData(for: id)
-            do {
-                try await sendSensorUpdate([data])
-                try await handler.removeData(identifier: id)
-            } catch {
-                Logger.shared.error("Failed during sync: \(error)")
-            }
-        }
-    }
 }

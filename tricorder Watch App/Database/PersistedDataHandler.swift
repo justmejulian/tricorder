@@ -41,20 +41,31 @@ extension PersistedDataHandler {
     }
 
     func getData(for identifier: PersistentIdentifier) async throws -> Data {
-        let descriptor = FetchDescriptor<PersistedDatabaseModel>(
-            predicate: #Predicate<PersistedDatabaseModel> {
-                $0.id == identifier
-            }
-        )
         let modelContext = createModelContext(
             modelContainer: modelContainer
         )
 
-        guard let first = try modelContext.fetch(descriptor).first else {
+        guard let model = modelContext.model(for: identifier) as? PersistedDatabaseModel else {
             throw PersistedDataHandlerError.notFound
         }
 
-        return first.data
+        return model.data
+    }
+
+    func getData(for identifiers: [PersistentIdentifier]) async throws -> [Data] {
+        let modelContext = createModelContext(
+            modelContainer: modelContainer
+        )
+
+        let data = try identifiers.map { identifier in
+            guard let model = modelContext.model(for: identifier) as? PersistedDatabaseModel else {
+                throw PersistedDataHandlerError.notFound
+            }
+
+            return model.data
+        }
+
+        return data
     }
 
     func getData() async throws -> [Data] {
@@ -68,6 +79,17 @@ extension PersistedDataHandler {
         let data = persistedDatabaseModel.map { $0.data }
 
         return data
+    }
+
+    func removeData(identifiers: [PersistentIdentifier]) throws {
+        Logger.shared.debug("called on Thread \(Thread.current)")
+
+        let modelContext = createModelContext(modelContainer: modelContainer)
+        for identifier in identifiers {
+            let model = modelContext.model(for: identifier)
+            modelContext.delete(model)
+        }
+        try save(modelContext: modelContext)
     }
 }
 

@@ -164,6 +164,7 @@ extension RecordingManager {
             }  // todo else check if workout is running
 
             return nil
+
         default:
             throw RecordingManagerError.noKey
         }
@@ -180,6 +181,7 @@ extension RecordingManager {
 
         // todo can I replace this with the changeState?
         case "startDate":
+            Logger.shared.debug("Recieved Start Date")
             Task {
                 let date = try JSONDecoder().decode(
                     Date.self,
@@ -237,9 +239,17 @@ extension RecordingManager {
             modelContainer: modelContainer
         )
 
-        try await recordingBackgroundDataHandler.conditionallyAddRecording(
+        // Check if recording exists
+        let recordingId = try await recordingBackgroundDataHandler.getRecordingPersistentIdentifier(
             startTimestamp: sensor.recordingStartDate
         )
+
+        if recordingId == nil {
+            try await recordingBackgroundDataHandler.addNewRecording(
+                name: nil,
+                startTimestamp: sensor.recordingStartDate
+            )
+        }
 
         try await sensorBackgroundDataHandler.add(sensor: sensor)
     }

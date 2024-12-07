@@ -180,6 +180,7 @@ extension RecordingManager {
 
         // todo can I replace this with the changeState?
         case "startDate":
+            Logger.shared.debug("Recieved Start Date")
             Task {
                 let date = try JSONDecoder().decode(
                     Date.self,

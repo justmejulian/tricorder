@@ -104,6 +104,15 @@ extension WorkoutManager {
             throw WorkoutManagerError.failedToSendData
         }
     }
+    
+    nonisolated func handleSessionSateChange(_ sessionSateChange: SessionStateChange) {
+        Task {
+            await eventManager.trigger(
+                key: .sessionStateChanged,
+                data: sessionSateChange
+            ) as Void
+        }
+    }
 }
 
 // MARK: - HKWorkoutSessionDelegate
@@ -130,12 +139,8 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
             newState: toState,
             date: date
         )
-        Task {
-            await eventManager.trigger(
-                key: .sessionStateChanged,
-                data: sessionSateChange
-            ) as Void
-        }
+        
+        handleSessionSateChange(sessionSateChange)
     }
 
     nonisolated func workoutSession(

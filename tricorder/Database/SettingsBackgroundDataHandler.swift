@@ -16,14 +16,15 @@ actor SettingsBackgroundDataHandler: BackgroundDataHandlerProtocol {
 }
 
 extension SettingsBackgroundDataHandler {
-    func add(_ settings: SettingDatabaseModel.Struct) throws {
+    func createSettings() throws {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         if (try getSettingsPersistentIdentifier()) != nil {
             throw SettingsBackgroundDataHandlerError.alreadyCreated
         }
 
-        let settingsModel = SettingDatabaseModel(settingDatabaseModelStruct: settings)
+        let settingsModel = SettingDatabaseModel()
+
         try appendData(settingsModel)
     }
 
@@ -38,6 +39,7 @@ extension SettingsBackgroundDataHandler {
         )
 
         if persistentIdentifiers.count > 1 {
+            // todo replace with some error in the settings page and an option to reset settings
             fatalError("Found multiple settings")
         }
 

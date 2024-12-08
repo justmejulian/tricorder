@@ -33,18 +33,13 @@ struct StartView: View {
             .navigationBarTitle(Text("Tricorder"), displayMode: .inline)
             .navigationBarItems(
                 leading:
-                    HStack {
-                        Button(action: {
-                            print("Info button tapped!")
-                        }) {
-                            Image(systemName: "gear")
-                        }
+                    NavigationLink(destination: SettingsView()) {
+                        Image(systemName: "gear")
                     },
+
                 trailing:
-                    HStack {
-                        NavigationLink(destination: RecordingListView()) {
-                            Image(systemName: "list.bullet")
-                        }
+                    NavigationLink(destination: RecordingListView()) {
+                        Image(systemName: "list.bullet")
                     }
             )
         }

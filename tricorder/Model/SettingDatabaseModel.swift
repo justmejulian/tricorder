@@ -18,6 +18,11 @@ class SettingDatabaseModel {
         self.motionSensorRecodingRates = motionSensorRecodingRates
     }
 
+    init(settingDatabaseModelStruct: SettingDatabaseModel.Struct) {
+        self.failRate = settingDatabaseModelStruct.failRate
+        self.motionSensorRecodingRates = settingDatabaseModelStruct.motionSensorRecodingRates
+    }
+
     init() {
         self.failRate = 5
 

@@ -203,6 +203,19 @@ func getEmpytSensorOfEach(recordingStart: Date) -> [String: Sensor] {
     }
 }
 
+func getDefaultMotionsensorRecordingRate(sensorName: Sensor.MotionSensorName) -> Int {
+    getMaxMotionsensorRecordingRate(sensorName: sensorName)
+}
+
+func getMaxMotionsensorRecordingRate(sensorName: Sensor.MotionSensorName) -> Int {
+    switch sensorName {
+    case .acceleration:
+        return 800
+    case .rotationRate, .userAcceleration, .gravity, .quaternion:
+        return 200
+    }
+}
+
 enum SensorError: Error {
     case differentSensors
 }

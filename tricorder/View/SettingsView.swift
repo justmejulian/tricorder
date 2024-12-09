@@ -20,10 +20,22 @@ struct SettingsView: View {
 
         if let settings = settingsArray.first {
             VStack {
-                Text("Fail Rate:\(settings.failRate)")
-                List(Array(settings.motionSensorRecodingRates.keys), id: \.self) { key in
-                    let value = settings.motionSensorRecodingRates[key] ?? 0
-                    Text("\(key):\(String(value))")
+                List {
+                    SettingsDropdown(
+                        title: "failRate",
+                        maxValue: 100,
+                        step: 50,
+                        value: settings.failRate
+                    )
+
+                    ForEach(Array(settings.motionSensorRecodingRates.keys), id: \.self) { key in
+                        SettingsDropdown(
+                            title: key.rawValue,
+                            maxValue: getMaxMotionsensorRecordingRate(sensorName: key),
+                            step: 50,
+                            value: settings.motionSensorRecodingRates[key] ?? 0
+                        )
+                    }
                 }
             }
         } else {
@@ -48,6 +60,27 @@ struct SettingsView: View {
                 }
 
         }
+    }
+}
 
+extension SettingsView {
+    struct SettingsDropdown: View {
+        let title: String
+        let maxValue: Int
+        let step: Int
+
+        @State var value: Int
+        var body: some View {
+            HStack {
+                Text(title)
+                TextField(
+                    "\(value)",
+                    text: Binding<String>(
+                        get: { String(value) },
+                        set: { value = Int($0) ?? 0 }
+                    )
+                )
+            }
+        }
     }
 }

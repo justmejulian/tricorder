@@ -24,16 +24,30 @@ struct SettingsView: View {
                     SettingsDropdown(
                         title: "failRate",
                         maxValue: 100,
-                        step: 50,
-                        value: settings.failRate
+                        step: 5,
+                        value: Binding<Int>(
+                            get: { settings.failRate },
+                            set: { settings.failRate = $0 }
+                        )
                     )
 
-                    ForEach(Array(settings.motionSensorRecodingRates.keys), id: \.self) { key in
+                    let keys = settings.motionSensorRecodingRates.keys.sorted {
+                        $0.rawValue < $1.rawValue
+                    }
+
+                    ForEach(keys, id: \.self) { key in
                         SettingsDropdown(
                             title: key.rawValue,
                             maxValue: getMaxMotionsensorRecordingRate(sensorName: key),
                             step: 50,
-                            value: settings.motionSensorRecodingRates[key] ?? 0
+                            value: Binding(
+                                get: {
+                                    self.settingsArray.first!.motionSensorRecodingRates[key] ?? 0
+                                },
+                                set: {
+                                    self.settingsArray.first!.motionSensorRecodingRates[key] = $0
+                                }
+                            )
                         )
                     }
                 }
@@ -69,17 +83,16 @@ extension SettingsView {
         let maxValue: Int
         let step: Int
 
-        @State var value: Int
+        var value: Binding<Int>
+
         var body: some View {
             HStack {
-                Text(title)
-                TextField(
-                    "\(value)",
-                    text: Binding<String>(
-                        get: { String(value) },
-                        set: { value = Int($0) ?? 0 }
-                    )
-                )
+                Picker(title, selection: value) {
+                    ForEach(Array(stride(from: 0, to: maxValue + 1, by: step)), id: \.self) {
+                        value in
+                        Text("\(value)")
+                    }
+                }
             }
         }
     }

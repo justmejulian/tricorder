@@ -64,6 +64,21 @@ enum Sensor: Codable {
         case userAcceleration
         case gravity
         case quaternion
+
+        var name: String {
+            switch self {
+            case .acceleration:
+                return "Acceleration"
+            case .rotationRate:
+                return "Rotation Rate"
+            case .userAcceleration:
+                return "User Acceleration"
+            case .gravity:
+                return "Gravity"
+            case .quaternion:
+                return "Quaternion"
+            }
+        }
     }
 
     enum StatisticSensorName: String, Codable, CaseIterable {

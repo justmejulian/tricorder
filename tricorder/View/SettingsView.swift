@@ -22,7 +22,7 @@ struct SettingsView: View {
             VStack {
                 List {
                     SettingsDropdown(
-                        title: "failRate",
+                        title: "Max Fail Rate",
                         maxValue: 100,
                         step: 5,
                         value: Binding<Int>(
@@ -37,7 +37,7 @@ struct SettingsView: View {
 
                     ForEach(keys, id: \.self) { key in
                         SettingsDropdown(
-                            title: key.rawValue,
+                            title: key.name,
                             maxValue: getMaxMotionsensorRecordingRate(sensorName: key),
                             step: 50,
                             value: Binding(

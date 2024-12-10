@@ -159,7 +159,7 @@ extension RecordingManager {
 
             try await storeSensor(sensor)
 
-            if await startDate != nil {
+            if await recordingState == .running {
                 await classifierManager.update(sensor)
             }  // todo else check if workout is running
 

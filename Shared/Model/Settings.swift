@@ -7,5 +7,7 @@
 struct Settings: Codable {
     let shouldFail: Bool
     let failRate: Int
+
+    let useHighFrequencySensor: Bool
     let motionSensorRecodingRates: [Sensor.MotionSensorName: Int]
 }

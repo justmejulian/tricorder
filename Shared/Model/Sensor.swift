@@ -222,12 +222,11 @@ func getDefaultMotionsensorRecordingRate(sensorName: Sensor.MotionSensorName) ->
     getMaxMotionsensorRecordingRate(sensorName: sensorName)
 }
 
+// For not hight frequency
 func getMaxMotionsensorRecordingRate(sensorName: Sensor.MotionSensorName) -> Int {
     switch sensorName {
-    case .acceleration:
-        return 800
-    case .rotationRate, .userAcceleration, .gravity, .quaternion:
-        return 200
+    case .acceleration, .rotationRate, .userAcceleration, .gravity, .quaternion:
+        return 100
     }
 }
 

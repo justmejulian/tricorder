@@ -31,34 +31,51 @@ struct SettingsView: View {
                     }
                     .toggleStyle(.switch)
 
-                    SettingsDropdown(
-                        title: "Max Fail Rate",
-                        maxValue: 500,
-                        step: 10,
-                        value: Binding<Int>(
-                            get: { settings.failRate },
-                            set: { settings.failRate = $0 }
+                    if settings.shouldFail {
+                        SettingsDropdown(
+                            title: "Max Fail Rate",
+                            maxValue: 500,
+                            step: 50,
+                            value: Binding<Int>(
+                                get: { settings.failRate },
+                                set: { settings.failRate = $0 }
+                            )
                         )
-                    ).disabled(settings.shouldFail)
+                    }
 
                     let keys = settings.motionSensorRecodingRates.keys.sorted {
                         $0.rawValue < $1.rawValue
                     }
 
-                    ForEach(keys, id: \.self) { key in
-                        SettingsDropdown(
-                            title: key.name,
-                            maxValue: getMaxMotionsensorRecordingRate(sensorName: key),
-                            step: 50,
-                            value: Binding(
-                                get: {
-                                    self.settingsArray.first!.motionSensorRecodingRates[key] ?? 0
-                                },
-                                set: {
-                                    self.settingsArray.first!.motionSensorRecodingRates[key] = $0
-                                }
-                            )
+                    Toggle(
+                        isOn: Binding<Bool>(
+                            get: { self.settingsArray.first!.useHighFrequencySensor },
+                            set: { self.settingsArray.first!.useHighFrequencySensor = $0 }
                         )
+                    ) {
+                        Text("Use High Frequency Sensor")
+                    }
+                    .toggleStyle(.switch)
+
+                    if !settings.useHighFrequencySensor {
+                        ForEach(keys, id: \.self) { key in
+                            SettingsDropdown(
+                                title: key.name,
+                                maxValue: 100,  // Because not high frequency
+                                step: 25,
+                                value: Binding(
+                                    get: {
+                                        self.settingsArray.first!.motionSensorRecodingRates[key]
+                                            ?? 0
+                                    },
+                                    set: {
+                                        self.settingsArray.first!.motionSensorRecodingRates[key] =
+                                            $0
+                                    }
+                                )
+                            )
+                        }
+
                     }
                 }
             }

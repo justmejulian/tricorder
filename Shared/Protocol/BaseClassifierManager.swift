@@ -8,7 +8,7 @@ import Foundation
 
 @MainActor
 protocol BaseClassifierManager: ObservableObject {
-    var motionManager: MotionManager { get }
+    var motionManager: MotionObservableValueManager { get }
     var distanceManager: ObservableValueManager<DistanceValue> { get }
     var heartRateManager: ObservableValueManager<StatisticValue> { get }
 

@@ -82,7 +82,7 @@ extension RecordingManager {
         }
 
         // todo make sure these are actually started
-        try await startUpdates(recordingStart: recordingStart)
+        try await startUpdates(recordingStart: recordingStart, settings: settings)
     }
 
     func startWorkout() async throws -> Date {
@@ -94,9 +94,12 @@ extension RecordingManager {
         }
     }
 
-    func startUpdates(recordingStart: Date) async throws {
+    func startUpdates(recordingStart: Date, settings: Settings?) async throws {
         do {
-            try await coreMotionManager.startUpdates(recordingStart: recordingStart)
+            try await coreMotionManager.startUpdates(
+                recordingStart: recordingStart,
+                settings: settings
+            )
         } catch {
             Logger.shared.error("Failed to start Motion Updates: \(error)")
             throw RecordingManagerError.startWorkout

@@ -143,6 +143,8 @@ extension NearbyInteractionManager: NISessionDelegate {
     ) {
         Logger.shared.debug("called on Thread \(Thread.current)")
         let timestamp = Date()
+        // todo: I guess always should just be one so I can take first
+        // if let object = nearbyObjects.first, let distance = object.distance {
         let values: [Double] = nearbyObjects.map { Double($0.distance ?? 0) }
         Task {
             await eventManager.trigger(

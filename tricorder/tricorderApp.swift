@@ -23,7 +23,7 @@ struct tricorderApp: App {
             ])
             self.database = Database(modelContainer: try ModelContainer(for: schema))
 
-            //            database.clear()
+            //                        database.clear()
 
             self.recordingManager = RecordingManager(modelContainer: database.getModelContainer())
         } catch {

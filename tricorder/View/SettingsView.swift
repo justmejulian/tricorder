@@ -21,15 +21,25 @@ struct SettingsView: View {
         if let settings = settingsArray.first {
             VStack {
                 List {
+                    Toggle(
+                        isOn: Binding<Bool>(
+                            get: { self.settingsArray.first!.shouldFail },
+                            set: { self.settingsArray.first!.shouldFail = $0 }
+                        )
+                    ) {
+                        Text("Should use fail rate")
+                    }
+                    .toggleStyle(.switch)
+
                     SettingsDropdown(
                         title: "Max Fail Rate",
-                        maxValue: 100,
-                        step: 5,
+                        maxValue: 500,
+                        step: 10,
                         value: Binding<Int>(
                             get: { settings.failRate },
                             set: { settings.failRate = $0 }
                         )
-                    )
+                    ).disabled(settings.shouldFail)
 
                     let keys = settings.motionSensorRecodingRates.keys.sorted {
                         $0.rawValue < $1.rawValue

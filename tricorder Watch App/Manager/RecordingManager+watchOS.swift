@@ -72,6 +72,8 @@ extension RecordingManager {
             )
         )
 
+        let settings = getSettings()
+
         do {
             try await initNIDiscoveryToken()
             await nearbyInteractionManager.start()
@@ -274,6 +276,16 @@ extension RecordingManager {
 // MARK: -  RecordingManager nonisolated functions
 //
 extension RecordingManager {
+    nonisolated func getSettings() async throws -> Settings? {
+        Logger.shared.debug("called on Thread \(Thread.current)")
+
+        let data =
+            try await connectivityManager.sendData(
+                key: "settings",
+                data: try JSONEncoder().encode("")
+            ) as Data?
+    }
+
     nonisolated func sendSensorUpdate(_ archive: [Data]) async throws {
         try await connectivityManager.sendDataArray(
             key: "sensorUpdate",

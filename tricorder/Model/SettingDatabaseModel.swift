@@ -21,7 +21,7 @@ class SettingDatabaseModel {
         self.motionSensorRecodingRates = motionSensorRecodingRates
     }
 
-    init(settingDatabaseModelStruct: SettingDatabaseModel.Struct) {
+    init(settingDatabaseModelStruct: Settings) {
         self.shouldFail = settingDatabaseModelStruct.shouldFail
         self.failRate = settingDatabaseModelStruct.failRate
         self.motionSensorRecodingRates = settingDatabaseModelStruct.motionSensorRecodingRates
@@ -42,20 +42,15 @@ class SettingDatabaseModel {
 }
 
 extension SettingDatabaseModel {
-    // Used to pass around
-    struct Struct {
-        let shouldFail: Bool
-        let failRate: Int
-        let motionSensorRecodingRates: [Sensor.MotionSensorName: Int]
-
-        init(recording: SettingDatabaseModel) {
-            self.shouldFail = recording.shouldFail
-            self.failRate = recording.failRate
-            self.motionSensorRecodingRates = recording.motionSensorRecodingRates
-        }
+    func toStruct() -> Settings {
+        return Settings(recording: self)
     }
+}
 
-    func toStruct() -> Struct {
-        return Struct(recording: self)
+extension Settings {
+    init(recording: SettingDatabaseModel) {
+        self.shouldFail = recording.shouldFail
+        self.failRate = recording.failRate
+        self.motionSensorRecodingRates = recording.motionSensorRecodingRates
     }
 }

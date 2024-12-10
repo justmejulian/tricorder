@@ -72,7 +72,7 @@ extension RecordingManager {
             )
         )
 
-        let settings = getSettings()
+        let settings = try await getSettings()
 
         do {
             try await initNIDiscoveryToken()
@@ -279,11 +279,26 @@ extension RecordingManager {
     nonisolated func getSettings() async throws -> Settings? {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        let data =
-            try await connectivityManager.sendData(
+        guard let data = await sendGetSettings() else {
+            return nil
+        }
+
+        let settings = try? JSONDecoder().decode(Settings.self, from: data)
+        Logger.shared.debug("settings: \(String(describing: settings ?? nil))")
+
+        return settings
+    }
+
+    nonisolated func sendGetSettings() async -> Data? {
+        do {
+            return try await connectivityManager.sendData(
                 key: "settings",
                 data: try JSONEncoder().encode("")
             ) as Data?
+        } catch {
+            Logger.shared.error("Failed to send get settings: \(error)")
+            return nil
+        }
     }
 
     nonisolated func sendSensorUpdate(_ archive: [Data]) async throws {

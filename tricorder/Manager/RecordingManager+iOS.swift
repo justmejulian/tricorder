@@ -150,8 +150,17 @@ extension RecordingManager {
             await nearbyInteractionManager.start()
             return token
 
+        case "settings":
+            let handler = SettingsBackgroundDataHandler(modelContainer: modelContainer)
+            let settings = try await handler.getSettings()
+            do {
+                return try JSONEncoder().encode(settings)
+            } catch {
+                Logger.shared.error("Failed to encode settings: \(error)")
+                return nil
+            }
+
         case "sensorUpdate":
-            //            await heartRateManager.update(
             let sensor = try JSONDecoder().decode(
                 Sensor.self,
                 from: dataObject.data

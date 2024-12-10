@@ -21,31 +21,6 @@ struct SettingsView: View {
         if let settings = settingsArray.first {
             VStack {
                 List {
-                    Toggle(
-                        isOn: Binding<Bool>(
-                            get: { self.settingsArray.first!.shouldFail },
-                            set: { self.settingsArray.first!.shouldFail = $0 }
-                        )
-                    ) {
-                        Text("Should use fail rate")
-                    }
-                    .toggleStyle(.switch)
-
-                    if settings.shouldFail {
-                        SettingsDropdown(
-                            title: "Max Fail Rate",
-                            maxValue: 500,
-                            step: 50,
-                            value: Binding<Int>(
-                                get: { settings.failRate },
-                                set: { settings.failRate = $0 }
-                            )
-                        )
-                    }
-
-                    let keys = settings.motionSensorRecodingRates.keys.sorted {
-                        $0.rawValue < $1.rawValue
-                    }
 
                     Toggle(
                         isOn: Binding<Bool>(
@@ -58,6 +33,10 @@ struct SettingsView: View {
                     .toggleStyle(.switch)
 
                     if !settings.useHighFrequencySensor {
+                        let keys = settings.motionSensorRecodingRates.keys.sorted {
+                            $0.rawValue < $1.rawValue
+                        }
+
                         ForEach(keys, id: \.self) { key in
                             SettingsDropdown(
                                 title: key.name,

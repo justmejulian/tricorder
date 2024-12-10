@@ -9,28 +9,19 @@ import SwiftData
 
 @Model
 class SettingDatabaseModel {
-    var shouldFail: Bool = false
-    var failRate: Int = 100
-
     var useHighFrequencySensor: Bool = true
 
     var motionSensorRecodingRates: [Sensor.MotionSensorName: Int]
 
     init(
-        shouldFail: Bool,
-        failRate: Int,
         useHighFrequencySensor: Bool,
         motionSensorRecodingRates: [Sensor.MotionSensorName: Int]
     ) {
-        self.shouldFail = shouldFail
-        self.failRate = failRate
         self.useHighFrequencySensor = useHighFrequencySensor
         self.motionSensorRecodingRates = motionSensorRecodingRates
     }
 
     init(settingDatabaseModelStruct: Settings) {
-        self.shouldFail = settingDatabaseModelStruct.shouldFail
-        self.failRate = settingDatabaseModelStruct.failRate
         self.useHighFrequencySensor = settingDatabaseModelStruct.useHighFrequencySensor
         self.motionSensorRecodingRates = settingDatabaseModelStruct.motionSensorRecodingRates
     }
@@ -54,8 +45,6 @@ extension SettingDatabaseModel {
 
 extension Settings {
     init(recording: SettingDatabaseModel) {
-        self.shouldFail = recording.shouldFail
-        self.failRate = recording.failRate
         self.useHighFrequencySensor = recording.useHighFrequencySensor
         self.motionSensorRecodingRates = recording.motionSensorRecodingRates
     }

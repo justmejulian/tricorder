@@ -32,14 +32,18 @@ extension CoreMotionManager {
     func startUpdates(recordingStart: Date, settings: Settings?) async throws {
         Logger.shared.debug("MotinManager: startUpdates called on Thread \(Thread.current)")
 
-        guard
-            CMBatchedSensorManager.isAccelerometerSupported
-                && CMBatchedSensorManager.isDeviceMotionSupported
-        else {
-            throw CoreMotionManagerError.notSupported
-        }
 
-        let motionManager = HighFrequencyMotionManager(handleUpdate: handleUpdate)
+        var motionManager: MotionManager {
+            guard let settings else {
+               return HighFrequencyMotionManager(handleUpdate: handleUpdate)
+            }
+            
+            if settings.useHighFrequencySensor {
+                return HighFrequencyMotionManager(handleUpdate: handleUpdate)
+            }
+            
+            return LowFrequencyMotionManager(settings: settings, handleUpdate: handleUpdate)
+        }
 
         //
         //        if let settings {

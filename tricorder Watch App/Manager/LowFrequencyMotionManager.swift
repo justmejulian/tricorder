@@ -1,5 +1,5 @@
 //
-//  HighFrequencyMotionManager.swift
+//  LowFrequencyMotionManager.swift
 //
 //  Created by Julian Visser on 10.12.2024.
 //
@@ -23,15 +23,8 @@ extension HighFrequencyMotionManager {
     }
 
     nonisolated func startUpdates(recordingStart: Date) async throws {
-        guard
-            CMBatchedSensorManager.isAccelerometerSupported
-                && CMBatchedSensorManager.isDeviceMotionSupported
-        else {
-            throw HighFrequencyMotionManagerError.notSupported
-        }
-
         await manager.startAccelerometerUpdates(handler: {
-            @Sendable (data, error) in
+            @Sendable (valuesedData, error) in
             Logger.shared.debug("called on Thread \(Thread.current)")
 
             if let error = error {
@@ -41,7 +34,7 @@ extension HighFrequencyMotionManager {
                 return
             }
 
-            guard let data = data else {
+            guard let valuesedData = valuesedData else {
                 Logger.shared.error(
                     "Error starting AccelerometerUpdates: did not recive any data"
                 )
@@ -49,13 +42,13 @@ extension HighFrequencyMotionManager {
             }
 
             self.consumeAccelerometerUpdates(
-                dataArray: data,
+                valuesedData: valuesedData,
                 recordingStart: recordingStart
             )
         })
 
         await manager.startDeviceMotionUpdates(handler: {
-            @Sendable (data, error) in
+            @Sendable (valuesedData, error) in
 
             Logger.shared.debug("called on Thread \(Thread.current)")
 
@@ -66,7 +59,7 @@ extension HighFrequencyMotionManager {
                 return
             }
 
-            guard let data = data else {
+            guard let valuesedData = valuesedData else {
                 Logger.shared.error(
                     "Error starting DeviceMotionUpdate: did not recive any data"
                 )
@@ -74,21 +67,21 @@ extension HighFrequencyMotionManager {
             }
 
             self.consumeDeviceMotionUpdates(
-                dataArray: data,
+                valuesedData: valuesedData,
                 recordingStart: recordingStart
             )
         })
     }
 
     nonisolated func consumeAccelerometerUpdates(
-        dataArray: [CMAccelerometerData],
+        valuesedData: [CMAccelerometerData],
         recordingStart: Date
     ) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         var values: [MotionValue] = []
 
-        dataArray.forEach { data in
+        valuesedData.forEach { data in
             values.append(
                 MotionValue(
                     x: data.acceleration.x,
@@ -112,7 +105,7 @@ extension HighFrequencyMotionManager {
         )
     }
     nonisolated func consumeDeviceMotionUpdates(
-        dataArray: [CMDeviceMotion],
+        valuesedData: [CMDeviceMotion],
         recordingStart: Date
     ) {
         Logger.shared.debug("called on Thread \(Thread.current)")
@@ -124,7 +117,7 @@ extension HighFrequencyMotionManager {
         var gravityValues: [MotionValue] = []
         var quaternionValues: [MotionValue] = []
 
-        dataArray.forEach { data in
+        valuesedData.forEach { data in
             let dataDate = Date(
                 timeIntervalSince1970: data.timestamp.timeIntervalSince1970
             )
@@ -192,7 +185,4 @@ extension HighFrequencyMotionManager {
             )
         )
     }
-}
-enum HighFrequencyMotionManagerError: Error {
-    case notSupported
 }

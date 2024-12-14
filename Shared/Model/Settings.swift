@@ -6,5 +6,7 @@
 
 struct Settings: Codable {
     let useHighFrequencySensor: Bool
-    let motionSensorRecodingRates: [Sensor.MotionSensorName: Int]
+    let motionSensors: [Sensor.MotionSensorName: Bool]
+    let accelerometerRecordingRate: Int
+    let deviceMotionRecordingRate: Int
 }

@@ -10,30 +10,37 @@ import SwiftData
 @Model
 class SettingDatabaseModel {
     var useHighFrequencySensor: Bool = true
+    var motionSensors: [Sensor.MotionSensorName: Bool] = [:]
+    var accelerometerRecordingRate: Int = 200
+    var deviceMotionRecordingRate: Int = 200
 
-    var motionSensorRecodingRates: [Sensor.MotionSensorName: Int]
+    init() {
+        let motionSensors = Sensor.MotionSensorName.allCases.reduce(
+            into: [Sensor.MotionSensorName: Bool]()
+        ) { result, sensorName in
+            result[sensorName] = true
+        }
+        self.motionSensors = motionSensors
+    }
 
     init(
         useHighFrequencySensor: Bool,
-        motionSensorRecodingRates: [Sensor.MotionSensorName: Int]
+        motionSensors: [Sensor.MotionSensorName: Bool],
+        accelerometerRecordingRate: Int,
+        deviceMotionRecordingRate: Int
     ) {
+
         self.useHighFrequencySensor = useHighFrequencySensor
-        self.motionSensorRecodingRates = motionSensorRecodingRates
+        self.accelerometerRecordingRate = accelerometerRecordingRate
+        self.deviceMotionRecordingRate = deviceMotionRecordingRate
+        self.motionSensors = motionSensors
     }
 
     init(settingDatabaseModelStruct: Settings) {
         self.useHighFrequencySensor = settingDatabaseModelStruct.useHighFrequencySensor
-        self.motionSensorRecodingRates = settingDatabaseModelStruct.motionSensorRecodingRates
-    }
-
-    init() {
-        let motionSensorRecodingRates = Sensor.MotionSensorName.allCases.reduce(
-            into: [Sensor.MotionSensorName: Int]()
-        ) { result, sensorName in
-            result[sensorName] = getDefaultMotionsensorRecordingRate(sensorName: sensorName)
-        }
-
-        self.motionSensorRecodingRates = motionSensorRecodingRates
+        self.motionSensors = settingDatabaseModelStruct.motionSensors
+        self.accelerometerRecordingRate = settingDatabaseModelStruct.accelerometerRecordingRate
+        self.deviceMotionRecordingRate = settingDatabaseModelStruct.deviceMotionRecordingRate
     }
 }
 
@@ -46,6 +53,8 @@ extension SettingDatabaseModel {
 extension Settings {
     init(recording: SettingDatabaseModel) {
         self.useHighFrequencySensor = recording.useHighFrequencySensor
-        self.motionSensorRecodingRates = recording.motionSensorRecodingRates
+        self.motionSensors = recording.motionSensors
+        self.accelerometerRecordingRate = recording.accelerometerRecordingRate
+        self.deviceMotionRecordingRate = recording.deviceMotionRecordingRate
     }
 }

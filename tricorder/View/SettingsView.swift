@@ -33,29 +33,44 @@ struct SettingsView: View {
                     .toggleStyle(.switch)
 
                     if !settings.useHighFrequencySensor {
-                        let keys = settings.motionSensorRecodingRates.keys.sorted {
-                            $0.rawValue < $1.rawValue
-                        }
-
-                        ForEach(keys, id: \.self) { key in
-                            SettingsDropdown(
-                                title: key.name,
-                                maxValue: 100,  // Because not high frequency
-                                step: 25,
-                                value: Binding(
-                                    get: {
-                                        self.settingsArray.first!.motionSensorRecodingRates[key]
-                                            ?? 0
-                                    },
-                                    set: {
-                                        self.settingsArray.first!.motionSensorRecodingRates[key] =
-                                            $0
-                                    }
-                                )
+                        SettingsDropdown(
+                            title: "Accelerometer Recording Rate",
+                            maxValue: 200,
+                            step: 50,
+                            value: Binding<Int>(
+                                get: { self.settingsArray.first!.accelerometerRecordingRate },
+                                set: { self.settingsArray.first!.accelerometerRecordingRate = $0 }
                             )
-                        }
+                        )
+
+                        SettingsDropdown(
+                            title: "Device Motion Recording Rate",
+                            maxValue: 200,
+                            step: 50,
+                            value: Binding<Int>(
+                                get: { self.settingsArray.first!.deviceMotionRecordingRate },
+                                set: { self.settingsArray.first!.deviceMotionRecordingRate = $0 }
+                            )
+                        )
 
                     }
+                    
+                    let keys = settings.motionSensors.keys.sorted {
+                        $0.rawValue < $1.rawValue
+                    }
+
+                    ForEach(keys, id: \.self) { key in
+                        Toggle(
+                            isOn: Binding<Bool>(
+                                get: { self.settingsArray.first!.motionSensors[key] ?? false },
+                                set: { self.settingsArray.first!.motionSensors[key] = $0 }
+                            )
+                        ) {
+                            Text("Record \(key.rawValue)")
+                        }
+                        .toggleStyle(.switch)
+                    }
+
                 }
             }
         } else {

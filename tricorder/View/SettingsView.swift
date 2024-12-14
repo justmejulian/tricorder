@@ -22,6 +22,8 @@ struct SettingsView: View {
             VStack {
                 List {
 
+                    // todo use sections
+
                     Toggle(
                         isOn: Binding<Bool>(
                             get: { self.settingsArray.first!.useHighFrequencySensor },
@@ -54,7 +56,7 @@ struct SettingsView: View {
                         )
 
                     }
-                    
+
                     let keys = settings.motionSensors.keys.sorted {
                         $0.rawValue < $1.rawValue
                     }
@@ -66,6 +68,7 @@ struct SettingsView: View {
                                 set: { self.settingsArray.first!.motionSensors[key] = $0 }
                             )
                         ) {
+                            // todo use the better name
                             Text("Record \(key.rawValue)")
                         }
                         .toggleStyle(.switch)

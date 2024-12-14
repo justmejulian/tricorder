@@ -88,21 +88,11 @@ extension HighFrequencyMotionManager {
 
         var values: [MotionValue] = []
 
+        // todo replace with reduce
         dataArray.forEach { data in
-            values.append(
-                MotionValue(
-                    x: data.acceleration.x,
-                    y: data.acceleration.y,
-                    z: data.acceleration.z,
-
-                    // The timestamp is the amount of time in seconds since the device booted.
-                    timestamp: Date(
-                        timeIntervalSince1970: data.timestamp
-                            .timeIntervalSince1970
-                    )
-                )
-            )
+            values.append(createMotionValues(data: data))
         }
+
         handleUpdate(
             Sensor.motion(
                 .acceleration,
@@ -117,80 +107,29 @@ extension HighFrequencyMotionManager {
     ) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        // todo make this more reusable
-        // todo do all of this in a different thread
-        var rotationRateValues: [MotionValue] = []
-        var userAccelerationValues: [MotionValue] = []
-        var gravityValues: [MotionValue] = []
-        var quaternionValues: [MotionValue] = []
+        var values: [Sensor.MotionSensorName: [MotionValue]] = [:]
 
         dataArray.forEach { data in
-            let dataDate = Date(
-                timeIntervalSince1970: data.timestamp.timeIntervalSince1970
-            )
-            rotationRateValues.append(
-                MotionValue(
-                    x: data.rotationRate.x,
-                    y: data.rotationRate.y,
-                    z: data.rotationRate.z,
-                    timestamp: dataDate
-                )
-            )
-            userAccelerationValues.append(
-                MotionValue(
-                    x: data.userAcceleration.x,
-                    y: data.userAcceleration.y,
-                    z: data.userAcceleration.z,
-                    timestamp: dataDate
-                )
-            )
-            gravityValues.append(
-                MotionValue(
-                    x: data.gravity.x,
-                    y: data.gravity.y,
-                    z: data.gravity.z,
-                    timestamp: dataDate
-                )
-            )
-            quaternionValues.append(
-                MotionValue(
-                    x: data.attitude.quaternion.x,
-                    y: data.attitude.quaternion.y,
-                    z: data.attitude.quaternion.z,
-                    w: data.attitude.quaternion.w,
-                    timestamp: dataDate
+            let motionValues = createMotionValues(data: data)
+
+            for motionValue in motionValues {
+                if values[motionValue.key] == nil {
+                    values[motionValue.key] = []
+                }
+
+                values[motionValue.key]?.append(motionValue.value)
+            }
+        }
+
+        for value in values {
+            handleUpdate(
+                Sensor.motion(
+                    value.key,
+                    recordingStartDate: recordingStart,
+                    values: value.value
                 )
             )
         }
-
-        handleUpdate(
-            Sensor.motion(
-                .rotationRate,
-                recordingStartDate: recordingStart,
-                values: rotationRateValues
-            )
-        )
-        handleUpdate(
-            Sensor.motion(
-                .userAcceleration,
-                recordingStartDate: recordingStart,
-                values: userAccelerationValues
-            )
-        )
-        handleUpdate(
-            Sensor.motion(
-                .gravity,
-                recordingStartDate: recordingStart,
-                values: gravityValues
-            )
-        )
-        handleUpdate(
-            Sensor.motion(
-                .quaternion,
-                recordingStartDate: recordingStart,
-                values: quaternionValues
-            )
-        )
     }
 }
 enum HighFrequencyMotionManagerError: Error {

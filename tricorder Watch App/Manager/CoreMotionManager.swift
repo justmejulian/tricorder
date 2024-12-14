@@ -32,16 +32,15 @@ extension CoreMotionManager {
     func startUpdates(recordingStart: Date, settings: Settings?) async throws {
         Logger.shared.debug("MotinManager: startUpdates called on Thread \(Thread.current)")
 
-
         var motionManager: MotionManager {
             guard let settings else {
-               return HighFrequencyMotionManager(handleUpdate: handleUpdate)
+                return HighFrequencyMotionManager(handleUpdate: handleUpdate)
             }
-            
+
             if settings.useHighFrequencySensor {
                 return HighFrequencyMotionManager(handleUpdate: handleUpdate)
             }
-            
+
             return LowFrequencyMotionManager(settings: settings, handleUpdate: handleUpdate)
         }
 

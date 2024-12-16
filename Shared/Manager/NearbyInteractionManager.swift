@@ -145,11 +145,24 @@ extension NearbyInteractionManager: NISessionDelegate {
         let timestamp = Date()
         // todo: I guess always should just be one so I can take first
         // if let object = nearbyObjects.first, let distance = object.distance {
-        let values: [Double] = nearbyObjects.map { Double($0.distance ?? 0) }
+
+        if nearbyObjects.isEmpty {
+            Logger.shared.error("NISession did not receive any nearby objects")
+            return
+        }
+
+        if nearbyObjects.count > 1 {
+            Logger.shared.error("NISession received more than one nearby object")
+        }
+
+        let firstObject = nearbyObjects.first!
+
+        let value: Double = Double(firstObject.distance ?? 0)
+
         Task {
             await eventManager.trigger(
                 key: .collectedDistance,
-                data: DistanceValue(values: values, timestamp: timestamp)
+                data: DistanceValue(value: value, timestamp: timestamp)
             ) as Void
         }
     }

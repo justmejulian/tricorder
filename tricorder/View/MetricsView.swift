@@ -28,7 +28,7 @@ struct MetricsView: View {
             HStack {
                 MetricsBox(
                     title: "Distance",
-                    value: formatDistance(classifierManager.distanceManager.mostRecent?.avg)
+                    value: formatDistance(classifierManager.distanceManager.mostRecent?.value)
                 )
                 MetricsBox(
                     title: "# Distance",

@@ -61,7 +61,7 @@ class ClassifierManager: BaseClassifierManager {
 extension ClassifierManager {
     func updateDistaceChartValues(_ values: [DistanceValue]) {
         for value in values {
-            let point = LineChart.DataPoint(timestamp: value.timestamp, value: value.avg)
+            let point = LineChart.DataPoint(timestamp: value.timestamp, value: value.value)
             distanceChartValues.append(point)
         }
     }

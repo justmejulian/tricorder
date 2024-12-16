@@ -12,14 +12,11 @@ actor LowFrequencyMotionManager: MotionManager {
     let manager = CMMotionManager()
     let queue = OperationQueue()
 
-    let settings: Settings
     let handleUpdate: @Sendable (_ sensor: Sensor) -> Void
 
     init(
-        settings: Settings,
         handleUpdate: @escaping @Sendable (_: Sensor) -> Void
     ) {
-        self.settings = settings
         self.handleUpdate = handleUpdate
     }
 
@@ -43,7 +40,24 @@ extension LowFrequencyMotionManager {
         await manager.stopDeviceMotionUpdates()
     }
 
-    nonisolated func startUpdates(recordingStart: Date) async throws {
+    nonisolated func startUpdates(
+        recordingStart: Date,
+        motionSensors: [Sensor.MotionSensorName: Bool]?
+    ) async throws {
+        try await startUpdates(
+            recordingStart: recordingStart,
+            motionSensors: motionSensors ?? [:],
+            accelerometerRecordingRate: 200,
+            deviceMotionRecordingRate: 200
+        )
+    }
+
+    nonisolated func startUpdates(
+        recordingStart: Date,
+        motionSensors: [Sensor.MotionSensorName: Bool],
+        accelerometerRecordingRate: Int?,
+        deviceMotionRecordingRate: Int?
+    ) async throws {
 
         guard
             await manager.isDeviceMotionAvailable
@@ -51,38 +65,42 @@ extension LowFrequencyMotionManager {
             throw HighFrequencyMotionManagerError.notSupported
         }
 
-        //        await setAccelerometerUpdateInterval(
-        //            self.settings.motionSensorRecodingRates[.accelerometer]
-        //        )
-        //        await setDeviceMotionUpdateInterval(
-        //            self.settings.motionSensorRecodingRates[.]
-        //        )
-        await manager.startAccelerometerUpdates(
-            to: self.queue,
-            withHandler: {
-                @Sendable (data, error) in
-                Logger.shared.debug("called on Thread \(Thread.current)")
+        if let accelerometerRecordingRate = accelerometerRecordingRate {
+            await setAccelerometerUpdateInterval(accelerometerRecordingRate)
+        }
 
-                if let error = error {
-                    Logger.shared.error(
-                        "Error starting AccelerometerUpdates: \(error.localizedDescription)"
+        if let deviceMotionRecordingRate = deviceMotionRecordingRate {
+            await setDeviceMotionUpdateInterval(deviceMotionRecordingRate)
+        }
+
+        if motionSensors[.acceleration] ?? true {
+            await manager.startAccelerometerUpdates(
+                to: self.queue,
+                withHandler: {
+                    @Sendable (data, error) in
+                    Logger.shared.debug("called on Thread \(Thread.current)")
+
+                    if let error = error {
+                        Logger.shared.error(
+                            "Error starting AccelerometerUpdates: \(error.localizedDescription)"
+                        )
+                        return
+                    }
+
+                    guard let data = data else {
+                        Logger.shared.error(
+                            "Error starting AccelerometerUpdates: did not recive any data"
+                        )
+                        return
+                    }
+
+                    self.consumeAccelerometerUpdates(
+                        data: data,
+                        recordingStart: recordingStart
                     )
-                    return
                 }
-
-                guard let data = data else {
-                    Logger.shared.error(
-                        "Error starting AccelerometerUpdates: did not recive any data"
-                    )
-                    return
-                }
-
-                self.consumeAccelerometerUpdates(
-                    data: data,
-                    recordingStart: recordingStart
-                )
-            }
-        )
+            )
+        }
 
         await manager.startDeviceMotionUpdates(
             to: self.queue,
@@ -107,7 +125,8 @@ extension LowFrequencyMotionManager {
 
                 self.consumeDeviceMotionUpdates(
                     data: data,
-                    recordingStart: recordingStart
+                    recordingStart: recordingStart,
+                    motionSensors: motionSensors
                 )
             }
         )
@@ -131,11 +150,15 @@ extension LowFrequencyMotionManager {
     }
     nonisolated func consumeDeviceMotionUpdates(
         data: CMDeviceMotion,
-        recordingStart: Date
+        recordingStart: Date,
+        motionSensors: [Sensor.MotionSensorName: Bool]
     ) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
-        let motionValues = createMotionValues(data: data)
+        let motionValues = createMotionValues(
+            data: data,
+            motionSensors: motionSensors
+        )
 
         for motionValue in motionValues {
             handleUpdate(

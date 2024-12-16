@@ -10,9 +10,12 @@ import OSLog
 
 actor HighFrequencyMotionManager: MotionManager {
     let manager = CMBatchedSensorManager()
+
     let handleUpdate: @Sendable (_ sensor: Sensor) -> Void
 
-    init(handleUpdate: @escaping @Sendable (_: Sensor) -> Void) {
+    init(
+        handleUpdate: @escaping @Sendable (_: Sensor) -> Void
+    ) {
         self.handleUpdate = handleUpdate
     }
 }
@@ -22,7 +25,10 @@ extension HighFrequencyMotionManager {
         await manager.stopDeviceMotionUpdates()
     }
 
-    nonisolated func startUpdates(recordingStart: Date) async throws {
+    nonisolated func startUpdates(
+        recordingStart: Date,
+        motionSensors: [Sensor.MotionSensorName: Bool]?
+    ) async throws {
         guard
             CMBatchedSensorManager.isAccelerometerSupported
                 && CMBatchedSensorManager.isDeviceMotionSupported
@@ -30,29 +36,33 @@ extension HighFrequencyMotionManager {
             throw HighFrequencyMotionManagerError.notSupported
         }
 
-        await manager.startAccelerometerUpdates(handler: {
-            @Sendable (data, error) in
-            Logger.shared.debug("called on Thread \(Thread.current)")
+        let motionSensors = motionSensors ?? [:]
 
-            if let error = error {
-                Logger.shared.error(
-                    "Error starting AccelerometerUpdates: \(error.localizedDescription)"
+        if motionSensors[.acceleration] ?? true {
+            await manager.startAccelerometerUpdates(handler: {
+                @Sendable (data, error) in
+                Logger.shared.debug("called on Thread \(Thread.current)")
+
+                if let error = error {
+                    Logger.shared.error(
+                        "Error starting AccelerometerUpdates: \(error.localizedDescription)"
+                    )
+                    return
+                }
+
+                guard let data = data else {
+                    Logger.shared.error(
+                        "Error starting AccelerometerUpdates: did not recive any data"
+                    )
+                    return
+                }
+
+                self.consumeAccelerometerUpdates(
+                    dataArray: data,
+                    recordingStart: recordingStart
                 )
-                return
-            }
-
-            guard let data = data else {
-                Logger.shared.error(
-                    "Error starting AccelerometerUpdates: did not recive any data"
-                )
-                return
-            }
-
-            self.consumeAccelerometerUpdates(
-                dataArray: data,
-                recordingStart: recordingStart
-            )
-        })
+            })
+        }
 
         await manager.startDeviceMotionUpdates(handler: {
             @Sendable (data, error) in
@@ -75,7 +85,8 @@ extension HighFrequencyMotionManager {
 
             self.consumeDeviceMotionUpdates(
                 dataArray: data,
-                recordingStart: recordingStart
+                recordingStart: recordingStart,
+                motionSensors: motionSensors
             )
         })
     }
@@ -103,14 +114,18 @@ extension HighFrequencyMotionManager {
     }
     nonisolated func consumeDeviceMotionUpdates(
         dataArray: [CMDeviceMotion],
-        recordingStart: Date
+        recordingStart: Date,
+        motionSensors: [Sensor.MotionSensorName: Bool]
     ) {
         Logger.shared.debug("called on Thread \(Thread.current)")
 
         var values: [Sensor.MotionSensorName: [MotionValue]] = [:]
 
         dataArray.forEach { data in
-            let motionValues = createMotionValues(data: data)
+            let motionValues = createMotionValues(
+                data: data,
+                motionSensors: motionSensors
+            )
 
             for motionValue in motionValues {
                 if values[motionValue.key] == nil {

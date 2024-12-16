@@ -41,16 +41,13 @@ extension CoreMotionManager {
                 return HighFrequencyMotionManager(handleUpdate: handleUpdate)
             }
 
-            return LowFrequencyMotionManager(settings: settings, handleUpdate: handleUpdate)
+            return LowFrequencyMotionManager(handleUpdate: handleUpdate)
         }
 
-        //
-        //        if let settings {
-        //            motionManager.accelerometerDataFrequency = settings.motionSensorRecodingRates[.acceleration] ?? .max
-        //            motionManager.deviceMotionDataFrequency = settings.motionSensorRecodingRates[.deviceMotion] ?? .max
-        //        }
-
-        try await motionManager.startUpdates(recordingStart: recordingStart)
+        try await motionManager.startUpdates(
+            recordingStart: recordingStart,
+            motionSensors: settings?.motionSensors
+        )
 
         self.motionManager = motionManager
     }

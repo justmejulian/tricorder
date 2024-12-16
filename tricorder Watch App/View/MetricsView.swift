@@ -19,7 +19,7 @@ struct MetricsView: View {
         HStack {
             Text(formatHeartRate(heartRateManager.mostRecent?.value))
             Spacer()
-            Text(formatDistance(distanceManager.mostRecent?.avg))
+            Text(formatDistance(distanceManager.mostRecent?.value))
         }
         .font(
             .system(.title2, design: .rounded)

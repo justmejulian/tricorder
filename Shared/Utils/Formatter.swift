@@ -11,7 +11,10 @@ func formatDistance(_ distance: Double?) -> String {
     guard let distance else {
         return "-- m"
     }
-    return "\(distance) m"
+
+    let roundedDistance = roundToDecimal(distance, decimals: 1)
+
+    return "\(roundedDistance) m"
 }
 
 func formatHeartRate(_ heartRate: Double?) -> String {

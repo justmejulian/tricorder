@@ -10,7 +10,7 @@ import OSLog
 
 @MainActor
 class ClassifierManager: ObservableObject {
-    var motionManager = MotionManager()
+    var motionManager = MotionObservableValueManager()
     var distanceManager = ObservableValueManager<DistanceValue>()
     var heartRateManager = ObservableValueManager<StatisticValue>()
 

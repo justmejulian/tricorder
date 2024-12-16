@@ -50,7 +50,7 @@ extension SettingsBackgroundDataHandler {
         return persistentIdentifier
     }
 
-    func getSettings() async throws -> SettingDatabaseModel.Struct {
+    func getSettings() async throws -> Settings {
         let descriptor = FetchDescriptor<SettingDatabaseModel>()
 
         let modelContext = createModelContext(

@@ -21,35 +21,59 @@ struct SettingsView: View {
         if let settings = settingsArray.first {
             VStack {
                 List {
-                    SettingsDropdown(
-                        title: "failRate",
-                        maxValue: 100,
-                        step: 5,
-                        value: Binding<Int>(
-                            get: { settings.failRate },
-                            set: { settings.failRate = $0 }
-                        )
-                    )
 
-                    let keys = settings.motionSensorRecodingRates.keys.sorted {
+                    // todo use sections
+
+                    Toggle(
+                        isOn: Binding<Bool>(
+                            get: { self.settingsArray.first!.useHighFrequencySensor },
+                            set: { self.settingsArray.first!.useHighFrequencySensor = $0 }
+                        )
+                    ) {
+                        Text("Use High Frequency Sensor")
+                    }
+                    .toggleStyle(.switch)
+
+                    if !settings.useHighFrequencySensor {
+                        SettingsDropdown(
+                            title: "Accelerometer Recording Rate",
+                            maxValue: 200,
+                            step: 50,
+                            value: Binding<Int>(
+                                get: { self.settingsArray.first!.accelerometerRecordingRate },
+                                set: { self.settingsArray.first!.accelerometerRecordingRate = $0 }
+                            )
+                        )
+
+                        SettingsDropdown(
+                            title: "Device Motion Recording Rate",
+                            maxValue: 200,
+                            step: 50,
+                            value: Binding<Int>(
+                                get: { self.settingsArray.first!.deviceMotionRecordingRate },
+                                set: { self.settingsArray.first!.deviceMotionRecordingRate = $0 }
+                            )
+                        )
+
+                    }
+
+                    let keys = settings.motionSensors.keys.sorted {
                         $0.rawValue < $1.rawValue
                     }
 
                     ForEach(keys, id: \.self) { key in
-                        SettingsDropdown(
-                            title: key.rawValue,
-                            maxValue: getMaxMotionsensorRecordingRate(sensorName: key),
-                            step: 50,
-                            value: Binding(
-                                get: {
-                                    self.settingsArray.first!.motionSensorRecodingRates[key] ?? 0
-                                },
-                                set: {
-                                    self.settingsArray.first!.motionSensorRecodingRates[key] = $0
-                                }
+                        Toggle(
+                            isOn: Binding<Bool>(
+                                get: { self.settingsArray.first!.motionSensors[key] ?? false },
+                                set: { self.settingsArray.first!.motionSensors[key] = $0 }
                             )
-                        )
+                        ) {
+                            // todo use the better name
+                            Text("Record \(key.rawValue)")
+                        }
+                        .toggleStyle(.switch)
                     }
+
                 }
             }
         } else {

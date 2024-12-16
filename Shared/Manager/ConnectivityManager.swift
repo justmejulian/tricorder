@@ -20,14 +20,6 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
     @MainActor
     lazy var connectivityMetaInfoManager = ConnectivityMetaInfoManager()
 
-    private var shoudSend: Bool {
-        if failedSendCount > 10 {
-            return false
-        }
-
-        return true
-    }
-
     override init() {
         Logger.shared.debug("run on Thread \(Thread.current)")
 
@@ -126,11 +118,6 @@ extension ConnectivityManager {
     }
 
     private func sendMessageData(_ data: Data) async throws -> Data? {
-
-        // stop sending Packets when too many fail
-        if !shoudSend {
-            throw ConnectivityError.toManyFailed
-        }
 
         Task {
             await connectivityMetaInfoManager.increaseOpenSendConnectionsCount()

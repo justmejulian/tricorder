@@ -1,5 +1,5 @@
 //
-//  MotionManager.swift
+//  MotionObservableValueManager.swift
 //  tricorder
 //
 //  Created by Julian Visser on 05.11.2024.
@@ -9,7 +9,7 @@ import Foundation
 import OSLog
 
 @MainActor
-class MotionManager: ObservableObject {
+class MotionObservableValueManager: ObservableObject {
 
     @Published
     var count = 0
@@ -19,7 +19,7 @@ class MotionManager: ObservableObject {
         [Sensor.MotionSensorName: ObservableValueManager<MotionValue>] = [:]
 }
 
-extension MotionManager {
+extension MotionObservableValueManager {
     func reset() {
         count = 0
         motionObservableValueManagers = [:]
@@ -35,7 +35,7 @@ extension MotionManager {
         observableValueManager.update(newValues)
     }
 }
-extension MotionManager {
+extension MotionObservableValueManager {
     private func getOrCreateObservableValueManager(for sensorName: Sensor.MotionSensorName)
         -> ObservableValueManager<MotionValue>
     {
@@ -49,6 +49,6 @@ extension MotionManager {
     }
 }
 
-enum MotionManagerError: Error {
+enum MotionObservableValueManagerError: Error {
     case invalidData
 }

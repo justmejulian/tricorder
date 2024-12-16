@@ -72,6 +72,8 @@ extension RecordingManager {
             )
         )
 
+        let settings = try await getSettings()
+
         do {
             try await initNIDiscoveryToken()
             await nearbyInteractionManager.start()
@@ -80,7 +82,7 @@ extension RecordingManager {
         }
 
         // todo make sure these are actually started
-        try await startUpdates(recordingStart: recordingStart)
+        try await startUpdates(recordingStart: recordingStart, settings: settings)
     }
 
     func startWorkout() async throws -> Date {
@@ -92,9 +94,12 @@ extension RecordingManager {
         }
     }
 
-    func startUpdates(recordingStart: Date) async throws {
+    func startUpdates(recordingStart: Date, settings: Settings?) async throws {
         do {
-            try await coreMotionManager.startUpdates(recordingStart: recordingStart)
+            try await coreMotionManager.startUpdates(
+                recordingStart: recordingStart,
+                settings: settings
+            )
         } catch {
             Logger.shared.error("Failed to start Motion Updates: \(error)")
             throw RecordingManagerError.startWorkout
@@ -274,6 +279,31 @@ extension RecordingManager {
 // MARK: -  RecordingManager nonisolated functions
 //
 extension RecordingManager {
+    nonisolated func getSettings() async throws -> Settings? {
+        Logger.shared.debug("called on Thread \(Thread.current)")
+
+        guard let data = await sendGetSettings() else {
+            return nil
+        }
+
+        let settings = try? JSONDecoder().decode(Settings.self, from: data)
+        Logger.shared.debug("settings: \(String(describing: settings ?? nil))")
+
+        return settings
+    }
+
+    nonisolated func sendGetSettings() async -> Data? {
+        do {
+            return try await connectivityManager.sendData(
+                key: "settings",
+                data: try JSONEncoder().encode("")
+            ) as Data?
+        } catch {
+            Logger.shared.error("Failed to send get settings: \(error)")
+            return nil
+        }
+    }
+
     nonisolated func sendSensorUpdate(_ archive: [Data]) async throws {
         try await connectivityManager.sendDataArray(
             key: "sensorUpdate",

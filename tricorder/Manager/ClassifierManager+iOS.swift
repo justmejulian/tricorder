@@ -9,7 +9,7 @@ import OSLog
 
 @MainActor
 class ClassifierManager: BaseClassifierManager {
-    var motionManager = MotionManager()
+    var motionManager = MotionObservableValueManager()
     var distanceManager = ObservableValueManager<DistanceValue>()
     var heartRateManager = ObservableValueManager<StatisticValue>()
 

@@ -34,6 +34,7 @@ class RecordingManager: ObservableObject {
     #endif
 
     init(modelContainer: ModelContainer) {
+        // Logger.shared.debug("creating RecordingManager on Thread \(Thread.current)")
 
         self.modelContainer = modelContainer
 

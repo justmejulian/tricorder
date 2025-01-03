@@ -54,7 +54,6 @@ extension RecordingManager {
 //
 extension RecordingManager {
     func startRecording() async throws {
-
         Logger.shared.info("Starting Recording")
 
         await reset()
@@ -105,7 +104,7 @@ extension RecordingManager {
     }
 
     func initNIDiscoveryToken() async throws {
-        Logger.shared.info("Init NIDiscovery Token")
+        Logger.shared.debug("Initalizing NIDiscovery Token")
 
         let discoveryToken =
             try await nearbyInteractionManager.getDiscoveryTokenData()
@@ -147,7 +146,7 @@ extension RecordingManager {
             return
         }
 
-        Logger.shared.info(
+        Logger.shared.debug(
             "Session state changed to \(change.newState.rawValue)"
         )
 
@@ -156,6 +155,8 @@ extension RecordingManager {
         }
 
         if change.newState == .running {
+            Logger.shared.debug("Session started")
+
             Task {
                 let startDate = await workoutManager.getStartDate()
 
@@ -167,7 +168,7 @@ extension RecordingManager {
         }
 
         if change.newState == .stopped {
-            Logger.shared.info("\(#function): Session stopped")
+            Logger.shared.debug("Session stopped")
 
             Task {
                 do {

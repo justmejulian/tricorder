@@ -41,9 +41,6 @@ struct PagingView: View {
         .onChange(of: recordingManager.recordingState) {
             _,
             newValue in
-            Logger.shared.debug(
-                "PagingView.onChange: Session state changed to \(newValue.rawValue)"
-            )
 
             if newValue == .running || newValue == .paused {
                 displayMetricsView()

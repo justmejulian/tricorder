@@ -30,14 +30,7 @@ extension WorkoutManager {
          HealthKit calls this handler when a session starts mirroring.
          */
         healthStore.workoutSessionMirroringStartHandler = { mirroredSession in
-            Logger.shared.debug(
-                "workoutSessionMirroringStartHandler called on Thread \(Thread.current)"
-            )
-
             Task {
-                Logger.shared.debug(
-                    "workoutSessionMirroringStartHandler Taks running on Thread \(Thread.current)"
-                )
                 await self.reset()
                 await self.setSession(mirroredSession)
 

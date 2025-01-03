@@ -61,8 +61,7 @@ extension NearbyInteractionManager {
 
 extension NearbyInteractionManager {
     func start() {
-
-        Logger.shared.info("Start NearbyInteractionManager")
+        Logger.shared.info("Starting NearbyInteractionManager")
 
         guard let config = config else {
             Logger.shared.error(

@@ -42,7 +42,6 @@ extension RecordingManager {
 extension RecordingManager {
     // todo add name: String?
     func startRecording() async throws {
-
         Logger.shared.info("Starting Recording")
 
         await reset()
@@ -112,7 +111,7 @@ extension RecordingManager {
             return
         }
 
-        Logger.shared.info(
+        Logger.shared.debug(
             "Session state changed to \(change.newState.rawValue)"
         )
 

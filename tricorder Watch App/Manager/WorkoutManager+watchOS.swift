@@ -91,9 +91,7 @@ extension WorkoutManager {
     }
 
     func handleReceivedData(_ data: Data) throws {
-
         let dataObject = try SendDataObjectManager().decode(data)
-        Logger.shared.info("Received data: \(dataObject.key)")
     }
 
     func getStartDate() -> Date? {

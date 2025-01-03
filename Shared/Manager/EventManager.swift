@@ -17,7 +17,6 @@ actor EventManager {
         key: EventListenerKey,
         handleData: @escaping @Sendable (_ data: Sendable) async throws -> Data?  // todo make sendable?
     ) {
-
         // todo: check if already exists
         EventManager.listeners[key] = handleData
 

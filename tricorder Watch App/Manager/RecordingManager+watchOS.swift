@@ -13,7 +13,6 @@ let MAXCHUNKSIZE = 300
 
 extension RecordingManager {
     func registerListeners() async {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         await eventManager.register(
             key: .sessionStateChanged,
@@ -55,7 +54,6 @@ extension RecordingManager {
 //
 extension RecordingManager {
     func startRecording() async throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Logger.shared.info("Starting Recording")
 
@@ -108,7 +106,6 @@ extension RecordingManager {
 
     func initNIDiscoveryToken() async throws {
         Logger.shared.info("Init NIDiscovery Token")
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let discoveryToken =
             try await nearbyInteractionManager.getDiscoveryTokenData()
@@ -136,7 +133,6 @@ extension RecordingManager {
 extension RecordingManager {
     @Sendable
     nonisolated func handleCompanionStartedRecording(_ data: Sendable) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Task {
             try await startRecording()
@@ -145,7 +141,6 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleSessionStateChange(_ data: Sendable) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         guard let change = data as? SessionStateChange else {
             Logger.shared.error("\(#function): Invalid data type")
@@ -193,7 +188,6 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedData(_ data: Sendable) async throws -> Data? {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let dataObject = try SendDataObjectManager().decode(data)
 
@@ -212,7 +206,6 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedWorkoutData(_ data: Sendable) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let dataObject = try SendDataObjectManager().decode(data)
 
@@ -225,7 +218,6 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleSensorUpdate(_ data: Sendable) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let sensor = data as! Sensor
 
@@ -259,7 +251,7 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedDistance(_ data: Sendable) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
+
         Task {
             guard let newValues = data as? DistanceValue else {
                 Logger.shared.error("\(#function): Invalid data type")
@@ -280,15 +272,12 @@ extension RecordingManager {
 //
 extension RecordingManager {
     nonisolated func getSettings() async throws -> Settings? {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         guard let data = await sendGetSettings() else {
             return nil
         }
 
         let settings = try? JSONDecoder().decode(Settings.self, from: data)
-        Logger.shared.debug("settings: \(String(describing: settings ?? nil))")
-
         return settings
     }
 
@@ -312,13 +301,11 @@ extension RecordingManager {
     }
 
     nonisolated func archiveSendable(_ data: Codable) throws -> Data {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         return try JSONEncoder().encode(data)
     }
 
     nonisolated func archiveSendableArray(_ data: [Codable]) -> [Data] {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         do {
             return try data.map(archiveSendable(_:))

@@ -17,19 +17,16 @@ actor EventManager {
         key: EventListenerKey,
         handleData: @escaping @Sendable (_ data: Sendable) async throws -> Data?  // todo make sendable?
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         // todo: check if already exists
         EventManager.listeners[key] = handleData
 
-        Logger.shared.debug("Added EventListener for \(key.rawValue)")
     }
 
     func register(
         key: EventListenerKey,
         handleData: @escaping @Sendable (_ data: Sendable) throws -> Void
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         self.register(
             key: key,
@@ -40,8 +37,6 @@ actor EventManager {
         )
     }
     func trigger(key: EventListenerKey, data: Sendable) async throws -> Data? {
-        Logger.shared.debug("key\(key.rawValue) called on Thread \(Thread.current)")
-
         guard let listener = EventManager.listeners[key] else {
             throw EventManagerError.noListenerFound
         }

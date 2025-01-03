@@ -21,7 +21,8 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
     lazy var connectivityMetaInfoManager = ConnectivityMetaInfoManager()
 
     override init() {
-        Logger.shared.debug("run on Thread \(Thread.current)")
+        Logger.shared.info("Creating ConnectivityManager")
+        // Logger.shared.debug("run on Thread \(Thread.current)")
 
         super.init()
 
@@ -45,8 +46,6 @@ extension ConnectivityManager {
         activationDidCompleteWith activationState: WCSessionActivationState,
         error: Error?
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         if let error = error {
             Logger.shared.error("Error trying to activate WCSession: \(error.localizedDescription)")
         } else {
@@ -60,8 +59,6 @@ extension ConnectivityManager {
         // todo not sure if this works
         replyHandler: @Sendable @escaping (Data) -> Void
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         Task {
             await connectivityMetaInfoManager.updateLastDidReceiveDataDate()
 
@@ -70,7 +67,6 @@ extension ConnectivityManager {
                     key: .receivedData,
                     data: messageData
                 ) {
-                    Logger.shared.debug("EventManager.trigger returned: \(data)")
                     replyHandler(data)
                     return
                 }

@@ -15,7 +15,6 @@ class ClassifierManager: ObservableObject {
     var heartRateManager = ObservableValueManager<StatisticValue>()
 
     func reset() async {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         distanceManager.reset()
         heartRateManager.reset()
@@ -23,7 +22,6 @@ class ClassifierManager: ObservableObject {
     }
 
     func update(_ sensor: Sensor) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         switch sensor {
         case .motion(let name, _, let values):

@@ -10,7 +10,6 @@ import OSLog
 
 extension RecordingManager {
     func registerListeners() async {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         await eventManager.register(
             key: .sessionStateChanged,
@@ -43,7 +42,6 @@ extension RecordingManager {
 extension RecordingManager {
     // todo add name: String?
     func startRecording() async throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         Logger.shared.info("Starting Recording")
 
@@ -65,7 +63,7 @@ extension RecordingManager {
     }
 
     func fetchRemoteRecordingState() async {
-        Logger.shared.debug("called on Thread \(Thread.current)")
+
         do {
             guard
                 let recordingStateData = try await connectivityManager.sendData(
@@ -108,7 +106,6 @@ extension RecordingManager {
 extension RecordingManager {
     @Sendable
     nonisolated func handleSessionStateChange(_ data: Sendable) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         guard let change = data as? SessionStateChange else {
             Logger.shared.error("\(#function): Invalid data type")
@@ -137,7 +134,6 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedData(_ data: Sendable) async throws -> Data? {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let dataObject = try SendDataObjectManager().decode(data)
 
@@ -181,7 +177,6 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedWorkoutData(_ data: Sendable) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let dataObject = try SendDataObjectManager().decode(data)
 
@@ -190,7 +185,7 @@ extension RecordingManager {
 
         // todo can I replace this with the changeState?
         case "startDate":
-            Logger.shared.debug("Recieved Start Date")
+
             Task {
                 let date = try JSONDecoder().decode(
                     Date.self,
@@ -210,7 +205,7 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedDistance(_ data: Sendable) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
+
         Task {
             guard let recordingStartDate = await startDate else {
                 Logger.shared.error("Tried to set distance, but start date is nil.")

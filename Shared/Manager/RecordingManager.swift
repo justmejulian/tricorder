@@ -34,7 +34,6 @@ class RecordingManager: ObservableObject {
     #endif
 
     init(modelContainer: ModelContainer) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         self.modelContainer = modelContainer
 
@@ -52,7 +51,6 @@ class RecordingManager: ObservableObject {
 //
 extension RecordingManager {
     func setRecordingState(newState: HKWorkoutSessionState) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         self.recordingState = newState
     }
@@ -62,13 +60,10 @@ extension RecordingManager {
     }
 
     func setStartDate(_ date: Date) {
-        Logger.shared.debug("with: \(date) on called on Thread \(Thread.current)")
-
         self.startDate = date
     }
 
     func reset() async {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         recordingState = .notStarted
         startDate = nil

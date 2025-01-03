@@ -17,7 +17,6 @@ actor SensorBackgroundDataHandler: BackgroundDataHandlerProtocol {
 
 extension SensorBackgroundDataHandler {
     func add(sensor: Sensor) async throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         // tood make sure recording exists
 
@@ -32,7 +31,6 @@ extension SensorBackgroundDataHandler {
     func getSensors(recordingStart: Date) throws
         -> [Sensor]
     {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let descriptor = FetchDescriptor<SensorDatabaseModel>(
             predicate: #Predicate<SensorDatabaseModel> {
@@ -65,7 +63,6 @@ extension SensorBackgroundDataHandler {
     func getSensorValueCounts(recordingStart: Date) throws
         -> [String: Int]
     {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let sensors = try getSensors(recordingStart: recordingStart)
         return sensors.reduce(into: [:]) { result, sensor in

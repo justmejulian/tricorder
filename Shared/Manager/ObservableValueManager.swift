@@ -18,14 +18,12 @@ class ObservableValueManager<T: Value>: ObservableObject {
 
 extension ObservableValueManager {
     func reset() {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         count = 0
         mostRecent = nil
     }
 
     func update(_ newValues: [T]) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         count += newValues.count
         mostRecent = newValues.last

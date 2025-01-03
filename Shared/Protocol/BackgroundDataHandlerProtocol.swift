@@ -16,7 +16,6 @@ protocol BackgroundDataHandlerProtocol: Actor {
 }
 extension BackgroundDataHandlerProtocol {
     func createModelContext(modelContainer: ModelContainer) -> ModelContext {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let modelContext = ModelContext(modelContainer)
         modelContext.autosaveEnabled = false
@@ -24,7 +23,6 @@ extension BackgroundDataHandlerProtocol {
     }
 
     func save(modelContext: ModelContext) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         if modelContext.hasChanges {
             try modelContext.save()
@@ -32,7 +30,6 @@ extension BackgroundDataHandlerProtocol {
     }
 
     func appendData<T>(_ dataArray: [T]) throws where T: PersistentModel {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let modelContext = createModelContext(modelContainer: modelContainer)
         for data in dataArray {
@@ -42,7 +39,6 @@ extension BackgroundDataHandlerProtocol {
     }
 
     func appendData<T>(_ data: T) throws where T: PersistentModel {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let modelContext = createModelContext(modelContainer: modelContainer)
         modelContext.insert(data)
@@ -50,7 +46,6 @@ extension BackgroundDataHandlerProtocol {
     }
 
     func removeData(identifier: PersistentIdentifier) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let modelContext = createModelContext(modelContainer: modelContainer)
         let model = modelContext.model(for: identifier)
@@ -59,7 +54,6 @@ extension BackgroundDataHandlerProtocol {
     }
 
     func fetchDataCount<T: PersistentModel>(for _: T.Type) throws -> Int {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let descriptor = FetchDescriptor<T>()
 
@@ -69,7 +63,6 @@ extension BackgroundDataHandlerProtocol {
 
     func fetchPersistentIdentifiers<T>(for _: T.Type) throws -> [PersistentIdentifier]
     where T: PersistentModel {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         return try fetchPersistentIdentifiers(descriptor: FetchDescriptor<T>())
     }
@@ -77,7 +70,7 @@ extension BackgroundDataHandlerProtocol {
     func fetchPersistentIdentifiers<T>(descriptor: FetchDescriptor<T>) throws
         -> [PersistentIdentifier] where T: PersistentModel
     {
-        Logger.shared.debug("called on Thread \(Thread.current)")
+
         let modelContext = createModelContext(modelContainer: modelContainer)
         return try modelContext.fetchIdentifiers(descriptor)
     }

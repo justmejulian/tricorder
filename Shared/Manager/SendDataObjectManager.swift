@@ -17,7 +17,6 @@ struct SendDataObjectManager {
     }
 
     func encode(key: String, data: Data) throws -> Data {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let dataObject = DataObject(key: key, data: data)
         guard let encodedData = try? JSONEncoder().encode(dataObject) else {
@@ -27,7 +26,6 @@ struct SendDataObjectManager {
     }
 
     func decode(_ data: Data) throws -> DataObject {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         guard
             let dataObject = try? JSONDecoder().decode(

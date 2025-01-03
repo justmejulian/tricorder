@@ -40,25 +40,17 @@ extension ConnectivityMetaInfoManager {
     }
 
     func updateLastDidReceiveDataDate() {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         lastDidReceiveDataDate = Date()
         updateIsLastDidReceiveDataDateTooRecent()
     }
 
     func updateIsLastDidReceiveDataDateTooRecent() {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         Task {
-            Logger.shared.debug("Setting lastDidReceiveDataDateTooRecent to true")
             isLastDidReceiveDataDateTooRecent = true
 
             // Only continue if no more updates
             guard await debouncer.sleep() else { return }
 
-            Logger.shared.debug(
-                "lastUpdateTimeInterval: \(String(describing: lastDidReceiveDataDate?.timeIntervalSinceNow))"
-            )
             isLastDidReceiveDataDateTooRecent = false
         }
     }

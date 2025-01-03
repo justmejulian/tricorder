@@ -120,7 +120,7 @@ extension SettingsView {
         var body: some View {
             HStack {
                 Picker(title, selection: value) {
-                    ForEach(Array(stride(from: 0, to: maxValue + 1, by: step)), id: \.self) {
+                    ForEach(Array(stride(from: step, to: maxValue + 1, by: step)), id: \.self) {
                         value in
                         Text("\(value)")
                     }

@@ -51,7 +51,7 @@ extension RecordingManager {
 
         } catch {
             Logger.shared.log(
-                "Failed to start cycling on the paired watch."
+                "Failed to start recording on the paired watch."
             )
             throw RecordingManagerError.startWorkout
         }

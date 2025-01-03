@@ -11,7 +11,7 @@ import SwiftData
 @ModelActor
 actor SensorBackgroundDataHandler: BackgroundDataHandlerProtocol {
     func clear() throws {
-        try deleteAllInstances(of: RecordingDatabaseModel.self)
+        try deleteAllInstances(of: SensorDatabaseModel.self)
     }
 }
 
@@ -63,7 +63,6 @@ extension SensorBackgroundDataHandler {
     func getSensorValueCounts(recordingStart: Date) throws
         -> [String: Int]
     {
-
         let sensors = try getSensors(recordingStart: recordingStart)
         return sensors.reduce(into: [:]) { result, sensor in
             result[sensor.name.rawValue] = sensor.valuesCount

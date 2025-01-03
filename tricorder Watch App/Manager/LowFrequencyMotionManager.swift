@@ -78,8 +78,6 @@ extension LowFrequencyMotionManager {
                 to: self.queue,
                 withHandler: {
                     @Sendable (data, error) in
-                    Logger.shared.debug("called on Thread \(Thread.current)")
-
                     if let error = error {
                         Logger.shared.error(
                             "Error starting AccelerometerUpdates: \(error.localizedDescription)"
@@ -106,8 +104,6 @@ extension LowFrequencyMotionManager {
             to: self.queue,
             withHandler: {
                 @Sendable (data, error) in
-
-                Logger.shared.debug("called on Thread \(Thread.current)")
 
                 if let error = error {
                     Logger.shared.error(
@@ -136,7 +132,6 @@ extension LowFrequencyMotionManager {
         data: CMAccelerometerData,
         recordingStart: Date
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         handleUpdate(
             Sensor.motion(
@@ -153,7 +148,6 @@ extension LowFrequencyMotionManager {
         recordingStart: Date,
         motionSensors: [Sensor.MotionSensorName: Bool]
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let motionValues = createMotionValues(
             data: data,

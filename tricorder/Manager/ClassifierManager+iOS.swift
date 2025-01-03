@@ -22,7 +22,6 @@ class ClassifierManager: BaseClassifierManager {
     var topAcceleration: Double = 0
 
     func reset() async {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         distanceManager.reset()
         heartRateManager.reset()
@@ -35,7 +34,6 @@ class ClassifierManager: BaseClassifierManager {
     }
 
     func update(_ sensor: Sensor) async {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         switch sensor {
         case .motion(let name, _, let values):

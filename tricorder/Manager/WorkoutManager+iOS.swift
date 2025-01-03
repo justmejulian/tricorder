@@ -13,7 +13,7 @@ import OSLog
 //
 extension WorkoutManager {
     func startWatchWorkout() async throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
+        Logger.shared.info("Starting Watch Workout")
 
         // todo: how do I make sure it starts app? do I have to start twice?
         // or make the wake up the watch and only start with a followup request
@@ -26,20 +26,11 @@ extension WorkoutManager {
     }
 
     func retrieveRemoteSession() {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         /**
          HealthKit calls this handler when a session starts mirroring.
          */
         healthStore.workoutSessionMirroringStartHandler = { mirroredSession in
-            Logger.shared.debug(
-                "workoutSessionMirroringStartHandler called on Thread \(Thread.current)"
-            )
-
             Task {
-                Logger.shared.debug(
-                    "workoutSessionMirroringStartHandler Taks running on Thread \(Thread.current)"
-                )
                 await self.reset()
                 await self.setSession(mirroredSession)
 

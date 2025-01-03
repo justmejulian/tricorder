@@ -23,7 +23,6 @@ actor StatisticsManager {
 
 extension StatisticsManager {
     func handle(_ statistics: HKStatistics) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         switch statistics.quantityType {
         // Handle HeartRate
@@ -37,8 +36,6 @@ extension StatisticsManager {
                 Logger.shared.error("\(#function) failed to extract heart rate value")
                 return
             }
-
-            Logger.shared.debug("\(statistics.startDate)")
 
             Task {
                 await eventManager.trigger(

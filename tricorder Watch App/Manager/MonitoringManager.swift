@@ -23,14 +23,11 @@ class MonitoringManager: ObservableObject {
     }
 
     func reset() {
-        Logger.shared.debug("called on Thread \(Thread.current)")
         self.updateSendSuccess = []
         self.updateSendSuccessTrueCount = 0
     }
 
     func addUpdateSendSuccess(_ success: Bool) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         if success {
             updateSendSuccessTrueCount += 1
         }

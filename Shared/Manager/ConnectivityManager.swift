@@ -21,7 +21,7 @@ actor ConnectivityManager: NSObject, WCSessionDelegate {
     lazy var connectivityMetaInfoManager = ConnectivityMetaInfoManager()
 
     override init() {
-        Logger.shared.debug("run on Thread \(Thread.current)")
+        // Logger.shared.debug("creating ConnectivityManager on Thread \(Thread.current)")
 
         super.init()
 
@@ -45,12 +45,10 @@ extension ConnectivityManager {
         activationDidCompleteWith activationState: WCSessionActivationState,
         error: Error?
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         if let error = error {
             Logger.shared.error("Error trying to activate WCSession: \(error.localizedDescription)")
         } else {
-            Logger.shared.info("The session has completed activation.")
+            Logger.shared.info("ConnectivityManager session activated.")
         }
     }
 
@@ -60,8 +58,6 @@ extension ConnectivityManager {
         // todo not sure if this works
         replyHandler: @Sendable @escaping (Data) -> Void
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         Task {
             await connectivityMetaInfoManager.updateLastDidReceiveDataDate()
 
@@ -70,7 +66,6 @@ extension ConnectivityManager {
                     key: .receivedData,
                     data: messageData
                 ) {
-                    Logger.shared.debug("EventManager.trigger returned: \(data)")
                     replyHandler(data)
                     return
                 }
@@ -84,7 +79,7 @@ extension ConnectivityManager {
                 do {
                     replyHandler(try JSONEncoder().encode(["error": error.localizedDescription]))
                 } catch {
-                    Logger.shared.error("Failed to reply")
+                    Logger.shared.error("Failed to reply with error message.")
                 }
             }
         }
@@ -107,8 +102,6 @@ extension ConnectivityManager {
     }
 
     func sendData(key: String, data: Data) async throws -> Data? {
-        Logger.shared.debug("key: \(key), data: \(data) called on Thread \(Thread.current)")
-
         let dataObject = try SendDataObjectManager().encode(
             key: key,
             data: data
@@ -129,9 +122,6 @@ extension ConnectivityManager {
                 await self.session.sendMessageData(
                     data,
                     replyHandler: { data in
-                        Logger.shared.debug(
-                            "connectivityManager.sendMessageData replyHandler called"
-                        )
                         Task {
                             await self.connectivityMetaInfoManager
                                 .decreaseOpenSendConnectionsCount()

@@ -17,7 +17,7 @@ extension WorkoutManager {
      healthDataAccessRequest isn't available yet.
      */
     func requestAuthorization() {
-        Logger.shared.debug("called on Thread \(Thread.current)")
+        Logger.shared.info("Request authorization")
 
         Task {
             do {
@@ -32,7 +32,7 @@ extension WorkoutManager {
     }
 
     func startWorkout() async throws -> Date {
-        Logger.shared.debug("called on Thread \(Thread.current)")
+        Logger.shared.info("Starting workout")
 
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .functionalStrengthTraining
@@ -82,6 +82,8 @@ extension WorkoutManager {
     }
 
     func endWorkout(date: Date) async throws {
+        Logger.shared.info("End workout")
+
         do {
             workout = try await finishedWorkout(date: date)
         } catch {
@@ -93,10 +95,7 @@ extension WorkoutManager {
     }
 
     func handleReceivedData(_ data: Data) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         let dataObject = try SendDataObjectManager().decode(data)
-        Logger.shared.info("Received data: \(dataObject.key)")
     }
 
     func getStartDate() -> Date? {
@@ -112,8 +111,6 @@ extension WorkoutManager {
     }
 
     func finishedWorkout(date: Date) async throws -> HKWorkout? {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         guard let builder else {
             throw WorkoutManagerError.noLiveWorkoutBuilder
         }
@@ -137,15 +134,12 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
         _ workoutBuilder: HKLiveWorkoutBuilder,
         didCollectDataOf collectedTypes: Set<HKSampleType>
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         /**
           HealthKit calls this method on an anonymous serial background queue.
           Use Task to provide an asynchronous context so MainActor can come to play.
          */
         Task { @MainActor in
-            Logger.shared.debug("Task called on Thread \(Thread.current)")
-
             guard let statisticsManager = await statisticsManager else {
                 Logger.shared.error("Recieved didCollectDataOf while statisticsManager is nil")
                 return
@@ -166,6 +160,7 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
     nonisolated func workoutBuilderDidCollectEvent(
         _ workoutBuilder: HKLiveWorkoutBuilder
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
+
+        Logger.shared.debug("called.")
     }
 }

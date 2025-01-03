@@ -17,7 +17,6 @@ actor PersistedDataHandler: BackgroundDataHandlerProtocol {
 
 extension PersistedDataHandler {
     func add(data: Data) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let persistedData = PersistedDatabaseModel(data: data)
 
@@ -25,7 +24,6 @@ extension PersistedDataHandler {
     }
 
     func add(dataArray: [Data]) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         for data in dataArray {
             try add(data: data)
@@ -33,7 +31,6 @@ extension PersistedDataHandler {
     }
 
     func fetchAllPersistentIdentifiers() async throws -> [PersistentIdentifier] {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         return try fetchPersistentIdentifiers(
             for: PersistedDatabaseModel.self
@@ -82,7 +79,6 @@ extension PersistedDataHandler {
     }
 
     func removeData(identifiers: [PersistentIdentifier]) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let modelContext = createModelContext(modelContainer: modelContainer)
         for identifier in identifiers {

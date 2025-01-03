@@ -17,7 +17,6 @@ actor SettingsBackgroundDataHandler: BackgroundDataHandlerProtocol {
 
 extension SettingsBackgroundDataHandler {
     func createSettings() throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         if (try getSettingsPersistentIdentifier()) != nil {
             throw SettingsBackgroundDataHandlerError.alreadyCreated
@@ -31,7 +30,6 @@ extension SettingsBackgroundDataHandler {
     func getSettingsPersistentIdentifier() throws
         -> PersistentIdentifier?
     {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         let descriptor = FetchDescriptor<SettingDatabaseModel>()
         let persistentIdentifiers = try fetchPersistentIdentifiers(

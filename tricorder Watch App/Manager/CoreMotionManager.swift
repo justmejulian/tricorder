@@ -17,8 +17,7 @@ actor CoreMotionManager {
 
 extension CoreMotionManager {
     func stopUpdates() async {
-        Logger.shared.debug("MotinManager: stopUpdates called on Thread \(Thread.current)")
-
+        Logger.shared.info("Stop CoreMotion updates.")
         guard let motionManager else {
             Logger.shared.error("Tried to stop updates but motionManager is nil")
             return
@@ -30,7 +29,7 @@ extension CoreMotionManager {
     }
 
     func startUpdates(recordingStart: Date, settings: Settings?) async throws {
-        Logger.shared.debug("MotinManager: startUpdates called on Thread \(Thread.current)")
+        Logger.shared.info("Start CoreMotion updates.")
 
         var motionManager: MotionManager {
             guard let settings else {
@@ -59,8 +58,6 @@ extension CoreMotionManager {
     nonisolated private func handleUpdate(
         _ sensor: Sensor
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         Task {
             await eventManager.trigger(
                 key: .collectedSensorValues,

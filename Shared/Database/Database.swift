@@ -19,8 +19,6 @@ final class Database {
 
     // todo take shema and use to handle errors
     init(modelContainer: ModelContainer) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         Logger.shared.info("Creating Database")
 
         self.modelContainer = modelContainer
@@ -29,13 +27,10 @@ final class Database {
     }
 
     func getModelContainer() -> ModelContainer {
-        Logger.shared.debug("called on Thread \(Thread.current)")
         return self.modelContainer
     }
 
     func clear() {
-        Logger.shared.debug("called on Thread \(Thread.current)")
-
         Logger.shared.info("Deleting all Data from Database")
         self.modelContainer.deleteAllData()
     }

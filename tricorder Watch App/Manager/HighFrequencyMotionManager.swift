@@ -41,8 +41,6 @@ extension HighFrequencyMotionManager {
         if motionSensors[.acceleration] ?? true {
             await manager.startAccelerometerUpdates(handler: {
                 @Sendable (data, error) in
-                Logger.shared.debug("called on Thread \(Thread.current)")
-
                 if let error = error {
                     Logger.shared.error(
                         "Error starting AccelerometerUpdates: \(error.localizedDescription)"
@@ -66,8 +64,6 @@ extension HighFrequencyMotionManager {
 
         await manager.startDeviceMotionUpdates(handler: {
             @Sendable (data, error) in
-
-            Logger.shared.debug("called on Thread \(Thread.current)")
 
             if let error = error {
                 Logger.shared.error(
@@ -95,7 +91,6 @@ extension HighFrequencyMotionManager {
         dataArray: [CMAccelerometerData],
         recordingStart: Date
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         var values: [MotionValue] = []
 
@@ -117,7 +112,6 @@ extension HighFrequencyMotionManager {
         recordingStart: Date,
         motionSensors: [Sensor.MotionSensorName: Bool]
     ) {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         var values: [Sensor.MotionSensorName: [MotionValue]] = [:]
 

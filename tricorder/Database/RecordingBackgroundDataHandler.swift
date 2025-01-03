@@ -20,7 +20,6 @@ actor RecordingBackgroundDataHandler: BackgroundDataHandlerProtocol {
 
 extension RecordingBackgroundDataHandler {
     func addNewRecording(name: String?, startTimestamp: Date = Date()) throws {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         if (try getRecordingPersistentIdentifier(startTimestamp: startTimestamp)) != nil {
             Logger.shared.error("Recording already exists")
@@ -34,7 +33,6 @@ extension RecordingBackgroundDataHandler {
     }
 
     func fetchAllRecordingPersistentIdentifiers() async throws -> [PersistentIdentifier] {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         return try fetchPersistentIdentifiers(
             for: RecordingDatabaseModel.self
@@ -44,7 +42,6 @@ extension RecordingBackgroundDataHandler {
     func getRecordingPersistentIdentifier(startTimestamp: Date) throws
         -> PersistentIdentifier?
     {
-        Logger.shared.debug("called on Thread \(Thread.current)")
 
         // Check cache
         if let persistentIdentifier = cache[startTimestamp] {

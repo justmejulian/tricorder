@@ -35,7 +35,6 @@ struct FileExportButton: View {
                 Logger.shared.info("File exported to \(url)")
             case .failure(let error):
                 Logger.shared.error("Failed to export file: \(error)")
-                print("Failed to export file: \(error)")
             }
         }
     }

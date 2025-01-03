@@ -22,13 +22,14 @@ extension Logger {
         )
     #endif
 
+    // Usage:
+    //  Logger.shared.debug("run on Thread \(Thread.current)")
     internal func debug(
         _ message: @autoclosure () -> String,
         _ file: String = #file,
         _ function: String = #function,
         line: Int = #line
     ) {
-        // todo add thread?
         let converted =
             (file as NSString).lastPathComponent + ": " + function + ": "
             + "\(message())"

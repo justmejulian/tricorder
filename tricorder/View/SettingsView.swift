@@ -24,56 +24,64 @@ struct SettingsView: View {
 
                     // todo use sections
 
-                    Toggle(
-                        isOn: Binding<Bool>(
-                            get: { self.settingsArray.first!.useHighFrequencySensor },
-                            set: { self.settingsArray.first!.useHighFrequencySensor = $0 }
-                        )
-                    ) {
-                        Text("Use High Frequency Sensor")
-                    }
-                    .toggleStyle(.switch)
-
-                    if !settings.useHighFrequencySensor {
-                        SettingsDropdown(
-                            title: "Accelerometer Recording Rate",
-                            maxValue: 200,
-                            step: 50,
-                            value: Binding<Int>(
-                                get: { self.settingsArray.first!.accelerometerRecordingRate },
-                                set: { self.settingsArray.first!.accelerometerRecordingRate = $0 }
-                            )
-                        )
-
-                        SettingsDropdown(
-                            title: "Device Motion Recording Rate",
-                            maxValue: 200,
-                            step: 50,
-                            value: Binding<Int>(
-                                get: { self.settingsArray.first!.deviceMotionRecordingRate },
-                                set: { self.settingsArray.first!.deviceMotionRecordingRate = $0 }
-                            )
-                        )
-
-                    }
-
-                    let keys = settings.motionSensors.keys.sorted {
-                        $0.rawValue < $1.rawValue
-                    }
-
-                    ForEach(keys, id: \.self) { key in
+                    Section(header: Text("Recording Frequency")) {
                         Toggle(
                             isOn: Binding<Bool>(
-                                get: { self.settingsArray.first!.motionSensors[key] ?? false },
-                                set: { self.settingsArray.first!.motionSensors[key] = $0 }
+                                get: { self.settingsArray.first!.useHighFrequencySensor },
+                                set: { self.settingsArray.first!.useHighFrequencySensor = $0 }
                             )
                         ) {
-                            // todo use the better name
-                            Text("Record \(key.rawValue)")
+                            Text("Use High Frequency Sensor")
                         }
                         .toggleStyle(.switch)
+
+                        if !settings.useHighFrequencySensor {
+                            SettingsDropdown(
+                                title: "Accelerometer Recording Rate",
+                                maxValue: 200,
+                                step: 50,
+                                value: Binding<Int>(
+                                    get: { self.settingsArray.first!.accelerometerRecordingRate },
+                                    set: {
+                                        self.settingsArray.first!.accelerometerRecordingRate = $0
+                                    }
+                                )
+                            )
+
+                            SettingsDropdown(
+                                title: "Device Motion Recording Rate",
+                                maxValue: 200,
+                                step: 50,
+                                value: Binding<Int>(
+                                    get: { self.settingsArray.first!.deviceMotionRecordingRate },
+                                    set: {
+                                        self.settingsArray.first!.deviceMotionRecordingRate = $0
+                                    }
+                                )
+                            )
+
+                        }
                     }
 
+                    Section(header: Text("Enable / Disable Sensor")) {
+                        let keys = settings.motionSensors.keys.sorted {
+                            $0.rawValue < $1.rawValue
+                        }
+
+                        ForEach(keys, id: \.self) { key in
+                            Toggle(
+                                isOn: Binding<Bool>(
+                                    get: { self.settingsArray.first!.motionSensors[key] ?? false },
+                                    set: { self.settingsArray.first!.motionSensors[key] = $0 }
+                                )
+                            ) {
+                                // todo use the better name
+                                Text("Record \(key.rawValue)")
+                            }
+                            .toggleStyle(.switch)
+                        }
+
+                    }
                 }
             }
         } else {
@@ -112,7 +120,7 @@ extension SettingsView {
         var body: some View {
             HStack {
                 Picker(title, selection: value) {
-                    ForEach(Array(stride(from: 0, to: maxValue + 1, by: step)), id: \.self) {
+                    ForEach(Array(stride(from: step, to: maxValue + 1, by: step)), id: \.self) {
                         value in
                         Text("\(value)")
                     }

@@ -11,7 +11,7 @@ import SwiftData
 @ModelActor
 actor SensorBackgroundDataHandler: BackgroundDataHandlerProtocol {
     func clear() throws {
-        try deleteAllInstances(of: RecordingDatabaseModel.self)
+        try deleteAllInstances(of: SensorDatabaseModel.self)
     }
 }
 
@@ -63,10 +63,9 @@ extension SensorBackgroundDataHandler {
     func getSensorValueCounts(recordingStart: Date) throws
         -> [String: Int]
     {
-
         let sensors = try getSensors(recordingStart: recordingStart)
         return sensors.reduce(into: [:]) { result, sensor in
-            result[sensor.name] = sensor.valuesCount
+            result[sensor.name.rawValue] = sensor.valuesCount
         }
     }
 }
@@ -81,15 +80,15 @@ extension SensorBackgroundDataHandler {
         let motionSensor = getEmpytSensorOfEach(recordingStart: recordingStart)
 
         let mergedSensorBatches = sensors.reduce(into: motionSensor) { result, sensor in
-            guard let pastSensor = result[sensor.name] else {
+            guard let pastSensor = result[sensor.name.rawValue] else {
                 Logger.shared.error(
-                    "Could not find sensor name \(sensor.name) in getEmpytSensorOfEach"
+                    "Could not find sensor name \(sensor.name.rawValue) in getEmpytSensorOfEach"
                 )
                 return
             }
 
             do {
-                result[sensor.name] = try mergeSensorValues(a: pastSensor, b: sensor)
+                result[sensor.name.rawValue] = try mergeSensorValues(a: pastSensor, b: sensor)
             } catch {
                 Logger.shared.error("Could not merge sensor values. \(error.localizedDescription)")
             }

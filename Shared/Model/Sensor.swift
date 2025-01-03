@@ -11,16 +11,15 @@ enum Sensor: Codable {
     case statistic(StatisticSensorName, recordingStartDate: Date, values: [StatisticValue])
     case distance(DistanceSensorName, recordingStartDate: Date, values: [DistanceValue])
 
-    var name: String {
+    var name: any SensorName {
         switch self {
         case .motion(let name, _, _):
-            return name.rawValue
+            return name
         case .statistic(let name, _, _):
-            return name.rawValue
+            return name
         case .distance(let name, _, _):
-            return name.rawValue
+            return name
         }
-
     }
 
     var recordingStartDate: Date {
@@ -58,13 +57,18 @@ enum Sensor: Codable {
         case distance
     }
 
-    enum MotionSensorName: String, Codable, CaseIterable {
+    protocol SensorName: Codable, CaseIterable {
+        var name: String { get }
+        var rawValue: String { get }
+    }
+
+    enum MotionSensorName: String, SensorName {
         case acceleration
         case rotationRate
         case userAcceleration
         case gravity
         case quaternion
-
+        
         var name: String {
             switch self {
             case .acceleration:
@@ -81,12 +85,26 @@ enum Sensor: Codable {
         }
     }
 
-    enum StatisticSensorName: String, Codable, CaseIterable {
+    enum StatisticSensorName: String, SensorName {
         case heartRate
+
+        var name: String {
+            switch self {
+            case .heartRate:
+                return "Heart Rate"
+            }
+        }
     }
 
-    enum DistanceSensorName: String, Codable, CaseIterable {
+    enum DistanceSensorName: String, SensorName {
         case distance
+
+        var name: String {
+            switch self {
+            case .distance:
+                return "Distance"
+            }
+        }
     }
 
     // Decoding
@@ -214,7 +232,7 @@ func getEmpytSensorOfEach(recordingStart: Date) -> [String: Sensor] {
     let merged = motionSensors + statisticSensors + distanceSensors
 
     return merged.reduce(into: [:]) { result, sensor in
-        result[sensor.name] = sensor
+        result[sensor.name.rawValue] = sensor
     }
 }
 

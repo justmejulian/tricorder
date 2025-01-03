@@ -19,6 +19,8 @@ struct tricorder_Watch_AppApp: App {
         do {
             let schema = Schema([PersistedDatabaseModel.self])
             self.database = Database(modelContainer: try ModelContainer(for: schema))
+            
+            // database.clear()
 
             self.recordingManager = RecordingManager(modelContainer: database.getModelContainer())
 

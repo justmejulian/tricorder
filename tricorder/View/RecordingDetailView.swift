@@ -31,10 +31,11 @@ struct RecordingDetailView: View {
             FileExportButton(recordingStartDate: recordingStartTime)
         }
         .onAppear {
-            Task {
-                loading = true
-                self.values = await getSensorValueCounts(recordingStart: recordingStartTime)
-                loading = false
+            Task.detached {
+                await setLoading(true)
+                let values = await getSensorValueCounts(recordingStart: recordingStartTime)
+                await setValues(values)
+                await setLoading(false)
             }
         }
         .overlay {
@@ -53,6 +54,14 @@ struct RecordingDetailView: View {
 }
 
 extension RecordingDetailView {
+    func setLoading(_ loading: Bool) {
+        self.loading = loading
+    }
+
+    func setValues(_ values: [String: Int]) {
+        self.values = values
+    }
+
     nonisolated func getSensorValueCounts(recordingStart: Date) async -> [String: Int] {
         do {
             let modelContainer = await recordingManager.modelContainer

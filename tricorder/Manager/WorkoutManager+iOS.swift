@@ -13,6 +13,7 @@ import OSLog
 //
 extension WorkoutManager {
     func startWatchWorkout() async throws {
+        Logger.shared.info("Starting Watch Workout")
 
         // todo: how do I make sure it starts app? do I have to start twice?
         // or make the wake up the watch and only start with a followup request
@@ -25,7 +26,6 @@ extension WorkoutManager {
     }
 
     func retrieveRemoteSession() {
-
         /**
          HealthKit calls this handler when a session starts mirroring.
          */

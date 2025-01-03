@@ -52,7 +52,6 @@ class RecordingManager: ObservableObject {
 //
 extension RecordingManager {
     func setRecordingState(newState: HKWorkoutSessionState) {
-
         self.recordingState = newState
     }
 
@@ -65,7 +64,6 @@ extension RecordingManager {
     }
 
     func reset() async {
-
         recordingState = .notStarted
         startDate = nil
 

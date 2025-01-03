@@ -17,6 +17,7 @@ extension WorkoutManager {
      healthDataAccessRequest isn't available yet.
      */
     func requestAuthorization() {
+        Logger.shared.info("Request authorization")
 
         Task {
             do {
@@ -31,6 +32,7 @@ extension WorkoutManager {
     }
 
     func startWorkout() async throws -> Date {
+        Logger.shared.info("Starting workout")
 
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .functionalStrengthTraining
@@ -80,6 +82,8 @@ extension WorkoutManager {
     }
 
     func endWorkout(date: Date) async throws {
+        Logger.shared.info("End workout")
+
         do {
             workout = try await finishedWorkout(date: date)
         } catch {
@@ -107,7 +111,6 @@ extension WorkoutManager {
     }
 
     func finishedWorkout(date: Date) async throws -> HKWorkout? {
-
         guard let builder else {
             throw WorkoutManagerError.noLiveWorkoutBuilder
         }
@@ -158,5 +161,6 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
         _ workoutBuilder: HKLiveWorkoutBuilder
     ) {
 
+        Logger.shared.debug("called.")
     }
 }

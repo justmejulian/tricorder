@@ -57,13 +57,14 @@ extension WorkoutManager {
     }
 
     func stop() {
+        Logger.shared.info("Stop Activity")
+
         session?.stopActivity(
             with: .now
         )
     }
 
     func sendCodable(key: String, data: Data) async throws {
-
         let dataObject = try SendDataObjectManager().encode(
             key: key,
             data: data
@@ -73,10 +74,6 @@ extension WorkoutManager {
     }
 
     func sendData(_ data: Data, retryCount: Int = 0) async throws {
-        Logger.shared.debug(
-            "with data: \(data) retry count: \(retryCount) called on Thread \(Thread.current)"
-        )
-
         do {
             try await session?.sendToRemoteWorkoutSession(data: data)
         } catch {
@@ -124,8 +121,7 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
         from fromState: HKWorkoutSessionState,
         date: Date
     ) {
-
-        Logger.shared.log(
+        Logger.shared.debug(
             "Session state changed from \(fromState.rawValue) to \(toState.rawValue)"
         )
         /**
@@ -171,7 +167,6 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
         _ workoutSession: HKWorkoutSession,
         didReceiveDataFromRemoteWorkoutSession data: [Data]
     ) {
-
         // todo: is main needed?
         Task { @MainActor in
             for anElement in data {

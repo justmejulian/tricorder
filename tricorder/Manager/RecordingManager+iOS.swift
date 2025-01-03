@@ -110,11 +110,6 @@ extension RecordingManager {
             Logger.shared.error("\(#function): Invalid data type")
             return
         }
-
-        Logger.shared.debug(
-            "Session state changed to \(change.newState.rawValue)"
-        )
-
         Task {
             let currentState = await getRecordingState()
 
@@ -133,7 +128,6 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedData(_ data: Sendable) async throws -> Data? {
-
         let dataObject = try SendDataObjectManager().decode(data)
 
         // todo move these keys into and enum, so I know what is possible
@@ -176,7 +170,6 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedWorkoutData(_ data: Sendable) throws {
-
         let dataObject = try SendDataObjectManager().decode(data)
 
         // todo move these keys into and enum, so I know what is possible
@@ -204,7 +197,6 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedDistance(_ data: Sendable) throws {
-
         Task {
             guard let recordingStartDate = await startDate else {
                 Logger.shared.error("Tried to set distance, but start date is nil.")

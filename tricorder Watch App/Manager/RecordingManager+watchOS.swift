@@ -132,7 +132,6 @@ extension RecordingManager {
 extension RecordingManager {
     @Sendable
     nonisolated func handleCompanionStartedRecording(_ data: Sendable) throws {
-
         Task {
             try await startRecording()
         }
@@ -140,15 +139,10 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleSessionStateChange(_ data: Sendable) throws {
-
         guard let change = data as? SessionStateChange else {
             Logger.shared.error("\(#function): Invalid data type")
             return
         }
-
-        Logger.shared.debug(
-            "Session state changed to \(change.newState.rawValue)"
-        )
 
         Task {
             await setRecordingState(newState: change.newState)
@@ -163,13 +157,11 @@ extension RecordingManager {
                 if let startDateData = try? JSONEncoder().encode(startDate) {
                     try await workoutManager.sendCodable(key: "startDate", data: startDateData)
                 }
-
             }
         }
 
         if change.newState == .stopped {
             Logger.shared.debug("Session stopped")
-
             Task {
                 do {
                     await coreMotionManager.stopUpdates()

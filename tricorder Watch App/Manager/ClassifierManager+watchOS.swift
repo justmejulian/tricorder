@@ -15,14 +15,12 @@ class ClassifierManager: ObservableObject {
     var heartRateManager = ObservableValueManager<StatisticValue>()
 
     func reset() async {
-
         distanceManager.reset()
         heartRateManager.reset()
         motionManager.reset()
     }
 
     func update(_ sensor: Sensor) {
-
         switch sensor {
         case .motion(let name, _, let values):
             motionManager.update(

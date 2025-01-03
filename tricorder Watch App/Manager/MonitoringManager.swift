@@ -23,13 +23,11 @@ class MonitoringManager: ObservableObject {
     }
 
     func reset() {
-
         self.updateSendSuccess = []
         self.updateSendSuccessTrueCount = 0
     }
 
     func addUpdateSendSuccess(_ success: Bool) {
-
         if success {
             updateSendSuccessTrueCount += 1
         }

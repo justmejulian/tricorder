@@ -79,7 +79,7 @@ extension ConnectivityManager {
                 do {
                     replyHandler(try JSONEncoder().encode(["error": error.localizedDescription]))
                 } catch {
-                    Logger.shared.error("Failed to reply")
+                    Logger.shared.error("Failed to reply with error message.")
                 }
             }
         }

@@ -97,7 +97,7 @@ extension ControlsView {
         Task {
             self.loading = true
             do {
-                try await recordingManager.startRecording()
+                try await recordingManager.start()
             } catch {
                 Logger.shared.error("Error starting workout: \(error)")
                 self.error = error

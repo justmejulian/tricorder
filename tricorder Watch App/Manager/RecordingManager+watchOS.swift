@@ -53,54 +53,40 @@ extension RecordingManager {
 // MARK: -  RecordingManager functions
 //
 extension RecordingManager {
-    func startRecording() async throws {
+    func start() async throws {
         Logger.shared.info("Starting Recording")
 
         await reset()
 
-        let recordingStart = try await startWorkout()
-
-        // todo needed?
-        // Force SessionStateChange
-        workoutManager.handleSessionSateChange(
-            SessionStateChange(
-                newState: .running,
-                date: recordingStart
-            )
-        )
-
         let settings = try await getSettings()
+        
+        try await startNearbyInteraction()
 
-        do {
-            try await initNIDiscoveryToken()
-            await nearbyInteractionManager.start()
-        } catch {
-            Logger.shared.error("Failed to start Nearby Interaction: \(error)")
-        }
-
-        // todo make sure these are actually started
-        try await startUpdates(recordingStart: recordingStart, settings: settings)
+        try await startWorkout(settings: settings)
     }
 
-    func startWorkout() async throws -> Date {
-        do {
-            return try await workoutManager.startWorkout()
-        } catch {
-            Logger.shared.error("Failed to start startWorkout: \(error)")
-            throw RecordingManagerError.startWorkout
-        }
+    func startWorkout() async throws {
+        try await startWorkout(settings: nil)
     }
-
-    func startUpdates(recordingStart: Date, settings: Settings?) async throws {
+    
+    func startWorkout(settings: Settings?) async throws {
         do {
+            let recordingStart = try await workoutManager.startWorkout()
+            
+            // CoreMotion requires a running workout
             try await coreMotionManager.startUpdates(
                 recordingStart: recordingStart,
                 settings: settings
             )
         } catch {
-            Logger.shared.error("Failed to start Motion Updates: \(error)")
+            Logger.shared.error("Failed to start startWorkout: \(error)")
             throw RecordingManagerError.startWorkout
         }
+    }
+    
+    func startNearbyInteraction() async throws {
+        try await initNIDiscoveryToken()
+        await nearbyInteractionManager.start()
     }
 
     func initNIDiscoveryToken() async throws {
@@ -133,7 +119,7 @@ extension RecordingManager {
     @Sendable
     nonisolated func handleCompanionStartedRecording(_ data: Sendable) throws {
         Task {
-            try await startRecording()
+            try await start()
         }
     }
 

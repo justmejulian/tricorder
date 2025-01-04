@@ -8,8 +8,9 @@ import OSLog
 import SwiftUI
 
 struct ClearAllConfirmationButton<Label: View>: View {
+    let callback: () -> Void
+
     @EnvironmentObject var recordingManager: RecordingManager
-    @Environment(\.dismiss) private var dismiss
 
     @ViewBuilder let label: Label
 
@@ -36,8 +37,8 @@ struct ClearAllConfirmationButton<Label: View>: View {
                         Logger.shared.error("\(error)")
                     }
                     loading = false
-                    // go back to home
-                    dismiss()
+
+                    callback()
                 }
             }
             Button("Cancel", role: .cancel) {}

@@ -11,6 +11,7 @@ import SwiftUI
 
 struct RecordingListView: View {
     @EnvironmentObject var recordingManager: RecordingManager
+    @Environment(\.dismiss) private var dismiss
 
     @State
     var recordings: [RecordingDatabaseModel.Struct] = []
@@ -37,7 +38,11 @@ struct RecordingListView: View {
         }
         .navigationBarItems(
             trailing:
-                ClearAllConfirmationButton {
+                ClearAllConfirmationButton(
+                    callback: {
+                        dismiss()
+                    }
+                ) {
                     Image(systemName: "xmark.bin")
                 }
         )

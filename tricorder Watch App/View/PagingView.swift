@@ -16,12 +16,16 @@ struct PagingView: View {
     @State private var isSheetActive = false
 
     private enum Tab {
-        case controls, metrics, settings
+        case controls, metrics, persisted
     }
 
     var body: some View {
         TabView(selection: $selection) {
-            SettingsView().tag(Tab.settings)
+            if !recordingManager.recordingState.isActive {
+                PersistedView(
+                    navigateBack: displayMetricsView
+                ).tag(Tab.persisted)
+            }
             ControlsView(
                 connectivityMetaInfoManager: recordingManager.connectivityManager
                     .connectivityMetaInfoManager

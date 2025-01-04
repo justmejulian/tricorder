@@ -46,6 +46,7 @@ extension RecordingManager {
     }
 
     func resetRest() {
+        usePhone = true
         monitoringManager.reset()
     }
 }
@@ -54,13 +55,27 @@ extension RecordingManager {
 //
 extension RecordingManager {
     func startRecording() async throws {
-        Logger.shared.info("Starting Recording")
+        try await self.startRecording(withPhone: true)
+    }
+
+    func startRecording(withPhone: Bool) async throws {
+        Logger.shared.info("Starting Recording, with Phone: \(withPhone)")
 
         await reset()
 
+        self.usePhone = withPhone
+
         let recordingStart = try await startWorkout()
 
-        // todo needed?
+        if withPhone {
+            try await startRecordingWithPhone(recordingStart: recordingStart)
+            return
+        }
+
+        try await startUpdates(recordingStart: recordingStart, settings: nil)
+    }
+
+    func startRecordingWithPhone(recordingStart: Date) async throws {
         // Force SessionStateChange
         workoutManager.handleSessionSateChange(
             SessionStateChange(
@@ -71,14 +86,11 @@ extension RecordingManager {
 
         let settings = try await getSettings()
 
-        do {
-            try await initNIDiscoveryToken()
-            await nearbyInteractionManager.start()
-        } catch {
-            Logger.shared.error("Failed to start Nearby Interaction: \(error)")
-        }
+        Logger.shared.debug("Settings: \(String(describing: settings))")
 
-        // todo make sure these are actually started
+        try await initNIDiscoveryToken()
+        await nearbyInteractionManager.start()
+
         try await startUpdates(recordingStart: recordingStart, settings: settings)
     }
 
@@ -209,35 +221,46 @@ extension RecordingManager {
 
     }
 
+    nonisolated func persistData(_ dataArray: [Data]) async {
+        do {
+            try await PersistedDataHandler(modelContainer: modelContainer).add(
+                dataArray: dataArray
+            )
+        } catch {
+            fatalError("Failed to persist data")
+        }
+    }
+
     @Sendable
     nonisolated func handleSensorUpdate(_ data: Sendable) {
-
-        let sensor = data as! Sensor
-
-        let archive = archiveSendableArray(
-            sensor.chunked(into: MAXCHUNKSIZE)
-        )
-
-        if archive.isEmpty {
-            fatalError("\(#function): No data to send")
-        }
-
         Task {
+            let sensor = data as! Sensor
+
+            await classifierManager.update(sensor)
+
+            let archive = archiveSendableArray(
+                sensor.chunked(into: MAXCHUNKSIZE)
+            )
+
+            // No need to send
+            if !(await usePhone) {
+                await monitoringManager.addUpdateSendSuccess(false)
+                await persistData(archive)
+                return
+            }
+
+            if archive.isEmpty {
+                fatalError("\(#function): No data to send")
+            }
+
             do {
-                await classifierManager.update(sensor)
                 try await sendSensorUpdate(archive)
                 await monitoringManager.addUpdateSendSuccess(true)
             } catch {
                 Logger.shared.error("\(#function): Failed to send data: \(error)")
                 await monitoringManager.addUpdateSendSuccess(false)
+                await persistData(archive)
 
-                do {
-                    try await PersistedDataHandler(modelContainer: modelContainer).add(
-                        dataArray: archive
-                    )
-                } catch {
-                    fatalError("Failed to persist data")
-                }
             }
         }
     }
@@ -264,26 +287,21 @@ extension RecordingManager {
 // MARK: -  RecordingManager nonisolated functions
 //
 extension RecordingManager {
-    nonisolated func getSettings() async throws -> Settings? {
+    nonisolated func getSettings() async throws -> Settings {
 
-        guard let data = await sendGetSettings() else {
-            return nil
+        guard let data = try await sendGetSettings() else {
+            throw RecordingManagerError.invalidData
         }
 
-        let settings = try? JSONDecoder().decode(Settings.self, from: data)
+        let settings = try JSONDecoder().decode(Settings.self, from: data)
         return settings
     }
 
-    nonisolated func sendGetSettings() async -> Data? {
-        do {
-            return try await connectivityManager.sendData(
-                key: "settings",
-                data: try JSONEncoder().encode("")
-            ) as Data?
-        } catch {
-            Logger.shared.error("Failed to send get settings: \(error)")
-            return nil
-        }
+    nonisolated func sendGetSettings() async throws -> Data? {
+        return try await connectivityManager.sendData(
+            key: "settings",
+            data: try JSONEncoder().encode("")
+        ) as Data?
     }
 
     nonisolated func sendSensorUpdate(_ archive: [Data]) async throws {

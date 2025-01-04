@@ -36,7 +36,7 @@ struct ControlsView: View {
 
         VStack {
             Button {
-                startWorkout()
+                startRecording()
             } label: {
                 Label("Start", systemImage: "play.fill")
                     .labelStyle(WatchMenuLabelStyle())
@@ -45,7 +45,7 @@ struct ControlsView: View {
             .tint(.green)
 
             Button {
-                stopWorkout()
+                stopRecording()
             } label: {
                 Label("End", systemImage: "xmark")
                     .labelStyle(WatchMenuLabelStyle())
@@ -61,9 +61,12 @@ struct ControlsView: View {
         }
         .disabled(loading)
         .alert(errorMessage, isPresented: $showAlert) {
-            Button("Dismiss", role: .cancel) {
+            Button("Cancel", role: .destructive) {
                 reset()
-                stopWorkout()
+                stopRecording()
+            }
+            Button("Dismiss", role: .cancel) {
+                startRecordingWithoutPhone()
             }
         }
     }
@@ -86,18 +89,31 @@ extension ControlsView {
         self.error = nil
         self.showAlert = false
     }
-    private func stopWorkout() {
+    private func stopRecording() {
         Task {
             self.loading = true
             await recordingManager.workoutManager.stop()
             self.loading = false
         }
     }
-    private func startWorkout() {
+    private func startRecording() {
         Task {
             self.loading = true
             do {
-                try await recordingManager.startRecording()
+                try await recordingManager.start()
+            } catch {
+                Logger.shared.error("Error starting workout: \(error)")
+                self.error = error
+                self.showAlert = true
+            }
+            self.loading = false
+        }
+    }
+    private func startRecordingWithoutPhone() {
+        Task {
+            self.loading = true
+            do {
+                try await recordingManager.startWorkout()
             } catch {
                 Logger.shared.error("Error starting workout: \(error)")
                 self.error = error

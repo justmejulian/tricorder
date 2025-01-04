@@ -30,6 +30,12 @@ extension HighFrequencyMotionManager {
         motionSensors: [Sensor.MotionSensorName: Bool]?
     ) async throws {
         guard
+            CMBatchedSensorManager.authorizationStatus == .authorized
+        else {
+            Logger.shared.error("CMBatchedSensorManager not authorized")
+            throw HighFrequencyMotionManagerError.notSupported
+        }
+        guard
             CMBatchedSensorManager.isAccelerometerSupported
                 && CMBatchedSensorManager.isDeviceMotionSupported
         else {

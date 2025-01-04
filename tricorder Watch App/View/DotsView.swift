@@ -13,7 +13,7 @@ struct DotsView: View {
 
     var body: some View {
 
-        let sendCount = monitoringManager.updateSendSuccessTrueCount
+        let sendCount = monitoringManager.updateSendSuccessCount
         let successSendCount = monitoringManager.updateSendSuccessTrueCount
         let last10 = monitoringManager.last10UpdateSendSuccess
 

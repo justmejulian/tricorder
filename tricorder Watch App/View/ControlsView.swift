@@ -15,6 +15,8 @@ struct ControlsView: View {
     @ObservedObject
     var connectivityMetaInfoManager: ConnectivityMetaInfoManager
 
+    @State private var usePhone: Bool = true
+
     @State private var error: Error?
     @State private var showAlert: Bool = false
     @State private var loading: Bool = false
@@ -31,33 +33,38 @@ struct ControlsView: View {
         let isSending = connectivityMetaInfoManager.hasOpenSendConnections
         let isActive = recordingManager.recordingState.isActive
 
-        let disableStart = isActive || isSending
-        let disableStop = !isActive || (!isActive && isSending)
-
         VStack {
-            Button {
-                startWorkout()
-            } label: {
-                Label("Start", systemImage: "play.fill")
-                    .labelStyle(WatchMenuLabelStyle())
+            Toggle(isOn: $usePhone) {
+                Text("Use Phone")
             }
-            .disabled(disableStart)
-            .tint(.green)
-
-            Button {
-                stopWorkout()
-            } label: {
-                Label("End", systemImage: "xmark")
-                    .labelStyle(WatchMenuLabelStyle())
-            }
-            .tint(.red)
-            .disabled(disableStop)
+            .padding(.horizontal, 20)
+            .disabled(isActive || isSending)
 
             Spacer()
 
             if isSending {
                 SpinnerView(text: "Sending Data")
             }
+
+            Spacer()
+
+            Button {
+                if isActive {
+                    stopWorkout()
+                } else {
+                    startWorkout()
+                }
+            } label: {
+                if isActive {
+                    Label("End", systemImage: "xmark")
+                        .labelStyle(WatchMenuLabelStyle())
+                } else {
+                    Label("Start", systemImage: "play.fill")
+                        .labelStyle(WatchMenuLabelStyle())
+                }
+            }
+            .tint(isActive ? .red : .green)
+            .disabled(!isActive && isSending)
         }
         .disabled(loading)
         .alert(errorMessage, isPresented: $showAlert) {
@@ -97,7 +104,7 @@ extension ControlsView {
         Task {
             self.loading = true
             do {
-                try await recordingManager.startRecording()
+                try await recordingManager.startRecording(withPhone: usePhone)
             } catch {
                 Logger.shared.error("Error starting workout: \(error)")
                 self.error = error

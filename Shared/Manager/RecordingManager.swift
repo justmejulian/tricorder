@@ -31,6 +31,7 @@ class RecordingManager: ObservableObject {
     #if os(watchOS)
         var coreMotionManager = CoreMotionManager()
         var monitoringManager = MonitoringManager()
+        var usePhone = true
     #endif
 
     init(modelContainer: ModelContainer) {

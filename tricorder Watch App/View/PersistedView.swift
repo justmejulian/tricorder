@@ -8,6 +8,8 @@ import OSLog
 import SwiftUI
 
 struct PersistedView: View {
+    let navigateBack: () -> Void
+
     @EnvironmentObject var recordingManager: RecordingManager
 
     @State
@@ -37,7 +39,9 @@ struct PersistedView: View {
                     Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
 
                 }
-                ClearAllConfirmationButton {
+                ClearAllConfirmationButton(
+                    callback: navigateBack
+                ) {
                     Image(systemName: "xmark.bin")
                 }
             }

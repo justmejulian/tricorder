@@ -68,7 +68,7 @@ enum Sensor: Codable {
         case userAcceleration
         case gravity
         case quaternion
-        
+
         var name: String {
             switch self {
             case .acceleration:

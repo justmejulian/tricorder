@@ -59,7 +59,7 @@ extension RecordingManager {
         await reset()
 
         let settings = try await getSettings()
-        
+
         try await startNearbyInteraction()
 
         try await startWorkout(settings: settings)
@@ -68,11 +68,11 @@ extension RecordingManager {
     func startWorkout() async throws {
         try await startWorkout(settings: nil)
     }
-    
+
     func startWorkout(settings: Settings?) async throws {
         do {
             let recordingStart = try await workoutManager.startWorkout()
-            
+
             // CoreMotion requires a running workout
             try await coreMotionManager.startUpdates(
                 recordingStart: recordingStart,
@@ -83,7 +83,7 @@ extension RecordingManager {
             throw RecordingManagerError.startWorkout
         }
     }
-    
+
     func startNearbyInteraction() async throws {
         try await initNIDiscoveryToken()
         await nearbyInteractionManager.start()

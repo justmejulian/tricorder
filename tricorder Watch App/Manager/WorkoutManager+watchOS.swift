@@ -94,10 +94,6 @@ extension WorkoutManager {
         session?.end()
     }
 
-    func handleReceivedData(_ data: Data) throws {
-        let dataObject = try SendDataObjectManager().decode(data)
-    }
-
     func getStartDate() -> Date? {
         session?.associatedWorkoutBuilder().startDate
     }

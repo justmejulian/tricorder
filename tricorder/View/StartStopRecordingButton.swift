@@ -44,13 +44,21 @@ struct StartStopRecordingButton: View {
         StartStopRecordingButton(
             title: title,
             tint: isActive ? .red : .blue,
-            action: isActive ? stopRecording : startRecording
+            action: {
+                Task {
+                    await loadingAction(
+                        isActive ? stopRecording : startRecording
+                    )
+                }
+            }
         )
         .disabled(loading || (!isActive && isReceivingData))
         .alert(errorMessage, isPresented: $showAlert) {
             Button("Dismiss", role: .cancel) {
                 reset()
-                stopRecording()
+                Task {
+                    await stopRecording()
+                }
             }
         }
     }
@@ -87,36 +95,30 @@ extension StartStopRecordingButton {
         self.showAlert = false
     }
 
-    func startRecording() {
-        // todo error handling
-        Task {
-            self.loading = true
-            await recordingManager.fetchRemoteRecordingState()
+    func startRecording() async {
+        do {
+            try await recordingManager.fetchRemoteRecordingState()
 
             // Make sure recording was not started already
             if recordingManager.recordingState != .running {
-                do {
-                    try await recordingManager.startRecording()
-                } catch {
-                    Logger.shared.error("Error starting recording: \(error)")
-                    self.showAlert = true
-                    self.error = error
-                }
+                try await recordingManager.start()
             }
-
-            await sleepFor1Second()
-
-            self.loading = false
+        } catch {
+            Logger.shared.error("Error starting recording: \(error)")
+            self.showAlert = true
+            self.error = error
         }
     }
 
-    func stopRecording() {
-        Task {
-            self.loading = true
-            await recordingManager.stopRecording()
-            await sleepFor1Second()
-            self.loading = false
-        }
+    func stopRecording() async {
+        await recordingManager.stopRecording()
+    }
+
+    func loadingAction(_ action: () async -> Void) async {
+        self.loading = true
+        await action()
+        await sleepFor1Second()
+        self.loading = false
     }
 
     func sleepFor1Second() async {

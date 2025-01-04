@@ -49,7 +49,11 @@ struct StartView: View {
                 await recordingManager.reset()
                 triggerAuthorization.toggle()
                 await recordingManager.workoutManager.retrieveRemoteSession()
-                await recordingManager.fetchRemoteRecordingState()
+                do {
+                    try await recordingManager.fetchRemoteRecordingState()
+                } catch {
+                    Logger.shared.error("Failed to send request for recording state: \(error)")
+                }
                 self.isLoading = false
             }
         }

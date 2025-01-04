@@ -41,7 +41,7 @@ extension RecordingManager {
 //
 extension RecordingManager {
     // todo add name: String?
-    func startRecording() async throws {
+    func start() async throws {
         Logger.shared.info("Starting Recording")
 
         await reset()
@@ -61,30 +61,25 @@ extension RecordingManager {
         await workoutManager.stop()
     }
 
-    func fetchRemoteRecordingState() async {
-
-        do {
-            guard
-                let recordingStateData = try await connectivityManager.sendData(
-                    key: "recordingState",
-                    data: JSONEncoder().encode([] as [Int])  // send empty data
-                )
-            else {
-                throw RecordingManagerError.invalidData
-            }
-
-            let recordingObject = try JSONDecoder().decode(
-                RecordingObject.self,
-                from: recordingStateData
+    func fetchRemoteRecordingState() async throws {
+        guard
+            let recordingStateData = try await connectivityManager.sendData(
+                key: "recordingState",
+                data: JSONEncoder().encode([] as [Int])  // send empty data
             )
-            self.recordingState = HKWorkoutSessionState(rawValue: recordingObject.recordingState)!
-            if let startTime = recordingObject.startTime {
-                self.startDate = Date(timeIntervalSince1970: startTime)
-            }
-            // todo also do something about the motionData count
-        } catch {
-            Logger.shared.error("Failed to send request for recording state: \(error)")
+        else {
+            throw RecordingManagerError.invalidData
         }
+
+        let recordingObject = try JSONDecoder().decode(
+            RecordingObject.self,
+            from: recordingStateData
+        )
+        self.recordingState = HKWorkoutSessionState(rawValue: recordingObject.recordingState)!
+        if let startTime = recordingObject.startTime {
+            self.startDate = Date(timeIntervalSince1970: startTime)
+        }
+        // todo also do something about the motionData count
     }
 
     func clearAllFromDatabase() async throws {

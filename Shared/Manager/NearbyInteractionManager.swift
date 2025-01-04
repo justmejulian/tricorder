@@ -19,6 +19,7 @@ actor NearbyInteractionManager: NSObject {
 
 extension NearbyInteractionManager {
     func setDiscoveryToken(_ token: NIDiscoveryToken) throws {
+        Logger.shared.debug("setting NI discovery token")
         // todo can i get rid of this? init?
         if session == nil {
             initializeNISession()
@@ -28,7 +29,6 @@ extension NearbyInteractionManager {
     }
 
     func setDiscoveryToken(_ tokenData: Data) throws {
-
         guard
             let token = try? NSKeyedUnarchiver.unarchivedObject(
                 ofClass: NIDiscoveryToken.self,
@@ -42,7 +42,6 @@ extension NearbyInteractionManager {
     }
 
     func getDiscoveryTokenData() throws -> Data {
-
         // todo can i get rid of this? init?
         if session == nil {
             initializeNISession()
@@ -74,26 +73,25 @@ extension NearbyInteractionManager {
     }
 
     func stop() {
+        Logger.shared.info("Stopping NearbyInteractionManager")
 
-        // todo: maybe deinitializeNISession?
         session?.pause()
 
         deinitializeNISession()
     }
 
     private func initializeNISession() {
+        Logger.shared.debug("Initializing NISession")
 
         let isSupported = NISession.deviceCapabilities
             .supportsPreciseDistanceMeasurement
         guard isSupported else {
             // todo throw error
             Logger.shared.error(
-                "precise distance measurement is not supported"
+                "Precise distance measurement is not supported"
             )
             return
         }
-
-        // todo: check if supported and
 
         session = NISession()
         session?.delegate = self
@@ -101,8 +99,7 @@ extension NearbyInteractionManager {
     }
 
     private func deinitializeNISession() {
-
-        Logger.shared.info("invalidating and deinitializing the NISession")
+        Logger.shared.debug("Invalidating and deinitializing the NISession")
 
         session?.invalidate()
         session = nil
@@ -112,13 +109,11 @@ extension NearbyInteractionManager {
 // MARK: - NISessionDelegate
 extension NearbyInteractionManager: NISessionDelegate {
     nonisolated func sessionWasSuspended(_ session: NISession) {
-
-        Logger.shared.info("NISession was suspended")
+        Logger.shared.debug("NISession was suspended")
     }
 
     nonisolated func sessionSuspensionEnded(_ session: NISession) {
-
-        Logger.shared.info("NISession suspension ended")
+        Logger.shared.debug("NISession suspension ended")
     }
 
     nonisolated func session(
@@ -168,14 +163,16 @@ extension NearbyInteractionManager: NISessionDelegate {
 
         switch reason {
         case .peerEnded:
-            Logger.shared.info("NISession remote peer ended the connection")
-            Task {
-                await deinitializeNISession()
-            }
+            Logger.shared.debug("NISession remote peer ended the connection")
         case .timeout:
             Logger.shared.error("NISession peer connection timed out")
         default:
             Logger.shared.error("NISession disconnected from peer for an unknown reason")
+        }
+
+        // Run after every RemovalReason
+        Task {
+            await deinitializeNISession()
         }
     }
 }

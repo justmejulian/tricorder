@@ -53,7 +53,6 @@ extension RecordingManager {
 
         do {
             try await workoutManager.startWatchWorkout()
-
         } catch {
             Logger.shared.log(
                 "Failed to start recording on the paired watch."

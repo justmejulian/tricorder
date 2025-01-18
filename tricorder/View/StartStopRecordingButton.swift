@@ -97,7 +97,11 @@ extension StartStopRecordingButton {
 
     func startRecording() async {
         do {
-            try await recordingManager.fetchRemoteRecordingState()
+            do {
+                try await recordingManager.fetchRemoteRecordingState()
+            } catch {
+                Logger.shared.debug("Error fetching recording state: \(error)")
+            }
 
             // Make sure recording was not started already
             if recordingManager.recordingState != .running {

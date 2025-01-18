@@ -15,9 +15,6 @@ extension WorkoutManager {
     func startWatchWorkout() async throws {
         Logger.shared.info("Starting Watch Workout")
 
-        // todo: how do I make sure it starts app? do I have to start twice?
-        // or make the wake up the watch and only start with a followup request
-        // test once have logs
         try await healthStore.startWatchApp(toHandle: HKWorkoutConfiguration())  // This Config is ignored
     }
 

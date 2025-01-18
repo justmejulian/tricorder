@@ -170,7 +170,7 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedFileData(_ data: Sendable) async throws -> Data? {
-        
+
         let fileMerger = FileMerger()
         let dataArray = try fileMerger.processReceivedData(data as! Data)
 

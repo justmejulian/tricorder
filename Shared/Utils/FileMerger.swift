@@ -3,8 +3,8 @@
 //  tricorder
 //
 
-import SwiftUI
 import Foundation
+import SwiftUI
 
 class FileMerger {
     /// Combines multiple Data objects with metadata (file sizes).
@@ -15,9 +15,9 @@ class FileMerger {
 
         for file in files {
             // Append the size of each file to the header
-            var fileSize = UInt32(file.count).bigEndian // Use big-endian to maintain compatibility
+            var fileSize = UInt32(file.count).bigEndian  // Use big-endian to maintain compatibility
             header.append(Data(buffer: UnsafeBufferPointer(start: &fileSize, count: 1)))
-            
+
             // Append the file data to the combined data
             combinedData.append(file)
         }
@@ -37,7 +37,9 @@ class FileMerger {
             guard sizeRange.upperBound <= combinedData.count else { break }
 
             let sizeData = combinedData.subdata(in: sizeRange)
-            fileSizes.append(UInt32(bigEndian: sizeData.withUnsafeBytes { $0.load(as: UInt32.self) }))
+            fileSizes.append(
+                UInt32(bigEndian: sizeData.withUnsafeBytes { $0.load(as: UInt32.self) })
+            )
             offset += MemoryLayout<UInt32>.size
         }
 

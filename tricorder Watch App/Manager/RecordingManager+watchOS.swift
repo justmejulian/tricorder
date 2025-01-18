@@ -279,8 +279,19 @@ extension RecordingManager {
         ) as Void
     }
 
-    nonisolated func archiveSendable(_ data: Codable) throws -> Data {
+    nonisolated func sendFile(_ archive: [Data]) async throws {
 
+        Logger.shared.debug("combining files \(archive.count)")
+        let fileMerger = FileMerger()
+        let combinedData = try fileMerger.prepareForTransfer(archive)
+        Logger.shared.debug("compressed size \(combinedData.count)")
+
+        try await connectivityManager.sendDataAsFile(
+            combinedData as Data
+        ) as Void
+    }
+
+    nonisolated func archiveSendable(_ data: Codable) throws -> Data {
         return try JSONEncoder().encode(data)
     }
 

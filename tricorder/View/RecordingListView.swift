@@ -19,19 +19,27 @@ struct RecordingListView: View {
     var loading = false
 
     var body: some View {
-        List(recordings, id: \.startTimestamp) { recording in
-            NavigationLink {
-                RecordingDetailView(recordingStartTime: recording.startTimestamp)
-            } label: {
-                VStack {
-                    Text(recording.name)
-                    Text(recording.startTimestamp.ISO8601Format()).font(.caption)
+
+        VStack {
+            if loading {
+                SpinnerView(text: "Loading")
+            } else {
+                List(recordings, id: \.startTimestamp) { recording in
+                    NavigationLink {
+                        RecordingDetailView(recordingStartTime: recording.startTimestamp)
+                    } label: {
+                        VStack {
+                            Text(recording.name)
+                            Text(recording.startTimestamp.ISO8601Format()).font(.caption)
+                        }
+                    }
                 }
             }
+
         }
         .onAppear {
+            loading = true
             Task {
-                loading = true
                 recordings = await getRecordings()
                 loading = false
             }
@@ -47,9 +55,6 @@ struct RecordingListView: View {
                 }
         )
         .overlay {
-            if loading {
-                SpinnerView(text: "Loading")
-            }
             if !loading && recordings.isEmpty {
                 ContentUnavailableView(
                     "No recordings yet",

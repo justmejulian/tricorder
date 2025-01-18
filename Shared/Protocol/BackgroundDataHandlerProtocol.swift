@@ -77,8 +77,14 @@ extension BackgroundDataHandlerProtocol {
 
     func deleteAllInstances<T: PersistentModel>(of modelType: T.Type) throws {
         let modelContext = createModelContext(modelContainer: modelContainer)
+        
+        try modelContext.save()
 
         try modelContext.delete(model: modelType)
+        
+        for model in try modelContext.fetch(FetchDescriptor<T>()) {
+          modelContext.delete(model)
+        }
 
         try modelContext.save()
     }

@@ -76,32 +76,27 @@ extension PersistedView {
 
     func sendData() async throws {
         let handler = PersistedDataHandler(modelContainer: recordingManager.modelContainer)
-        let ids = try await handler.fetchAllPersistentIdentifiers()
+        let allIds = try await handler.fetchAllPersistentIdentifiers()
 
         var failedCount = 0
 
         // break up, so that can sync more at once
-        let chundedIds = ids.chunked(into: 10)
+        let chundedIds = allIds.chunked(into: 500)
 
         // todo improve to maybe batch and compress
         for ids in chundedIds {
+            Logger.shared.debug("starting for \(ids.count)")
+                               
             if failedCount > 5 {
                 break
             }
             let dataArray = try await handler.getData(for: ids)
-            let tasks = dataArray.map { data in
-                Task {
-                    try await recordingManager.sendSensorUpdate([data])
-                }
-            }
-
+            Logger.shared.debug("fetched data for \(ids.count)")
             do {
-                for task in tasks {
-                    try await task.value
-                }
-
-                // If none fail then remove all
-                count -= tasks.count
+                Logger.shared.debug("starting send data for \(ids.count)")
+                try await recordingManager.sendFile(dataArray)
+                Logger.shared.debug("finished send data for \(ids.count)")
+                count -= ids.count
                 try await handler.removeData(identifiers: ids)
             } catch {
                 Logger.shared.error("Failed during sync: \(error)")

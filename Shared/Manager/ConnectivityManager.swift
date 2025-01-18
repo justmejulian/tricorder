@@ -84,6 +84,27 @@ extension ConnectivityManager {
             }
         }
     }
+
+    nonisolated func session(
+        _ session: WCSession,
+        didReceive file: WCSessionFile
+    ) {
+        let receivedFileURL = file.fileURL
+
+        do {
+            let fileData = try Data(contentsOf: receivedFileURL)
+
+            Task {
+                await eventManager.trigger(
+                    key: .receivedFileData,
+                    data: fileData
+                ) as Void
+            }
+
+        } catch {
+            Logger.shared.error("Failed to read file: \(error)")
+        }
+    }
 }
 
 // MARK: -  ConnectivityManager sendData
@@ -110,7 +131,22 @@ extension ConnectivityManager {
         return try await sendMessageData(dataObject)
     }
 
+    func sendDataAsFile(_ data: Data) async throws {
+        if !self.session.isReachable {
+            throw ConnectivityError.notReachable
+        }
+
+        let tempDirectory = FileManager.default.temporaryDirectory
+        let fileURL = tempDirectory.appendingPathComponent("tmp-file-send")
+        try data.write(to: fileURL)
+        try await sendFileData(fileURL)
+    }
+
     private func sendMessageData(_ data: Data) async throws -> Data? {
+
+        if !self.session.isReachable {
+            throw ConnectivityError.notReachable
+        }
 
         Task {
             await connectivityMetaInfoManager.increaseOpenSendConnectionsCount()
@@ -140,8 +176,56 @@ extension ConnectivityManager {
             }
         })
     }
+
+    private func sendFileData(_ url: URL) async throws {
+        if !self.session.isReachable {
+            throw ConnectivityError.notReachable
+        }
+
+        Task {
+            await connectivityMetaInfoManager.increaseOpenSendConnectionsCount()
+        }
+
+        try await withCheckedThrowingContinuation {
+            continuation in
+
+            let fileTransfer = self.session.transferFile(url, metadata: nil)
+
+            // Observe the progress
+            let observation = fileTransfer.progress.observe(\.isFinished, options: [.new]) {
+                progress,
+                _ in
+                if progress.isFinished {
+                    // Resume the continuation when the transfer finishes
+                    continuation.resume()
+
+                    // Decrement the connections count
+                    Task {
+                        await self.connectivityMetaInfoManager.decreaseOpenSendConnectionsCount()
+                    }
+                }
+            }
+
+            // Cleanup to ensure continuation is resumed in all cases
+            Task {
+                try await Task.sleep(nanoseconds: 60 * 1_000_000_000)  // 30 seconds timeout
+                if !fileTransfer.progress.isFinished {
+                    // Timeout fallback: Ensure continuation is resumed
+                    continuation.resume(throwing: ConnectivityError.timeout)
+
+                    // Decrement the connections count
+                    await self.connectivityMetaInfoManager.decreaseOpenSendConnectionsCount()
+                }
+
+                // Invalidate observation after the timeout
+                observation.invalidate()
+            }
+        }
+    }
 }
 
 enum ConnectivityError: Error {
     case toManyFailed
+    case notReachable
+    case timeout
 }

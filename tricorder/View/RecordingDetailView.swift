@@ -22,26 +22,27 @@ struct RecordingDetailView: View {
     // todo replace with backgorund fetch
     var body: some View {
         VStack {
-            Text(recordingStartTime.ISO8601Format()).font(.headline)
-            // todo make into something better looking
-            List(values.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                Text("# \(key): \(value)")
-            }
+            if loading {
+                SpinnerView(text: "Loading")
+            } else {
+                Text(recordingStartTime.ISO8601Format()).font(.headline)
+                // todo make into something better looking
+                List(values.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                    Text("# \(key): \(value)")
+                }
 
-            FileExportButton(recordingStartDate: recordingStartTime)
+                FileExportButton(recordingStartDate: recordingStartTime)
+            }
         }
         .onAppear {
+            setLoading(true)
             Task.detached {
-                await setLoading(true)
                 let values = await getSensorValueCounts(recordingStart: recordingStartTime)
                 await setValues(values)
                 await setLoading(false)
             }
         }
         .overlay {
-            if loading {
-                SpinnerView(text: "Loading")
-            }
             if !loading && values.isEmpty {
                 ContentUnavailableView(
                     "No Sensor Data",

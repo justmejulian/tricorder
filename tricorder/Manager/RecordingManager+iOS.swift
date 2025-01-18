@@ -22,6 +22,11 @@ extension RecordingManager {
         )
 
         await eventManager.register(
+            key: .receivedFileData,
+            handleData: self.handleReceivedFileData
+        )
+
+        await eventManager.register(
             key: .receivedWorkoutData,
             handleData: self.handleReceivedWorkoutData
         )
@@ -161,6 +166,22 @@ extension RecordingManager {
         default:
             throw RecordingManagerError.noKey
         }
+    }
+
+    @Sendable
+    nonisolated func handleReceivedFileData(_ data: Sendable) async throws -> Data? {
+
+        let fileMerger = FileMerger()
+        let dataArray = try fileMerger.processReceivedData(data as! Data)
+
+        for data in dataArray {
+            let sensor = try JSONDecoder().decode(
+                Sensor.self,
+                from: data
+            )
+            try await storeSensor(sensor)
+        }
+        return nil
     }
 
     @Sendable

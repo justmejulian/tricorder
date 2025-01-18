@@ -70,6 +70,7 @@ enum EventListenerKey: String, CaseIterable {
     case collectedDistance
     case receivedData
     case receivedWorkoutData
+    case receivedFileData
 }
 
 enum EventManagerHandler: Error {

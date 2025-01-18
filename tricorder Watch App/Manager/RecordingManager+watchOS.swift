@@ -279,8 +279,16 @@ extension RecordingManager {
         ) as Void
     }
 
-    nonisolated func archiveSendable(_ data: Codable) throws -> Data {
+    nonisolated func sendFile(_ archive: [Data]) async throws {
 
+        let encodedArray = try JSONEncoder().encode(archive)
+
+        try await connectivityManager.sendDataAsFile(
+            encodedArray
+        ) as Void
+    }
+
+    nonisolated func archiveSendable(_ data: Codable) throws -> Data {
         return try JSONEncoder().encode(data)
     }
 

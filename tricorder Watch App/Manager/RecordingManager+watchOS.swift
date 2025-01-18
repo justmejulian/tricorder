@@ -282,9 +282,12 @@ extension RecordingManager {
     nonisolated func sendFile(_ archive: [Data]) async throws {
 
         let encodedArray = try JSONEncoder().encode(archive)
+        Logger.shared.debug("Uncompressed size \(encodedArray.count)")
+        let compressedData = try (encodedArray as NSData).compressed(using: .lzfse)
+        Logger.shared.debug("compressed size \(compressedData.count)")
 
         try await connectivityManager.sendDataAsFile(
-            encodedArray
+            compressedData as Data
         ) as Void
     }
 

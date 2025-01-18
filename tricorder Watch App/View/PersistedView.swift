@@ -81,7 +81,7 @@ extension PersistedView {
         var failedCount = 0
 
         // break up, so that can sync more at once
-        let chundedIds = allIds.chunked(into: 500)
+        let chundedIds = allIds.chunked(into: 1000)
 
         // todo improve to maybe batch and compress
         for ids in chundedIds {

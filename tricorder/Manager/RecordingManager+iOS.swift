@@ -170,8 +170,9 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedFileData(_ data: Sendable) async throws -> Data? {
-        let decompressedData = try ( data as! NSData).decompressed(using: .lzfse)
-        let dataArray = try JSONDecoder().decode([Data].self, from: decompressedData as Data)
+        
+        let fileMerger = FileMerger()
+        let dataArray = try fileMerger.processReceivedData(data as! Data)
 
         for data in dataArray {
             let sensor = try JSONDecoder().decode(

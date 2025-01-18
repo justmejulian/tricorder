@@ -81,7 +81,7 @@ extension PersistedView {
         var failedCount = 0
 
         // break up, so that can sync more at once
-        let chundedIds = allIds.chunked(into: 1000)
+        let chundedIds = allIds.chunked(into: 500)
 
         // todo improve to maybe batch and compress
         for ids in chundedIds {
@@ -97,7 +97,7 @@ extension PersistedView {
                 try await recordingManager.sendFile(dataArray)
                 Logger.shared.debug("finished send data for \(ids.count)")
                 count -= ids.count
-                // try await handler.removeData(identifiers: ids)
+                try await handler.removeData(identifiers: ids)
             } catch {
                 Logger.shared.error("Failed during sync: \(error)")
                 failedCount += 1

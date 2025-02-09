@@ -14,12 +14,21 @@ struct PagingView: View {
 
     @State private var selection: Tab = .metrics
     @State private var isSheetActive = false
+    @State private var error: Error?
+    @State private var showAlert: Bool = false
 
     private enum Tab {
         case controls, metrics, persisted
     }
 
     var body: some View {
+        var errorMessage: String {
+            if let localizedDescription = error?.localizedDescription {
+                return localizedDescription
+            }
+
+            return "Something went wrong starting the workout."
+        }
         TabView(selection: $selection) {
             if !recordingManager.recordingState.isActive {
                 PersistedView(
@@ -31,6 +40,18 @@ struct PagingView: View {
                     .connectivityMetaInfoManager
             ).tag(Tab.controls)
             RecodingTimelineView().tag(Tab.metrics)
+        }
+        .alert(errorMessage, isPresented: $showAlert) {
+            Button("Dismiss", role: .cancel) {}
+        }
+        .onAppear {
+            Task {
+                guard await recordingManager.workoutManager.checkAllHealthKitPermissions() else {
+                    Logger.shared.debug("has all permissions")
+                    return
+                }
+                error = WorkoutManagerError.missingPermissions
+            }
         }
         .navigationTitle("Cycling")
         .navigationBarBackButtonHidden(true)

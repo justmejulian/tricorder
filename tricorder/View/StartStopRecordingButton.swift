@@ -52,6 +52,16 @@ struct StartStopRecordingButton: View {
                 }
             }
         )
+        .onAppear {
+            Task {
+                guard await recordingManager.workoutManager.checkAllHealthKitPermissions() else {
+                    Logger.shared.debug("has all permissions")
+                    return
+                }
+                error = WorkoutManagerError.missingPermissions
+                self.showAlert = true
+            }
+        }
         .disabled(loading || (!isActive && isReceivingData))
         .alert(errorMessage, isPresented: $showAlert) {
             Button("Dismiss", role: .cancel) {

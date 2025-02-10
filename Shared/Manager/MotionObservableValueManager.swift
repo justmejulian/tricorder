@@ -48,6 +48,13 @@ extension MotionObservableValueManager {
     }
 }
 
-enum MotionObservableValueManagerError: Error {
+enum MotionObservableValueManagerError: LocalizedError {
     case invalidData
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidData:
+            return "The motion data received is invalid or corrupted."
+        }
+    }
 }

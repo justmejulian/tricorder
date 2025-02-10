@@ -58,11 +58,10 @@ extension LowFrequencyMotionManager {
         accelerometerRecordingRate: Int?,
         deviceMotionRecordingRate: Int?
     ) async throws {
-
         guard
             await manager.isDeviceMotionAvailable
         else {
-            throw HighFrequencyMotionManagerError.notSupported
+            throw LowFrequencyMotionManagerError.notSupported
         }
 
         if let accelerometerRecordingRate = accelerometerRecordingRate {
@@ -164,5 +163,17 @@ extension LowFrequencyMotionManager {
             )
         }
 
+    }
+}
+
+enum LowFrequencyMotionManagerError: LocalizedError {
+    case notSupported
+
+    var errorDescription: String? {
+        switch self {
+        case .notSupported:
+            return
+                "Motion tracking is not supported on this device. Make sure to enable Motion Permissions."
+        }
     }
 }

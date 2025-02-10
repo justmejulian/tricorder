@@ -70,6 +70,13 @@ extension SettingsBackgroundDataHandler {
 
 }
 
-enum SettingsBackgroundDataHandlerError: Error {
+enum SettingsBackgroundDataHandlerError: LocalizedError {
     case alreadyCreated
+
+    var errorDescription: String? {
+        switch self {
+        case .alreadyCreated:
+            return "The settings background data handler has already been created."
+        }
+    }
 }

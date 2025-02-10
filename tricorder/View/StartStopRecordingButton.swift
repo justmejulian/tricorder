@@ -52,6 +52,17 @@ struct StartStopRecordingButton: View {
                 }
             }
         )
+        .onAppear {
+            Task {
+                if let missingPermission = await recordingManager.workoutManager
+                    .getMissingHealthKitPermission()
+                {
+                    // also use alertManager
+                    error = WorkoutManagerError.missingPermissions
+                    self.showAlert = true
+                }
+            }
+        }
         .disabled(loading || (!isActive && isReceivingData))
         .alert(errorMessage, isPresented: $showAlert) {
             Button("Dismiss", role: .cancel) {

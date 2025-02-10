@@ -50,7 +50,16 @@ struct SendDataObjectManager {
 
 // MARK: - SendDataObjectManagerError
 //
-enum SendDataObjectManagerError: Error {
+enum SendDataObjectManagerError: LocalizedError {
     case couldNotEncodeData
     case couldNotDecodeData
+
+    var errorDescription: String? {
+        switch self {
+        case .couldNotEncodeData:
+            return "Failed to encode the data before sending."
+        case .couldNotDecodeData:
+            return "Failed to decode the received data."
+        }
+    }
 }

@@ -29,12 +29,15 @@ extension HighFrequencyMotionManager {
         recordingStart: Date,
         motionSensors: [Sensor.MotionSensorName: Bool]?
     ) async throws {
-        guard
-            CMBatchedSensorManager.authorizationStatus == .authorized
-        else {
-            Logger.shared.error("CMBatchedSensorManager not authorized")
+        if CMBatchedSensorManager.authorizationStatus == .denied {
+            Logger.shared.error("CMBatchedSensorManager authorizationStatus is denied")
             throw HighFrequencyMotionManagerError.notSupported
         }
+        if CMBatchedSensorManager.authorizationStatus == .restricted {
+            Logger.shared.error("CMBatchedSensorManager authorizationStatus is restricted")
+            throw HighFrequencyMotionManagerError.notSupported
+        }
+
         guard
             CMBatchedSensorManager.isAccelerometerSupported
                 && CMBatchedSensorManager.isDeviceMotionSupported
@@ -147,6 +150,15 @@ extension HighFrequencyMotionManager {
         }
     }
 }
-enum HighFrequencyMotionManagerError: Error {
+
+enum HighFrequencyMotionManagerError: LocalizedError {
     case notSupported
+
+    var errorDescription: String? {
+        switch self {
+        case .notSupported:
+            return
+                "High-frequency motion tracking is not supported on this device. Make sure to enable Motion Permissions."
+        }
+    }
 }

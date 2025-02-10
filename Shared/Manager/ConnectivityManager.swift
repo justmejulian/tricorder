@@ -224,8 +224,16 @@ extension ConnectivityManager {
     }
 }
 
-enum ConnectivityError: Error {
-    case toManyFailed
+enum ConnectivityError: LocalizedError {
     case notReachable
     case timeout
+
+    var errorDescription: String? {
+        switch self {
+        case .notReachable:
+            return "The Watch is not reachable."
+        case .timeout:
+            return "The request timed out."
+        }
+    }
 }

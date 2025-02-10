@@ -29,7 +29,7 @@ struct File: FileDocument {
 
     init(configuration: ReadConfiguration) throws {
         guard let data = configuration.file.regularFileContents else {
-            throw FileCreatorError.FileInitializationError
+            throw FileCreatorError.fileInitializationError
         }
         self.fileData = data
         self.fileName = "Untitled.json"
@@ -40,6 +40,14 @@ struct File: FileDocument {
     }
 }
 
-enum FileCreatorError: Error {
-    case FileInitializationError
+enum FileCreatorError: LocalizedError {
+    case fileInitializationError
+
+    var errorDescription: String? {
+        switch self {
+        case .fileInitializationError:
+            return
+                "Failed to initialize the file. Ensure the file path and permissions are correct."
+        }
+    }
 }

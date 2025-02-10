@@ -108,6 +108,14 @@ extension RecordingBackgroundDataHandler {
     }
 }
 
-enum RecordingBackgroundDataHandlerError: Error {
+enum RecordingBackgroundDataHandlerError: LocalizedError {
     case noRecordingFound
+
+    var errorDescription: String? {
+        switch self {
+        case .noRecordingFound:
+            return
+                "No active recording was found. Ensure a recording session is started before accessing data."
+        }
+    }
 }

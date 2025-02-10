@@ -12,8 +12,12 @@ struct PagingView: View {
     @EnvironmentObject var recordingManager: RecordingManager
     @Environment(\.isLuminanceReduced) var isLuminanceReduced
 
+    @ObservedObject
+    private var alertManager = AlertManager()
+
     @State private var selection: Tab = .metrics
     @State private var isSheetActive = false
+    @State private var showAlert: Bool = false
 
     private enum Tab {
         case controls, metrics, persisted
@@ -28,11 +32,32 @@ struct PagingView: View {
             }
             ControlsView(
                 connectivityMetaInfoManager: recordingManager.connectivityManager
-                    .connectivityMetaInfoManager
+                    .connectivityMetaInfoManager,
+                alertManager: alertManager,
+                showAlert: $showAlert
             ).tag(Tab.controls)
             RecodingTimelineView().tag(Tab.metrics)
         }
-        .navigationTitle("Cycling")
+        .alert(
+            isPresented: $alertManager.isOpen,
+            content: { ErrorAlertProvider.errorAlert(alertManager: alertManager) }
+        )
+        .onAppear {
+            Task {
+                selection = .metrics
+                do {
+                    try await recordingManager.workoutManager.requestAuthorization()
+                } catch {
+                    Logger.shared.error("Failed to request authorization: \(error)")
+                    alertManager.configure(
+                        title: "Error",
+                        message:
+                            "Could not request workout authorization. Please enable it in the settings."
+                    )
+                }
+            }
+        }
+        .navigationTitle("Tricorder")
         .navigationBarBackButtonHidden(true)
         .tabViewStyle(
             PageTabViewStyle(
@@ -42,18 +67,10 @@ struct PagingView: View {
         .onChange(of: isLuminanceReduced) {
             displayMetricsView()
         }
-        .onChange(of: recordingManager.recordingState) {
-            _,
-            newValue in
-
+        .onChange(of: recordingManager.recordingState) { _, newValue in
             if newValue == .running || newValue == .paused {
                 displayMetricsView()
             }
-        }.onAppear {
-            Task {
-                await recordingManager.workoutManager.requestAuthorization()
-            }
-            selection = .metrics
         }
     }
 

@@ -20,9 +20,8 @@ actor WorkoutManager: NSObject {
     let typesToRead: Set = [
         HKQuantityType(.heartRate),
         HKQuantityType.workoutType(),
-        // todo can this be removed? (i guess requires reinstall)
-        HKObjectType.activitySummaryType(),
     ]
+
     let healthStore = HKHealthStore()
     var session: HKWorkoutSession?
 
@@ -41,6 +40,25 @@ actor WorkoutManager: NSObject {
 
     func getSession() -> HKWorkoutSession? {
         return session
+    }
+
+    func getMissingHealthKitPermission() -> String? {
+        for typeToRead in typesToRead {
+            Logger.shared.debug("\(healthStore.authorizationStatus(for: typeToRead))")
+            if typeToRead == HKQuantityType(.heartRate) {
+                continue
+            }
+            if healthStore.authorizationStatus(for: typeToRead) == .sharingDenied {
+                return typeToRead.identifier
+            }
+        }
+        for typeToShare in typesToShare {
+            Logger.shared.debug("\(healthStore.authorizationStatus(for: typeToShare))")
+            if healthStore.authorizationStatus(for: typeToShare) == .sharingDenied {
+                return typeToShare.identifier
+            }
+        }
+        return nil
     }
 }
 
@@ -189,15 +207,42 @@ extension HKWorkoutSessionState {
 
 // MARK: - WorkoutManager Error
 //
-enum WorkoutManagerError: Error {
+enum WorkoutManagerError: LocalizedError {
     case noWorkoutSession
     case noLiveWorkoutBuilder
     case failedToStartWorkout
     case failedToEndWorkout
     case failedToSendData
+    case failedToCreateWorkoutSession
     case workoutSessionNotStarted
     case workoutSessionAlreadyStarted
     case workoutSessionEnded
+    case missingPermissions
+
+    var errorDescription: String? {
+        switch self {
+        case .noWorkoutSession:
+            return "No active workout session found."
+        case .noLiveWorkoutBuilder:
+            return "The live workout builder is unavailable."
+        case .failedToStartWorkout:
+            return "Failed to start the workout session."
+        case .failedToEndWorkout:
+            return "Failed to end the workout session."
+        case .failedToSendData:
+            return "Failed to send workout data."
+        case .workoutSessionNotStarted:
+            return "The workout session has not started yet."
+        case .workoutSessionAlreadyStarted:
+            return "The workout session is already in progress."
+        case .workoutSessionEnded:
+            return "The workout session has already ended."
+        case .failedToCreateWorkoutSession:
+            return "Failed to create a workout session."
+        case .missingPermissions:
+            return "The app needs HealthKit permissions to run."
+        }
+    }
 }
 
 // MARK: - SessionSateChange

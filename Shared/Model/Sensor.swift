@@ -248,6 +248,13 @@ func getMaxMotionsensorRecordingRate(sensorName: Sensor.MotionSensorName) -> Int
     }
 }
 
-enum SensorError: Error {
+enum SensorError: LocalizedError {
     case differentSensors
+
+    var errorDescription: String? {
+        switch self {
+        case .differentSensors:
+            return "The sensors provided are not compatible or do not match."
+        }
+    }
 }

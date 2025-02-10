@@ -99,7 +99,16 @@ extension SensorBackgroundDataHandler {
 
 }
 
-enum SensorBackgroundDataHandlerError: Error {
+enum SensorBackgroundDataHandlerError: LocalizedError {
     case notFound
     case empty
+
+    var errorDescription: String? {
+        switch self {
+        case .notFound:
+            return "No sensor data was found. Ensure the sensor is active and providing data."
+        case .empty:
+            return "The sensor data is empty. No readings were recorded."
+        }
+    }
 }

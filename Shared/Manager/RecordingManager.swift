@@ -73,6 +73,17 @@ extension RecordingManager {
 
         resetRest()
     }
+
+    func getFirstMissingPermission() async -> String? {
+        if let missingPermission = await workoutManager.getMissingHealthKitPermission() {
+            return missingPermission
+        }
+        if await !nearbyInteractionManager.checkIfSupported() {
+            return "Nearby Interaction"
+        }
+
+        return nil
+    }
 }
 
 // MARK: -  Shared handlers

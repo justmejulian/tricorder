@@ -18,6 +18,10 @@ actor NearbyInteractionManager: NSObject {
 }
 
 extension NearbyInteractionManager {
+    func checkIfSupported() -> Bool {
+        return NISession.deviceCapabilities.supportsPreciseDistanceMeasurement
+    }
+
     func setDiscoveryToken(_ token: NIDiscoveryToken) throws {
         Logger.shared.debug("setting NI discovery token")
         // todo can i get rid of this? init?

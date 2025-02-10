@@ -65,6 +65,11 @@ extension RecordingManager {
         try await startWorkout(settings: settings)
     }
 
+    func stop() async {
+        await workoutManager.stop()
+        await reset()
+    }
+
     func startWorkout() async throws {
         try await startWorkout(settings: nil)
     }
@@ -80,7 +85,8 @@ extension RecordingManager {
             )
         } catch {
             Logger.shared.error("Failed to start startWorkout: \(error)")
-            throw RecordingManagerError.startWorkout
+            await stop()
+            throw error
         }
     }
 
@@ -230,7 +236,6 @@ extension RecordingManager {
 
     @Sendable
     nonisolated func handleReceivedDistance(_ data: Sendable) throws {
-
         Task {
             guard let newValues = data as? DistanceValue else {
                 Logger.shared.error("\(#function): Invalid data type")

@@ -86,7 +86,7 @@ extension PersistedView {
         // todo improve to maybe batch and compress
         for ids in chundedIds {
             Logger.shared.debug("starting for \(ids.count)")
-                               
+
             if failedCount > 5 {
                 break
             }

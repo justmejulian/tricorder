@@ -16,18 +16,23 @@ extension WorkoutManager {
      Use healthStore.requestAuthorization to request authorization in watchOS when
      healthDataAccessRequest isn't available yet.
      */
-    func requestAuthorization() {
+    func requestAuthorization() async throws {
         Logger.shared.info("Request authorization")
+        try await healthStore.requestAuthorization(
+            toShare: typesToShare,
+            read: typesToRead
+        )
+    }
 
-        Task {
-            do {
-                try await healthStore.requestAuthorization(
-                    toShare: typesToShare,
-                    read: typesToRead
-                )
-            } catch {
-                Logger.shared.log("Failed to request authorization: \(error)")
-            }
+    func createHKWorkoutSession(configuration: HKWorkoutConfiguration) throws -> HKWorkoutSession {
+        do {
+            return try HKWorkoutSession(
+                healthStore: healthStore,
+                configuration: configuration
+            )
+        } catch {
+            Logger.shared.error("\(error)")
+            throw WorkoutManagerError.failedToCreateWorkoutSession
         }
     }
 
@@ -38,12 +43,9 @@ extension WorkoutManager {
         configuration.activityType = .functionalStrengthTraining
         configuration.locationType = .indoor
 
-        session = try HKWorkoutSession(
-            healthStore: healthStore,
-            configuration: configuration
-        )
+        self.session = try createHKWorkoutSession(configuration: configuration)
 
-        guard let session else {
+        guard let session = self.session else {
             throw WorkoutManagerError.noWorkoutSession
         }
 
@@ -73,12 +75,17 @@ extension WorkoutManager {
           Start the workout session activity.
          */
         let startDate = Date()
-        session.startActivity(with: startDate)
-        try await builder?.beginCollection(at: startDate)
+        do {
+            session.startActivity(with: startDate)
+            try await builder?.beginCollection(at: startDate)
 
-        statisticsManager = StatisticsManager(recordingStartDate: startDate)
+            statisticsManager = StatisticsManager(recordingStartDate: startDate)
 
-        return startDate
+            return startDate
+        } catch {
+            Logger.shared.error("\(error)")
+            throw WorkoutManagerError.failedToStartWorkout
+        }
     }
 
     func endWorkout(date: Date) async throws {
@@ -110,14 +117,19 @@ extension WorkoutManager {
         guard let builder else {
             throw WorkoutManagerError.noLiveWorkoutBuilder
         }
-
-        do {
-            try await builder.endCollection(at: date)
-            return try await builder.finishWorkout()
-        } catch {
-            throw error
+        if builder.workoutSession?.state == .ended {
+            return nil
         }
 
+        if builder.startDate != nil {
+            try await builder.endCollection(at: date)
+        }
+
+        if builder.workoutSession?.state == .stopped {
+            return nil
+        }
+
+        return try await builder.finishWorkout()
     }
 }
 

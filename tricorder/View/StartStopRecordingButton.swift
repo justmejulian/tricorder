@@ -54,12 +54,13 @@ struct StartStopRecordingButton: View {
         )
         .onAppear {
             Task {
-                guard await recordingManager.workoutManager.checkAllHealthKitPermissions() else {
-                    Logger.shared.debug("has all permissions")
-                    return
+                if let missingPermission = await recordingManager.workoutManager
+                    .getMissingHealthKitPermission()
+                {
+                    // also use alertManager
+                    error = WorkoutManagerError.missingPermissions
+                    self.showAlert = true
                 }
-                error = WorkoutManagerError.missingPermissions
-                self.showAlert = true
             }
         }
         .disabled(loading || (!isActive && isReceivingData))

@@ -20,8 +20,8 @@ actor WorkoutManager: NSObject {
     let typesToRead: Set = [
         HKQuantityType(.heartRate),
         HKQuantityType.workoutType(),
-        HKObjectType.activitySummaryType(),
     ]
+
     let healthStore = HKHealthStore()
     var session: HKWorkoutSession?
 
@@ -40,6 +40,25 @@ actor WorkoutManager: NSObject {
 
     func getSession() -> HKWorkoutSession? {
         return session
+    }
+
+    func getMissingHealthKitPermission() -> String? {
+        for typeToRead in typesToRead {
+            Logger.shared.debug("\(healthStore.authorizationStatus(for: typeToRead))")
+            if typeToRead == HKQuantityType(.heartRate) {
+                continue
+            }
+            if healthStore.authorizationStatus(for: typeToRead) == .sharingDenied {
+                return typeToRead.identifier
+            }
+        }
+        for typeToShare in typesToShare {
+            Logger.shared.debug("\(healthStore.authorizationStatus(for: typeToShare))")
+            if healthStore.authorizationStatus(for: typeToShare) == .sharingDenied {
+                return typeToShare.identifier
+            }
+        }
+        return nil
     }
 }
 

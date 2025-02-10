@@ -12,9 +12,11 @@ struct PagingView: View {
     @EnvironmentObject var recordingManager: RecordingManager
     @Environment(\.isLuminanceReduced) var isLuminanceReduced
 
+    @ObservedObject
+    private var alertManager = AlertManager()
+
     @State private var selection: Tab = .metrics
     @State private var isSheetActive = false
-    @State private var error: Error?
     @State private var showAlert: Bool = false
 
     private enum Tab {
@@ -22,13 +24,6 @@ struct PagingView: View {
     }
 
     var body: some View {
-        var errorMessage: String {
-            if let localizedDescription = error?.localizedDescription {
-                return localizedDescription
-            }
-
-            return "Something went wrong starting the workout."
-        }
         TabView(selection: $selection) {
             if !recordingManager.recordingState.isActive {
                 PersistedView(
@@ -37,23 +32,32 @@ struct PagingView: View {
             }
             ControlsView(
                 connectivityMetaInfoManager: recordingManager.connectivityManager
-                    .connectivityMetaInfoManager
+                    .connectivityMetaInfoManager,
+                alertManager: alertManager,
+                showAlert: $showAlert
             ).tag(Tab.controls)
             RecodingTimelineView().tag(Tab.metrics)
         }
-        .alert(errorMessage, isPresented: $showAlert) {
-            Button("Dismiss", role: .cancel) {}
-        }
+        .alert(
+            isPresented: $alertManager.isOpen,
+            content: { ErrorAlertProvider.errorAlert(alertManager: alertManager) }
+        )
         .onAppear {
             Task {
-                guard await recordingManager.workoutManager.checkAllHealthKitPermissions() else {
-                    Logger.shared.debug("has all permissions")
-                    return
+                selection = .metrics
+                do {
+                    try await recordingManager.workoutManager.requestAuthorization()
+                } catch {
+                    Logger.shared.error("Failed to request authorization: \(error)")
+                    alertManager.configure(
+                        title: "Error",
+                        message:
+                            "Could not request workout authorization. Please enable it in the settings."
+                    )
                 }
-                error = WorkoutManagerError.missingPermissions
             }
         }
-        .navigationTitle("Cycling")
+        .navigationTitle("Tricorder")
         .navigationBarBackButtonHidden(true)
         .tabViewStyle(
             PageTabViewStyle(
@@ -63,18 +67,10 @@ struct PagingView: View {
         .onChange(of: isLuminanceReduced) {
             displayMetricsView()
         }
-        .onChange(of: recordingManager.recordingState) {
-            _,
-            newValue in
-
+        .onChange(of: recordingManager.recordingState) { _, newValue in
             if newValue == .running || newValue == .paused {
                 displayMetricsView()
             }
-        }.onAppear {
-            Task {
-                await recordingManager.workoutManager.requestAuthorization()
-            }
-            selection = .metrics
         }
     }
 

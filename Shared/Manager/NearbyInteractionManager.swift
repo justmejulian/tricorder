@@ -177,8 +177,20 @@ extension NearbyInteractionManager: NISessionDelegate {
     }
 }
 
-enum NearbyInteractionManagerError: Error {
+enum NearbyInteractionManagerError: LocalizedError {
     case noDiscoveryTokenAvailable
     case encodingError
     case decodingError
+
+    var errorDescription: String? {
+        switch self {
+        case .noDiscoveryTokenAvailable:
+            return
+                "No discovery token is available. Ensure the device is properly configured for nearby interactions."
+        case .encodingError:
+            return "Failed to encode data for nearby interaction."
+        case .decodingError:
+            return "Failed to decode received data for nearby interaction."
+        }
+    }
 }

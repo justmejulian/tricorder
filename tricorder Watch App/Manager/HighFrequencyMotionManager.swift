@@ -150,6 +150,13 @@ extension HighFrequencyMotionManager {
         }
     }
 }
-enum HighFrequencyMotionManagerError: Error {
+enum HighFrequencyMotionManagerError: LocalizedError {
     case notSupported
+
+    var errorDescription: String? {
+        switch self {
+        case .notSupported:
+            return "High-frequency motion tracking is not supported on this device."
+        }
+    }
 }

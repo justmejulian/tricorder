@@ -82,9 +82,22 @@ extension RecordingManager {
 
 // MARK: -  RecordingManagerError
 //
-enum RecordingManagerError: Error {
+enum RecordingManagerError: LocalizedError {
     case invalidData
     case noKey
     case startWorkout
     case startUpdates
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidData:
+            return "The recorded data is invalid or corrupted."
+        case .noKey:
+            return "A required encryption key is missing."
+        case .startWorkout:
+            return "Failed to start the workout session."
+        case .startUpdates:
+            return "Failed to start sensor updates."
+        }
+    }
 }

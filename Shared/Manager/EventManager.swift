@@ -56,8 +56,16 @@ actor EventManager {
     }
 }
 
-enum EventManagerError: Error {
+enum EventManagerError: LocalizedError {
     case noListenerFound
+
+    var errorDescription: String? {
+        switch self {
+        case .noListenerFound:
+            return
+                "No event listener found. Ensure that a listener is registered before emitting events."
+        }
+    }
 }
 
 // todo add types of data
@@ -71,10 +79,6 @@ enum EventListenerKey: String, CaseIterable {
     case receivedData
     case receivedWorkoutData
     case receivedFileData
-}
-
-enum EventManagerHandler: Error {
-    case noListenerFound
 }
 
 typealias EventHandler = (_ data: Sendable) throws -> Void

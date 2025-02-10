@@ -89,6 +89,13 @@ extension PersistedDataHandler {
     }
 }
 
-enum PersistedDataHandlerError: Error {
+enum PersistedDataHandlerError: LocalizedError {
     case notFound
+
+    var errorDescription: String? {
+        switch self {
+        case .notFound:
+            return "The requested persisted data was not found."
+        }
+    }
 }

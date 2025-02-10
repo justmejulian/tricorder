@@ -69,6 +69,13 @@ extension CoreMotionManager {
 
 // MARK: - MotionManagerError
 //
-enum CoreMotionManagerError: Error {
+enum CoreMotionManagerError: LocalizedError {
     case notSupported
+
+    var errorDescription: String? {
+        switch self {
+        case .notSupported:
+            return "Core Motion is not supported on this device."
+        }
+    }
 }

@@ -23,9 +23,7 @@ class ConnectivityMetaInfoManager: ObservableObject {
     var isLastDidReceiveDataDateTooRecent = false
 
     private let debouncer = Debouncer(duration: .seconds(10))  // Wait for last packages
-}
 
-extension ConnectivityMetaInfoManager {
     func reset() {
         openSendConnectionsCount = 0
         lastDidReceiveDataDate = nil

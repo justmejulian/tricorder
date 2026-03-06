@@ -9,7 +9,16 @@ import Combine
 import NearbyInteraction
 import OSLog
 
-actor NearbyInteractionManager: NSObject {
+protocol NearbyInteractionManaging: Actor {
+    func checkIfSupported() -> Bool
+    func setDiscoveryToken(_ token: NIDiscoveryToken) throws
+    func setDiscoveryToken(_ tokenData: Data) throws
+    func getDiscoveryTokenData() throws -> Data
+    func start()
+    func stop()
+}
+
+actor NearbyInteractionManager: NSObject, NearbyInteractionManaging {
     let eventManager = EventManager.shared
 
     private var session: NISession?

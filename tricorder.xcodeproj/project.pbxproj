@@ -18,6 +18,20 @@
 			remoteGlobalIDString = 749276C32CAC263B004315FD;
 			remoteInfo = "tricorder Watch App";
 		};
+		7A1B2C3D4E5F60718293A4BE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 749276AC2CAC2639004315FD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 749276B32CAC263A004315FD;
+			remoteInfo = tricorder;
+		};
+		AA1B2C3D4E5F60718293A4BE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 749276AC2CAC2639004315FD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 749276C32CAC263B004315FD;
+			remoteInfo = "tricorder Watch App";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,12 +51,19 @@
 /* Begin PBXFileReference section */
 		749276B42CAC263A004315FD /* tricorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tricorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		749276C42CAC263B004315FD /* tricorder Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "tricorder Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7A1B2C3D4E5F60718293A4BC /* tricorderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = tricorderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA1B2C3D4E5F60718293A4BC /* tricorder Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "tricorder Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		743137382CF252D500B36B5A /* tricorder Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "tricorder Watch App";
+			sourceTree = "<group>";
+		};
+		7A1B2C3D4E5F60718293A4BF /* tricorderTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = tricorderTests;
 			sourceTree = "<group>";
 		};
 		749192822CCA7C7100AAC143 /* Shared */ = {
@@ -53,6 +74,11 @@
 		749276B62CAC263A004315FD /* tricorder */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = tricorder;
+			sourceTree = "<group>";
+		};
+		AA1B2C3D4E5F60718293A4BF /* tricorder Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "tricorder Watch AppTests";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -72,6 +98,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7A1B2C3D4E5F60718293A4BA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA1B2C3D4E5F60718293A4BA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -81,7 +121,9 @@
 				749276B52CAC263A004315FD /* Products */,
 				749192822CCA7C7100AAC143 /* Shared */,
 				749276B62CAC263A004315FD /* tricorder */,
+				7A1B2C3D4E5F60718293A4BF /* tricorderTests */,
 				743137382CF252D500B36B5A /* tricorder Watch App */,
+				AA1B2C3D4E5F60718293A4BF /* tricorder Watch AppTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -90,6 +132,8 @@
 			children = (
 				749276B42CAC263A004315FD /* tricorder.app */,
 				749276C42CAC263B004315FD /* tricorder Watch App.app */,
+				7A1B2C3D4E5F60718293A4BC /* tricorderTests.xctest */,
+				AA1B2C3D4E5F60718293A4BC /* tricorder Watch AppTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -145,6 +189,29 @@
 			productReference = 749276C42CAC263B004315FD /* tricorder Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
+		7A1B2C3D4E5F60718293A4B5 /* tricorderTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A1B2C3D4E5F60718293A4B6 /* Build configuration list for PBXNativeTarget "tricorderTests" */;
+			buildPhases = (
+				7A1B2C3D4E5F60718293A4B9 /* Sources */,
+				7A1B2C3D4E5F60718293A4BA /* Frameworks */,
+				7A1B2C3D4E5F60718293A4BB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7A1B2C3D4E5F60718293A4BD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7A1B2C3D4E5F60718293A4BF /* tricorderTests */,
+			);
+			name = tricorderTests;
+			packageProductDependencies = (
+			);
+			productName = tricorderTests;
+			productReference = 7A1B2C3D4E5F60718293A4BC /* tricorderTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -159,6 +226,9 @@
 						CreatedOnToolsVersion = 16.0;
 					};
 					749276C32CAC263B004315FD = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					7A1B2C3D4E5F60718293A4B5 = {
 						CreatedOnToolsVersion = 16.0;
 					};
 				};
@@ -181,6 +251,7 @@
 			targets = (
 				749276B32CAC263A004315FD /* tricorder */,
 				749276C32CAC263B004315FD /* tricorder Watch App */,
+				7A1B2C3D4E5F60718293A4B5 /* tricorderTests */,
 			);
 		};
 /* End PBXProject section */
@@ -194,6 +265,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		749276C22CAC263B004315FD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A1B2C3D4E5F60718293A4BB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -217,6 +295,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7A1B2C3D4E5F60718293A4B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -225,9 +310,68 @@
 			target = 749276C32CAC263B004315FD /* tricorder Watch App */;
 			targetProxy = 749276C62CAC263B004315FD /* PBXContainerItemProxy */;
 		};
+		7A1B2C3D4E5F60718293A4BD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 749276B32CAC263A004315FD /* tricorder */;
+			targetProxy = 7A1B2C3D4E5F60718293A4BE /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		7A1B2C3D4E5F60718293A4B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(MY_VERSION)";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = tricorderTests;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ch.zhaw.vissejul.tricorderTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tricorder.app/tricorder";
+				BUNDLE_LOADER = "$(TEST_HOST)";
+			};
+			name = Debug;
+		};
+		7A1B2C3D4E5F60718293A4B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(MY_VERSION)";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = tricorderTests;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ch.zhaw.vissejul.tricorderTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tricorder.app/tricorder";
+				BUNDLE_LOADER = "$(TEST_HOST)";
+			};
+			name = Release;
+		};
 		749276D22CAC263C004315FD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -516,6 +660,15 @@
 			buildConfigurations = (
 				749276D22CAC263C004315FD /* Debug */,
 				749276D32CAC263C004315FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7A1B2C3D4E5F60718293A4B6 /* Build configuration list for PBXNativeTarget "tricorderTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A1B2C3D4E5F60718293A4B7 /* Debug */,
+				7A1B2C3D4E5F60718293A4B8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

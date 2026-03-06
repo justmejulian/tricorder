@@ -10,7 +10,6 @@ import SwiftUI
 
 @main
 struct tricorderApp: App {
-    private let eventManager = EventManager.shared
     private let recordingManager: RecordingManager
     private let database: Database
 
@@ -36,6 +35,9 @@ struct tricorderApp: App {
             if UIDevice.current.userInterfaceIdiom == .phone {
                 StartView()
                     .environmentObject(recordingManager)
+                    .task {
+                        await recordingManager.initialize()
+                    }
             } else {
                 // todo maybe show list
                 Text("Cannot Start Workouts from iPad")

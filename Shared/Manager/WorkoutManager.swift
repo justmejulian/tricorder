@@ -9,20 +9,44 @@ import Foundation
 import HealthKit
 import OSLog
 
-actor WorkoutManager: NSObject {
+protocol WorkoutManaging: Actor {
+    nonisolated var typesToShare: Set<HKSampleType> { get }
+    nonisolated var typesToRead: Set<HKObjectType> { get }
+    nonisolated var healthStore: HKHealthStore { get }
+
+    func getMissingHealthKitPermission() -> String?
+    func reset()
+    func stop()
+    func sendCodable(key: String, data: Data) async throws
+
+    #if os(watchOS)
+        func requestAuthorization() async throws
+        func startWorkout() async throws -> Date
+        func endWorkout(date: Date) async throws
+        func getStartDate() -> Date?
+        func getElapsedTime(at: Date?) -> TimeInterval?
+    #endif
+
+    #if os(iOS)
+        func startWatchWorkout() async throws
+        func retrieveRemoteSession()
+    #endif
+}
+
+actor WorkoutManager: NSObject, WorkoutManaging {
     var workout: HKWorkout?
 
     /// HealthKit data types to share and read.
-    let typesToShare: Set = [
+    nonisolated(unsafe) let typesToShare: Set<HKSampleType> = [
         HKQuantityType.workoutType()
     ]
 
-    let typesToRead: Set = [
+    nonisolated(unsafe) let typesToRead: Set<HKObjectType> = [
         HKQuantityType(.heartRate),
         HKQuantityType.workoutType(),
     ]
 
-    let healthStore = HKHealthStore()
+    nonisolated(unsafe) let healthStore = HKHealthStore()
     var session: HKWorkoutSession?
 
     var eventManager = EventManager.shared

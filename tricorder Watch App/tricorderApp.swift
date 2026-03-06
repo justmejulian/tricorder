@@ -11,7 +11,6 @@ import SwiftUI
 @main
 struct tricorder_Watch_AppApp: App {
     @WKApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    private let eventManager = EventManager.shared
     private let recordingManager: RecordingManager
     private let database: Database
 
@@ -33,6 +32,9 @@ struct tricorder_Watch_AppApp: App {
         WindowGroup {
             PagingView()
                 .environmentObject(recordingManager)
+                .task {
+                    await recordingManager.initialize()
+                }
         }
     }
 }

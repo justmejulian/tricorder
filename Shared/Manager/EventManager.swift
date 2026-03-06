@@ -8,17 +8,31 @@
 import Foundation
 import OSLog
 
-actor EventManager {
+protocol EventManaging: Actor {
+    func register(
+        key: EventListenerKey,
+        handleData: @escaping @Sendable (_ data: Sendable) async throws -> Data?
+    )
+    func register(
+        key: EventListenerKey,
+        handleData: @escaping @Sendable (_ data: Sendable) throws -> Void
+    )
+    func trigger(key: EventListenerKey, data: Sendable) async throws -> Data?
+    func trigger(key: EventListenerKey, data: Sendable) async
+    func reset()
+}
+
+actor EventManager: EventManaging {
     static let shared = EventManager()
 
-    static var listeners: [EventListenerKey: AsyncEventHandler] = [:]
+    private var listeners: [EventListenerKey: AsyncEventHandler] = [:]
 
     func register(
         key: EventListenerKey,
         handleData: @escaping @Sendable (_ data: Sendable) async throws -> Data?  // todo make sendable?
     ) {
         // todo: check if already exists
-        EventManager.listeners[key] = handleData
+        listeners[key] = handleData
 
     }
 
@@ -36,7 +50,7 @@ actor EventManager {
         )
     }
     func trigger(key: EventListenerKey, data: Sendable) async throws -> Data? {
-        guard let listener = EventManager.listeners[key] else {
+        guard let listener = listeners[key] else {
             throw EventManagerError.noListenerFound
         }
 
@@ -53,6 +67,10 @@ actor EventManager {
                 "Failed to trigger Event Listener for \(key.rawValue): \(error.localizedDescription)"
             )
         }
+    }
+
+    func reset() {
+        listeners.removeAll()
     }
 }
 

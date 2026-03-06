@@ -9,7 +9,12 @@ import CoreMotion
 import Foundation
 import OSLog
 
-actor CoreMotionManager {
+protocol CoreMotionManaging: Actor {
+    func stopUpdates() async
+    func startUpdates(recordingStart: Date, settings: Settings?) async throws
+}
+
+actor CoreMotionManager: CoreMotionManaging {
     let eventManager = EventManager.shared
 
     var motionManager: MotionManager? = nil

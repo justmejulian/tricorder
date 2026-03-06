@@ -9,28 +9,91 @@ import Foundation
 import OSLog
 @preconcurrency import WatchConnectivity
 
-actor ConnectivityManager: NSObject, WCSessionDelegate {
-    let eventManager = EventManager.shared
+protocol WCSessionProtocol: AnyObject, Sendable {
+    var isReachable: Bool { get }
+    var delegate: WCSessionDelegate? { get set }
 
-    private var session: WCSession = .default
+    func activate()
+    func sendMessageData(
+        _ data: Data,
+        replyHandler: ((Data) -> Void)?,
+        errorHandler: ((Error) -> Void)?
+    )
+    func transferFile(_ file: URL, metadata: [String: Any]?) -> WCSessionFileTransfer
+}
+
+extension WCSession: WCSessionProtocol, @unchecked Sendable {}
+
+protocol ConnectivityManaging: Actor {
+    @MainActor var connectivityMetaInfoManager: ConnectivityMetaInfoManager { get }
+
+    func activate()
+    func sendDataArray(key: String, dataArray: [Data]) async throws
+    func sendData(key: String, data: Data) async throws
+    func sendData(key: String, data: Data) async throws -> Data?
+    func sendDataAsFile(_ data: Data) async throws
+    func increaseFailedSendCount()
+    func getFailedSendCount() -> Int
+    func reset() async
+}
+
+actor ConnectivityManager: NSObject, WCSessionDelegate, ConnectivityManaging {
+    let eventManager: any EventManaging
+
+    private var session: WCSessionProtocol
 
     private var failedSendCount: Int = 0
 
     // property whose initial value is not calculated until the first time it’s called
     @MainActor
-    lazy var connectivityMetaInfoManager = ConnectivityMetaInfoManager()
+    private var connectivityMetaInfoManagerStorage: ConnectivityMetaInfoManager?
 
     override init() {
         // Logger.shared.debug("creating ConnectivityManager on Thread \(Thread.current)")
 
+        self.eventManager = EventManager.shared
+        self.session = WCSession.default
         super.init()
+    }
 
-        self.session.delegate = self
-        self.session.activate()
+    init(
+        session: WCSessionProtocol,
+        eventManager: any EventManaging = EventManager.shared
+    ) {
+        self.eventManager = eventManager
+        self.session = session
+        super.init()
     }
 
     func increaseFailedSendCount() {
         self.failedSendCount += 1
+    }
+
+    func getFailedSendCount() -> Int {
+        return failedSendCount
+    }
+
+    func activate() {
+        self.session.delegate = self
+        self.session.activate()
+    }
+
+    @MainActor
+    var connectivityMetaInfoManager: ConnectivityMetaInfoManager {
+        if let connectivityMetaInfoManagerStorage {
+            return connectivityMetaInfoManagerStorage
+        }
+
+        let manager = ConnectivityMetaInfoManager()
+        connectivityMetaInfoManagerStorage = manager
+        return manager
+    }
+
+    @MainActor
+    func setConnectivityMetaInfoManager(
+        _ manager: ConnectivityMetaInfoManager
+    ) {
+        connectivityMetaInfoManagerStorage = manager
     }
 
     func reset() async {
@@ -152,28 +215,28 @@ extension ConnectivityManager {
             await connectivityMetaInfoManager.increaseOpenSendConnectionsCount()
         }
 
+        let session = self.session
+
         return try await withCheckedThrowingContinuation({
             @Sendable continuation in
-            Task {
-                await self.session.sendMessageData(
-                    data,
-                    replyHandler: { data in
-                        Task {
-                            await self.connectivityMetaInfoManager
-                                .decreaseOpenSendConnectionsCount()
-                            continuation.resume(returning: data)
-                        }
-                    },
-                    errorHandler: { (error) in
-                        Task {
-                            await self.increaseFailedSendCount()
-                            await self.connectivityMetaInfoManager
-                                .decreaseOpenSendConnectionsCount()
-                            continuation.resume(throwing: error)
-                        }
+            session.sendMessageData(
+                data,
+                replyHandler: { data in
+                    Task {
+                        await self.connectivityMetaInfoManager
+                            .decreaseOpenSendConnectionsCount()
+                        continuation.resume(returning: data)
                     }
-                )
-            }
+                },
+                errorHandler: { (error) in
+                    Task {
+                        await self.increaseFailedSendCount()
+                        await self.connectivityMetaInfoManager
+                            .decreaseOpenSendConnectionsCount()
+                        continuation.resume(throwing: error)
+                    }
+                }
+            )
         })
     }
 

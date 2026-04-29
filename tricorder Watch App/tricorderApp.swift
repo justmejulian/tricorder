@@ -6,12 +6,39 @@
 //
 
 import SwiftUI
+import HealthKit
 
 @main
-struct tricorder_Watch_AppApp: App {
+struct TricorderWatchApp: App {
+    @WKApplicationDelegateAdaptor(WatchAppDelegate.self) private var appDelegate
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(appDelegate.workoutManager)
+                .task { try? await appDelegate.workoutManager.requestAuthorization() }
+        }
+    }
+}
+
+/// Receives the workout configuration forwarded by the iPhone when it calls
+/// HKHealthStore.startWatchApp(toHandle:). This is the only entry point
+/// that can't be modelled as a SwiftUI lifecycle event.
+@MainActor
+final class WatchAppDelegate: NSObject, WKApplicationDelegate {
+    let workoutManager = WatchWorkoutManager()
+
+    // Called by the system on an arbitrary thread; hop to MainActor before
+    // touching workoutManager.
+    nonisolated func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
+        // Extract Sendable values before crossing the concurrency boundary.
+        let activityType = workoutConfiguration.activityType
+        let locationType = workoutConfiguration.locationType
+        Task { @MainActor [weak self] in
+            let config = HKWorkoutConfiguration()
+            config.activityType = activityType
+            config.locationType = locationType
+            try? await self?.workoutManager.startWorkout(with: config)
         }
     }
 }

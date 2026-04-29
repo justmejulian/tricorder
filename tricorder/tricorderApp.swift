@@ -8,10 +8,14 @@
 import SwiftUI
 
 @main
-struct tricorderApp: App {
+struct TricorderApp: App {
+    @State private var workoutManager = PhoneWorkoutManager()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(workoutManager)
+                .task { try? await workoutManager.requestAuthorization() }
         }
     }
 }

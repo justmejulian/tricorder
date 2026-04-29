@@ -102,6 +102,11 @@
 			path = "tricorder Watch AppUITests";
 			sourceTree = "<group>";
 		};
+		318431BABFD24F8397AB77E6 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +158,7 @@
 		745251E42FA20FD5005F3D12 = {
 			isa = PBXGroup;
 			children = (
+				318431BABFD24F8397AB77E6 /* Shared */,
 				745251EF2FA20FD5005F3D12 /* tricorder */,
 				745252002FA20FD6005F3D12 /* tricorderTests */,
 				7452520A2FA20FD6005F3D12 /* tricorderUITests */,
@@ -195,6 +201,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				745251EF2FA20FD5005F3D12 /* tricorder */,
+				318431BABFD24F8397AB77E6 /* Shared */,
 			);
 			name = tricorder;
 			packageProductDependencies = (
@@ -263,6 +270,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				745252172FA20FD6005F3D12 /* tricorder Watch App */,
+				318431BABFD24F8397AB77E6 /* Shared */,
 			);
 			name = "tricorder Watch App";
 			packageProductDependencies = (

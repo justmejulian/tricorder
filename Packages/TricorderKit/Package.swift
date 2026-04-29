@@ -5,14 +5,16 @@ let package = Package(
     name: "TricorderKit",
     platforms: [.iOS(.v18), .watchOS(.v11)],
     products: [
+        .library(name: "Util", targets: ["Util"]),
         .library(name: "WorkoutCore", targets: ["WorkoutCore"]),
         .library(name: "PhoneWorkout", targets: ["PhoneWorkout"]),
         .library(name: "WatchWorkout", targets: ["WatchWorkout"]),
     ],
     targets: [
-        .target(name: "WorkoutCore"),
-        .target(name: "PhoneWorkout", dependencies: ["WorkoutCore"]),
-        .target(name: "WatchWorkout", dependencies: ["WorkoutCore"]),
+        .target(name: "Util"),
+        .target(name: "WorkoutCore", dependencies: ["Util"]),
+        .target(name: "PhoneWorkout", dependencies: ["WorkoutCore", "Util"]),
+        .target(name: "WatchWorkout", dependencies: ["WorkoutCore", "Util"]),
         .testTarget(name: "WorkoutCoreTests", dependencies: ["WorkoutCore"]),
     ],
     swiftLanguageModes: [.v6]

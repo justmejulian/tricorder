@@ -7,7 +7,10 @@
 
 import SwiftUI
 import HealthKit
+import OSLog
 import WatchWorkout
+
+private let watchAppLogger = Logger(subsystem: "com.julianvisser.tricorder", category: "WatchApp")
 
 @main
 struct TricorderWatchApp: App {
@@ -35,6 +38,7 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate {
         // Extract Sendable values before crossing the concurrency boundary.
         let activityType = workoutConfiguration.activityType
         let locationType = workoutConfiguration.locationType
+        watchAppLogger.info("Received workout configuration from iPhone (activityType: \(activityType.rawValue))")
         Task { @MainActor [weak self] in
             let config = HKWorkoutConfiguration()
             config.activityType = activityType

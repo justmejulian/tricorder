@@ -1,0 +1,966 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		745252142FA20FD6005F3D12 /* tricorder Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 745252132FA20FD6005F3D12 /* tricorder Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		745251FE2FA20FD6005F3D12 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 745251E52FA20FD5005F3D12 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 745251EC2FA20FD5005F3D12;
+			remoteInfo = tricorder;
+		};
+		745252082FA20FD6005F3D12 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 745251E52FA20FD5005F3D12 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 745251EC2FA20FD5005F3D12;
+			remoteInfo = tricorder;
+		};
+		745252152FA20FD6005F3D12 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 745251E52FA20FD5005F3D12 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 745252122FA20FD6005F3D12;
+			remoteInfo = "tricorder Watch App";
+		};
+		745252262FA20FD7005F3D12 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 745251E52FA20FD5005F3D12 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 745252122FA20FD6005F3D12;
+			remoteInfo = "tricorder Watch App";
+		};
+		745252302FA20FD7005F3D12 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 745251E52FA20FD5005F3D12 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 745252122FA20FD6005F3D12;
+			remoteInfo = "tricorder Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7452523C2FA20FD7005F3D12 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				745252142FA20FD6005F3D12 /* tricorder Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		745251ED2FA20FD5005F3D12 /* tricorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tricorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		745251FD2FA20FD6005F3D12 /* tricorderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = tricorderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		745252072FA20FD6005F3D12 /* tricorderUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = tricorderUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		745252132FA20FD6005F3D12 /* tricorder Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "tricorder Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		745252252FA20FD7005F3D12 /* tricorder Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "tricorder Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7452522F2FA20FD7005F3D12 /* tricorder Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "tricorder Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		745251EF2FA20FD5005F3D12 /* tricorder */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = tricorder;
+			sourceTree = "<group>";
+		};
+		745252002FA20FD6005F3D12 /* tricorderTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = tricorderTests;
+			sourceTree = "<group>";
+		};
+		7452520A2FA20FD6005F3D12 /* tricorderUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = tricorderUITests;
+			sourceTree = "<group>";
+		};
+		745252172FA20FD6005F3D12 /* tricorder Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "tricorder Watch App";
+			sourceTree = "<group>";
+		};
+		745252282FA20FD7005F3D12 /* tricorder Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "tricorder Watch AppTests";
+			sourceTree = "<group>";
+		};
+		745252322FA20FD7005F3D12 /* tricorder Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "tricorder Watch AppUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		745251EA2FA20FD5005F3D12 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745251FA2FA20FD6005F3D12 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745252042FA20FD6005F3D12 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745252102FA20FD6005F3D12 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745252222FA20FD7005F3D12 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7452522C2FA20FD7005F3D12 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		745251E42FA20FD5005F3D12 = {
+			isa = PBXGroup;
+			children = (
+				745251EF2FA20FD5005F3D12 /* tricorder */,
+				745252002FA20FD6005F3D12 /* tricorderTests */,
+				7452520A2FA20FD6005F3D12 /* tricorderUITests */,
+				745252172FA20FD6005F3D12 /* tricorder Watch App */,
+				745252282FA20FD7005F3D12 /* tricorder Watch AppTests */,
+				745252322FA20FD7005F3D12 /* tricorder Watch AppUITests */,
+				745251EE2FA20FD5005F3D12 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		745251EE2FA20FD5005F3D12 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				745251ED2FA20FD5005F3D12 /* tricorder.app */,
+				745251FD2FA20FD6005F3D12 /* tricorderTests.xctest */,
+				745252072FA20FD6005F3D12 /* tricorderUITests.xctest */,
+				745252132FA20FD6005F3D12 /* tricorder Watch App.app */,
+				745252252FA20FD7005F3D12 /* tricorder Watch AppTests.xctest */,
+				7452522F2FA20FD7005F3D12 /* tricorder Watch AppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		745251EC2FA20FD5005F3D12 /* tricorder */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7452523D2FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorder" */;
+			buildPhases = (
+				745251E92FA20FD5005F3D12 /* Sources */,
+				745251EA2FA20FD5005F3D12 /* Frameworks */,
+				745251EB2FA20FD5005F3D12 /* Resources */,
+				7452523C2FA20FD7005F3D12 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				745252162FA20FD6005F3D12 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				745251EF2FA20FD5005F3D12 /* tricorder */,
+			);
+			name = tricorder;
+			packageProductDependencies = (
+			);
+			productName = tricorder;
+			productReference = 745251ED2FA20FD5005F3D12 /* tricorder.app */;
+			productType = "com.apple.product-type.application";
+		};
+		745251FC2FA20FD6005F3D12 /* tricorderTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 745252402FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorderTests" */;
+			buildPhases = (
+				745251F92FA20FD6005F3D12 /* Sources */,
+				745251FA2FA20FD6005F3D12 /* Frameworks */,
+				745251FB2FA20FD6005F3D12 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				745251FF2FA20FD6005F3D12 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				745252002FA20FD6005F3D12 /* tricorderTests */,
+			);
+			name = tricorderTests;
+			packageProductDependencies = (
+			);
+			productName = tricorderTests;
+			productReference = 745251FD2FA20FD6005F3D12 /* tricorderTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		745252062FA20FD6005F3D12 /* tricorderUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 745252432FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorderUITests" */;
+			buildPhases = (
+				745252032FA20FD6005F3D12 /* Sources */,
+				745252042FA20FD6005F3D12 /* Frameworks */,
+				745252052FA20FD6005F3D12 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				745252092FA20FD6005F3D12 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7452520A2FA20FD6005F3D12 /* tricorderUITests */,
+			);
+			name = tricorderUITests;
+			packageProductDependencies = (
+			);
+			productName = tricorderUITests;
+			productReference = 745252072FA20FD6005F3D12 /* tricorderUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		745252122FA20FD6005F3D12 /* tricorder Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 745252392FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorder Watch App" */;
+			buildPhases = (
+				7452520F2FA20FD6005F3D12 /* Sources */,
+				745252102FA20FD6005F3D12 /* Frameworks */,
+				745252112FA20FD6005F3D12 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				745252172FA20FD6005F3D12 /* tricorder Watch App */,
+			);
+			name = "tricorder Watch App";
+			packageProductDependencies = (
+			);
+			productName = "tricorder Watch App";
+			productReference = 745252132FA20FD6005F3D12 /* tricorder Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		745252242FA20FD7005F3D12 /* tricorder Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 745252462FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorder Watch AppTests" */;
+			buildPhases = (
+				745252212FA20FD7005F3D12 /* Sources */,
+				745252222FA20FD7005F3D12 /* Frameworks */,
+				745252232FA20FD7005F3D12 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				745252272FA20FD7005F3D12 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				745252282FA20FD7005F3D12 /* tricorder Watch AppTests */,
+			);
+			name = "tricorder Watch AppTests";
+			packageProductDependencies = (
+			);
+			productName = "tricorder Watch AppTests";
+			productReference = 745252252FA20FD7005F3D12 /* tricorder Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7452522E2FA20FD7005F3D12 /* tricorder Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 745252492FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorder Watch AppUITests" */;
+			buildPhases = (
+				7452522B2FA20FD7005F3D12 /* Sources */,
+				7452522C2FA20FD7005F3D12 /* Frameworks */,
+				7452522D2FA20FD7005F3D12 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				745252312FA20FD7005F3D12 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				745252322FA20FD7005F3D12 /* tricorder Watch AppUITests */,
+			);
+			name = "tricorder Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "tricorder Watch AppUITests";
+			productReference = 7452522F2FA20FD7005F3D12 /* tricorder Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		745251E52FA20FD5005F3D12 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					745251EC2FA20FD5005F3D12 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					745251FC2FA20FD6005F3D12 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 745251EC2FA20FD5005F3D12;
+					};
+					745252062FA20FD6005F3D12 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 745251EC2FA20FD5005F3D12;
+					};
+					745252122FA20FD6005F3D12 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					745252242FA20FD7005F3D12 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 745252122FA20FD6005F3D12;
+					};
+					7452522E2FA20FD7005F3D12 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 745252122FA20FD6005F3D12;
+					};
+				};
+			};
+			buildConfigurationList = 745251E82FA20FD5005F3D12 /* Build configuration list for PBXProject "tricorder" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 745251E42FA20FD5005F3D12;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 745251EE2FA20FD5005F3D12 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				745251EC2FA20FD5005F3D12 /* tricorder */,
+				745251FC2FA20FD6005F3D12 /* tricorderTests */,
+				745252062FA20FD6005F3D12 /* tricorderUITests */,
+				745252122FA20FD6005F3D12 /* tricorder Watch App */,
+				745252242FA20FD7005F3D12 /* tricorder Watch AppTests */,
+				7452522E2FA20FD7005F3D12 /* tricorder Watch AppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		745251EB2FA20FD5005F3D12 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745251FB2FA20FD6005F3D12 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745252052FA20FD6005F3D12 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745252112FA20FD6005F3D12 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745252232FA20FD7005F3D12 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7452522D2FA20FD7005F3D12 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		745251E92FA20FD5005F3D12 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745251F92FA20FD6005F3D12 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745252032FA20FD6005F3D12 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7452520F2FA20FD6005F3D12 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745252212FA20FD7005F3D12 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7452522B2FA20FD7005F3D12 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		745251FF2FA20FD6005F3D12 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 745251EC2FA20FD5005F3D12 /* tricorder */;
+			targetProxy = 745251FE2FA20FD6005F3D12 /* PBXContainerItemProxy */;
+		};
+		745252092FA20FD6005F3D12 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 745251EC2FA20FD5005F3D12 /* tricorder */;
+			targetProxy = 745252082FA20FD6005F3D12 /* PBXContainerItemProxy */;
+		};
+		745252162FA20FD6005F3D12 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 745252122FA20FD6005F3D12 /* tricorder Watch App */;
+			targetProxy = 745252152FA20FD6005F3D12 /* PBXContainerItemProxy */;
+		};
+		745252272FA20FD7005F3D12 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 745252122FA20FD6005F3D12 /* tricorder Watch App */;
+			targetProxy = 745252262FA20FD7005F3D12 /* PBXContainerItemProxy */;
+		};
+		745252312FA20FD7005F3D12 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 745252122FA20FD6005F3D12 /* tricorder Watch App */;
+			targetProxy = 745252302FA20FD7005F3D12 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		745252372FA20FD7005F3D12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		745252382FA20FD7005F3D12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		7452523A2FA20FD7005F3D12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"tricorder Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = ch.justmejulian.tricorder;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.justmejulian.tricorder.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		7452523B2FA20FD7005F3D12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"tricorder Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = ch.justmejulian.tricorder;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.justmejulian.tricorder.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+		7452523E2FA20FD7005F3D12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"tricorder/Preview Content\"";
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.justmejulian.tricorder;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7452523F2FA20FD7005F3D12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"tricorder/Preview Content\"";
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.justmejulian.tricorder;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		745252412FA20FD7005F3D12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.justmejulian.tricorderTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tricorder.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/tricorder";
+			};
+			name = Debug;
+		};
+		745252422FA20FD7005F3D12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.justmejulian.tricorderTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tricorder.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/tricorder";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		745252442FA20FD7005F3D12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.justmejulian.tricorderUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = tricorder;
+			};
+			name = Debug;
+		};
+		745252452FA20FD7005F3D12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.justmejulian.tricorderUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = tricorder;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		745252472FA20FD7005F3D12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.justmejulian.tricorder-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tricorder Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/tricorder Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		745252482FA20FD7005F3D12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.justmejulian.tricorder-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tricorder Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/tricorder Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+		7452524A2FA20FD7005F3D12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.justmejulian.tricorder-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "tricorder Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		7452524B2FA20FD7005F3D12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T73ZGJ9UTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.justmejulian.tricorder-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "tricorder Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		745251E82FA20FD5005F3D12 /* Build configuration list for PBXProject "tricorder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				745252372FA20FD7005F3D12 /* Debug */,
+				745252382FA20FD7005F3D12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		745252392FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorder Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7452523A2FA20FD7005F3D12 /* Debug */,
+				7452523B2FA20FD7005F3D12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7452523D2FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7452523E2FA20FD7005F3D12 /* Debug */,
+				7452523F2FA20FD7005F3D12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		745252402FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorderTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				745252412FA20FD7005F3D12 /* Debug */,
+				745252422FA20FD7005F3D12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		745252432FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorderUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				745252442FA20FD7005F3D12 /* Debug */,
+				745252452FA20FD7005F3D12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		745252462FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorder Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				745252472FA20FD7005F3D12 /* Debug */,
+				745252482FA20FD7005F3D12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		745252492FA20FD7005F3D12 /* Build configuration list for PBXNativeTarget "tricorder Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7452524A2FA20FD7005F3D12 /* Debug */,
+				7452524B2FA20FD7005F3D12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 745251E52FA20FD5005F3D12 /* Project object */;
+}

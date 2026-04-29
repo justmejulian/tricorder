@@ -1,4 +1,4 @@
-// PhoneWorkoutManager.swift — iOS target
+// PhoneWorkoutManager.swift — PhoneWorkout library
 //
 // Responsible for:
 //   • Initiating a workout on the watch via HKHealthStore.startWatchApp(toHandle:)
@@ -13,17 +13,18 @@
 
 @preconcurrency import HealthKit
 import Foundation
+import WorkoutCore
 
 @Observable
 @MainActor
-final class PhoneWorkoutManager: NSObject {
+public final class PhoneWorkoutManager: NSObject {
 
-    private(set) var state: WorkoutState = .idle
+    public private(set) var state: WorkoutState = .idle
 
     private let healthStore = HKHealthStore()
     private var mirroredSession: HKWorkoutSession?
 
-    override init() {
+    public override init() {
         super.init()
         // HealthKit delivers the mirrored session on an arbitrary thread;
         // hop to MainActor before touching any mutable state.
@@ -36,7 +37,7 @@ final class PhoneWorkoutManager: NSObject {
 
     // MARK: - Authorization
 
-    func requestAuthorization() async throws {
+    public func requestAuthorization() async throws {
         let read: Set<HKObjectType> = [
             .workoutType(),
             HKQuantityType(.heartRate),
@@ -48,7 +49,7 @@ final class PhoneWorkoutManager: NSObject {
 
     /// Asks HealthKit to launch / wake the watch app and hand it our configuration.
     /// State transitions to .active only after the mirroring handler fires.
-    func startWorkout() async throws {
+    public func startWorkout() async throws {
         let config = HKWorkoutConfiguration()
         config.activityType = .traditionalStrengthTraining
         config.locationType = .unknown
@@ -57,7 +58,7 @@ final class PhoneWorkoutManager: NSObject {
 
     /// Signals the watch session to stop; the mirrored delegate callback drives
     /// the state back to .idle.
-    func stopWorkout() {
+    public func stopWorkout() {
         mirroredSession?.stopActivity(with: Date())
     }
 
@@ -77,7 +78,7 @@ final class PhoneWorkoutManager: NSObject {
 
 extension PhoneWorkoutManager: HKWorkoutSessionDelegate {
 
-    nonisolated func workoutSession(
+    nonisolated public func workoutSession(
         _ workoutSession: HKWorkoutSession,
         didChangeTo toState: HKWorkoutSessionState,
         from fromState: HKWorkoutSessionState,
@@ -96,7 +97,7 @@ extension PhoneWorkoutManager: HKWorkoutSessionDelegate {
         }
     }
 
-    nonisolated func workoutSession(
+    nonisolated public func workoutSession(
         _ workoutSession: HKWorkoutSession,
         didFailWithError error: Error
     ) {
@@ -108,7 +109,7 @@ extension PhoneWorkoutManager: HKWorkoutSessionDelegate {
 
     // Seam: high-frequency data sent from the watch lands here.
     // Plug in motion streaming / analytics processing when ready.
-    nonisolated func workoutSession(
+    nonisolated public func workoutSession(
         _ workoutSession: HKWorkoutSession,
         didReceiveDataFromRemoteWorkoutSession data: [Data]
     ) {}

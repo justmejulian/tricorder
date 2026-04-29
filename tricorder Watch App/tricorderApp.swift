@@ -7,6 +7,7 @@
 
 import SwiftUI
 import HealthKit
+import WatchWorkout
 
 @main
 struct TricorderWatchApp: App {

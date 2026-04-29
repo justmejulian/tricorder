@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhoneWorkout
 
 @main
 struct TricorderApp: App {

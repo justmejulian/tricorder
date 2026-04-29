@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import WorkoutCore
+import WatchWorkout
 
 struct ContentView: View {
     @Environment(WatchWorkoutManager.self) private var workoutManager

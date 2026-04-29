@@ -1,4 +1,4 @@
-// WatchWorkoutManager.swift — watchOS target
+// WatchWorkoutManager.swift — WatchWorkout library
 //
 // Responsible for:
 //   • Owning the HKWorkoutSession — the watch is the source of truth.
@@ -14,20 +14,25 @@
 
 @preconcurrency import HealthKit
 import Foundation
+import WorkoutCore
 
 @Observable
 @MainActor
-final class WatchWorkoutManager: NSObject {
+public final class WatchWorkoutManager: NSObject {
 
-    private(set) var state: WorkoutState = .idle
+    public private(set) var state: WorkoutState = .idle
 
     private let healthStore = HKHealthStore()
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
 
+    public override init() {
+        super.init()
+    }
+
     // MARK: - Authorization
 
-    func requestAuthorization() async throws {
+    public func requestAuthorization() async throws {
         let share: Set<HKSampleType> = [.workoutType()]
         let read: Set<HKObjectType> = [
             .workoutType(),
@@ -39,7 +44,7 @@ final class WatchWorkoutManager: NSObject {
     // MARK: - Controls
 
     /// Called from the watch UI.
-    func startWorkout() async throws {
+    public func startWorkout() async throws {
         let config = HKWorkoutConfiguration()
         config.activityType = .traditionalStrengthTraining
         config.locationType = .unknown
@@ -47,7 +52,7 @@ final class WatchWorkoutManager: NSObject {
     }
 
     /// Called from WatchAppDelegate when the iPhone initiates via startWatchApp(toHandle:).
-    func startWorkout(with configuration: HKWorkoutConfiguration) async throws {
+    public func startWorkout(with configuration: HKWorkoutConfiguration) async throws {
         guard session == nil else { return }
 
         let newSession = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
@@ -70,7 +75,7 @@ final class WatchWorkoutManager: NSObject {
     }
 
     /// Signals the session to stop; finalization happens in the delegate callback.
-    func stopWorkout() {
+    public func stopWorkout() {
         session?.stopActivity(with: Date())
     }
 
@@ -93,7 +98,7 @@ final class WatchWorkoutManager: NSObject {
 
 extension WatchWorkoutManager: HKWorkoutSessionDelegate {
 
-    nonisolated func workoutSession(
+    nonisolated public func workoutSession(
         _ workoutSession: HKWorkoutSession,
         didChangeTo toState: HKWorkoutSessionState,
         from fromState: HKWorkoutSessionState,
@@ -112,7 +117,7 @@ extension WatchWorkoutManager: HKWorkoutSessionDelegate {
         }
     }
 
-    nonisolated func workoutSession(
+    nonisolated public func workoutSession(
         _ workoutSession: HKWorkoutSession,
         didFailWithError error: Error
     ) {
@@ -129,12 +134,12 @@ extension WatchWorkoutManager: HKWorkoutSessionDelegate {
 extension WatchWorkoutManager: HKLiveWorkoutBuilderDelegate {
 
     // Seam: workout events (sets, laps, markers) — process or relay to iPhone here.
-    nonisolated func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {}
+    nonisolated public func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {}
 
     // Seam: new quantity samples (HR, cadence, calories) — forward to iPhone or
     // store locally. When motion capture is added, custom HKQuantityType samples
     // from CMMotionManager will arrive here.
-    nonisolated func workoutBuilder(
+    nonisolated public func workoutBuilder(
         _ workoutBuilder: HKLiveWorkoutBuilder,
         didCollectDataOf collectedTypes: Set<HKSampleType>
     ) {}

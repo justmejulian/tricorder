@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7445DA242FA2289F000DAB18 /* PhoneWorkout in Frameworks */ = {isa = PBXBuildFile; productRef = 7445DA232FA2289F000DAB18 /* PhoneWorkout */; };
+		7445DA262FA2289F000DAB18 /* WatchWorkout in Frameworks */ = {isa = PBXBuildFile; productRef = 7445DA252FA2289F000DAB18 /* WatchWorkout */; };
+		7445DA282FA2289F000DAB18 /* WorkoutCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7445DA272FA2289F000DAB18 /* WorkoutCore */; };
+		7445DA2B2FA22A33000DAB18 /* WorkoutCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7445DA2A2FA22A33000DAB18 /* WorkoutCore */; };
 		745252142FA20FD6005F3D12 /* tricorder Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 745252132FA20FD6005F3D12 /* tricorder Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -102,11 +106,6 @@
 			path = "tricorder Watch AppUITests";
 			sourceTree = "<group>";
 		};
-		318431BABFD24F8397AB77E6 /* Shared */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Shared;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +113,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7445DA242FA2289F000DAB18 /* PhoneWorkout in Frameworks */,
+				7445DA282FA2289F000DAB18 /* WorkoutCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,6 +136,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7445DA262FA2289F000DAB18 /* WatchWorkout in Frameworks */,
+				7445DA2B2FA22A33000DAB18 /* WorkoutCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -155,16 +158,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7445DA292FA22A33000DAB18 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		745251E42FA20FD5005F3D12 = {
 			isa = PBXGroup;
 			children = (
-				318431BABFD24F8397AB77E6 /* Shared */,
 				745251EF2FA20FD5005F3D12 /* tricorder */,
 				745252002FA20FD6005F3D12 /* tricorderTests */,
 				7452520A2FA20FD6005F3D12 /* tricorderUITests */,
 				745252172FA20FD6005F3D12 /* tricorder Watch App */,
 				745252282FA20FD7005F3D12 /* tricorder Watch AppTests */,
 				745252322FA20FD7005F3D12 /* tricorder Watch AppUITests */,
+				7445DA292FA22A33000DAB18 /* Frameworks */,
 				745251EE2FA20FD5005F3D12 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -201,10 +211,11 @@
 			);
 			fileSystemSynchronizedGroups = (
 				745251EF2FA20FD5005F3D12 /* tricorder */,
-				318431BABFD24F8397AB77E6 /* Shared */,
 			);
 			name = tricorder;
 			packageProductDependencies = (
+				7445DA232FA2289F000DAB18 /* PhoneWorkout */,
+				7445DA272FA2289F000DAB18 /* WorkoutCore */,
 			);
 			productName = tricorder;
 			productReference = 745251ED2FA20FD5005F3D12 /* tricorder.app */;
@@ -270,10 +281,11 @@
 			);
 			fileSystemSynchronizedGroups = (
 				745252172FA20FD6005F3D12 /* tricorder Watch App */,
-				318431BABFD24F8397AB77E6 /* Shared */,
 			);
 			name = "tricorder Watch App";
 			packageProductDependencies = (
+				7445DA252FA2289F000DAB18 /* WatchWorkout */,
+				7445DA2A2FA22A33000DAB18 /* WorkoutCore */,
 			);
 			productName = "tricorder Watch App";
 			productReference = 745252132FA20FD6005F3D12 /* tricorder Watch App.app */;
@@ -368,6 +380,9 @@
 			);
 			mainGroup = 745251E42FA20FD5005F3D12;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7445DA222FA2289F000DAB18 /* XCLocalSwiftPackageReference "Packages/TricorderKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 745251EE2FA20FD5005F3D12 /* Products */;
 			projectDirPath = "";
@@ -969,6 +984,33 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		7445DA222FA2289F000DAB18 /* XCLocalSwiftPackageReference "Packages/TricorderKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/TricorderKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7445DA232FA2289F000DAB18 /* PhoneWorkout */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PhoneWorkout;
+		};
+		7445DA252FA2289F000DAB18 /* WatchWorkout */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WatchWorkout;
+		};
+		7445DA272FA2289F000DAB18 /* WorkoutCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WorkoutCore;
+		};
+		7445DA2A2FA22A33000DAB18 /* WorkoutCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7445DA222FA2289F000DAB18 /* XCLocalSwiftPackageReference "Packages/TricorderKit" */;
+			productName = WorkoutCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 745251E52FA20FD5005F3D12 /* Project object */;
 }

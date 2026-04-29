@@ -636,12 +636,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "tricorder Watch App/tricorderWatchApp.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"tricorder Watch App/Preview Content\"";
 				DEVELOPMENT_TEAM = T73ZGJ9UTG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "tricorder-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "tricorder reads health data to display your workout metrics.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "tricorder saves workout data to Apple Health.";
@@ -668,12 +670,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "tricorder Watch App/tricorderWatchApp.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"tricorder Watch App/Preview Content\"";
 				DEVELOPMENT_TEAM = T73ZGJ9UTG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "tricorder-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "tricorder reads health data to display your workout metrics.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "tricorder saves workout data to Apple Health.";
@@ -701,6 +705,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = tricorder/tricorder.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"tricorder/Preview Content\"";
@@ -708,6 +713,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "tricorder reads health data to display your workout metrics.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "tricorder saves workout data to Apple Health.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -733,6 +740,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = tricorder/tricorder.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"tricorder/Preview Content\"";
@@ -740,6 +748,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "tricorder reads health data to display your workout metrics.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "tricorder saves workout data to Apple Health.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

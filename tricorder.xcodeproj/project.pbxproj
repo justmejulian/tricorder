@@ -643,6 +643,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "tricorder reads health data to display your workout metrics.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "tricorder saves workout data to Apple Health.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = ch.justmejulian.tricorder;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -673,6 +675,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = tricorder;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "tricorder reads health data to display your workout metrics.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "tricorder saves workout data to Apple Health.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = ch.justmejulian.tricorder;
 				LD_RUNPATH_SEARCH_PATHS = (

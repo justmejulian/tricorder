@@ -139,6 +139,8 @@ extension WatchWorkoutManager: HKWorkoutSessionDelegate {
                 self?.state = .active(startDate: date)
             case .stopped:
                 self?.state = .idle
+                self?.session?.end()
+            case .ended:
                 await self?.finalizeWorkout(endDate: date)
             default:
                 break

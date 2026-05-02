@@ -32,14 +32,9 @@ public final class PhoneWorkoutManager: NSObject {
 
     public override init() {
         super.init()
-        // HealthKit delivers the mirrored session on an arbitrary thread;
-        // hop to MainActor before touching any mutable state.
-        healthStore.workoutSessionMirroringStartHandler = { [weak self] mirrored in
-            logger.info("Mirrored session received from watch")
-            Task { @MainActor [weak self] in
-                self?.attach(to: mirrored)
-            }
-        }
+        // Register immediately so watch-initiated workouts are received even when
+        // the user never taps Start on the phone first.
+        registerMirroringHandler()
     }
 
     // MARK: - Authorization
@@ -64,6 +59,9 @@ public final class PhoneWorkoutManager: NSObject {
     /// Asks HealthKit to launch / wake the watch app and hand it our configuration.
     /// State transitions to .active only after the mirroring handler fires.
     public func startWorkout() async throws {
+        // Re-register before each phone-initiated workout as a safety net.
+        registerMirroringHandler()
+
         logger.info("Requesting watch app launch for workout")
         let config = HKWorkoutConfiguration()
         config.activityType = .traditionalStrengthTraining
@@ -86,7 +84,28 @@ public final class PhoneWorkoutManager: NSObject {
 
     // MARK: - Private
 
+    private func registerMirroringHandler() {
+        // HealthKit delivers workoutSessionMirroringStartHandler only once per
+        // registration (catch-up delivery of an ended session consumes it). Re-register
+        // after each session ends so the next workout is covered regardless of whether
+        // it was initiated from the phone or the watch.
+        healthStore.workoutSessionMirroringStartHandler = { [weak self] mirrored in
+            logger.info("Mirrored session received from watch")
+            Task { @MainActor [weak self] in
+                self?.attach(to: mirrored)
+            }
+        }
+    }
+
     private func attach(to session: HKWorkoutSession) {
+        // When the handler is re-registered, HealthKit delivers the previous
+        // workout's ended session as "catch-up". Ignore any session that is
+        // already in a terminal state so we don't briefly replace mirroredSession
+        // with a dead object whose delegate callbacks could clear the real session.
+        guard session.state != .ended && session.state != .stopped else {
+            logger.info("Ignoring stale mirrored session (state: \(session.state.rawValue))")
+            return
+        }
         logger.info("Attaching to mirrored session (state: \(session.state.rawValue))")
         mirroredSession = session
         session.delegate = self
@@ -116,6 +135,7 @@ extension PhoneWorkoutManager: HKWorkoutSessionDelegate {
             case .stopped:
                 self?.state = .idle
                 self?.mirroredSession = nil
+                self?.registerMirroringHandler()
             default:
                 break
             }

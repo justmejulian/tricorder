@@ -67,18 +67,13 @@ public final class WatchWorkoutManager: NSObject {
     /// Called from WatchAppDelegate when the iPhone initiates via startWatchApp(toHandle:).
     public func startWorkout(with configuration: HKWorkoutConfiguration) async throws {
         guard session == nil else {
-            logger.warning("startWorkout called while a session is already active — restarting mirroring")
-            try await session?.startMirroringToCompanionDevice()
+            logger.warning("startWorkout called while a session is already active — ignoring")
             return
         }
 
         logger.info("Starting workout session (activityType: \(configuration.activityType.rawValue))")
         let newSession = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
         let newBuilder = newSession.associatedWorkoutBuilder()
-        newBuilder.dataSource = HKLiveWorkoutDataSource(
-            healthStore: healthStore,
-            workoutConfiguration: configuration
-        )
 
         newSession.delegate = self
         newBuilder.delegate = self
@@ -86,12 +81,12 @@ public final class WatchWorkoutManager: NSObject {
         session = newSession
         builder = newBuilder
 
+        newSession.prepare()
+
         // Mirror first so the iPhone receives the session as soon as activity starts.
         try await newSession.startMirroringToCompanionDevice()
         logger.info("Mirroring to companion device started")
         newSession.startActivity(with: Date())
-        try await newBuilder.beginCollection(at: Date())
-        logger.info("Workout session and builder active")
     }
 
     /// Signals the session to stop; finalization happens in the delegate callback.
@@ -102,10 +97,40 @@ public final class WatchWorkoutManager: NSObject {
 
     // MARK: - Private
 
+    private func beginCollection(at date: Date) async {
+        guard let b = builder else { return }
+        // No HKLiveWorkoutDataSource: setting one before the session is running
+        // causes HealthKit to sync its data-type config with the companion device
+        // during mirroring setup, which fails (the mirrored session on iPhone has
+        // no builder) and drives the builder into terminal Error(7). Without a
+        // data source, beginCollection only needs .workoutType write auth, which
+        // we already hold, and still tracks workout duration and events correctly.
+        // Health metrics (HR, calories) can be added via a custom data source once
+        // the right toShare types are added to requestAuthorization.
+        do {
+            try await b.beginCollection(at: date)
+            logger.info("Workout data collection started")
+        } catch {
+            logger.error("beginCollection failed: \(error.localizedDescription)")
+        }
+    }
+
     private func finalizeWorkout(endDate: Date) async {
         logger.info("Finalizing workout")
         guard let b = builder else {
             logger.fault("finalizeWorkout called with no active builder")
+            session = nil
+            return
+        }
+        defer {
+            session = nil
+            builder = nil
+        }
+        // beginCollection may have failed (e.g. due to a builder state-machine error),
+        // in which case startDate is nil and endCollection would throw
+        // "cannot set endDate without a startDate".
+        guard b.startDate != nil else {
+            logger.warning("Builder has no start date — workout was never collected, skipping finalization")
             return
         }
         do {
@@ -115,8 +140,6 @@ public final class WatchWorkoutManager: NSObject {
         } catch {
             logger.error("Failed to finalize workout: \(error.localizedDescription)")
         }
-        session = nil
-        builder = nil
     }
 }
 
@@ -137,6 +160,7 @@ extension WatchWorkoutManager: HKWorkoutSessionDelegate {
             switch toState {
             case .running:
                 self?.state = .active(startDate: date)
+                await self?.beginCollection(at: date)
             case .stopped:
                 self?.state = .idle
                 self?.session?.end()

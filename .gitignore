@@ -23,3 +23,9 @@ xcuserdata/
 # Swift Package Manager build artifacts
 .build/
 **/DerivedData/
+
+# Swift compiler intermediates (can spill outside .build/ on build errors)
+*.o
+*.d
+*.swiftdeps
+*.swiftdeps~

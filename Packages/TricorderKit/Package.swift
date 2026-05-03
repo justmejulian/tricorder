@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "TricorderKit",
-    platforms: [.iOS(.v18), .watchOS(.v11)],
+    platforms: [.iOS(.v18), .watchOS(.v11), .macOS(.v15)],
     products: [
         .library(name: "Util", targets: ["Util"]),
         .library(name: "WorkoutCore", targets: ["WorkoutCore"]),
@@ -16,6 +16,7 @@ let package = Package(
         .target(name: "PhoneWorkout", dependencies: ["WorkoutCore", "Util"]),
         .target(name: "WatchWorkout", dependencies: ["WorkoutCore", "Util"]),
         .testTarget(name: "WorkoutCoreTests", dependencies: ["WorkoutCore"]),
+        .testTarget(name: "WatchWorkoutTests", dependencies: ["WatchWorkout", "WorkoutCore"]),
     ],
     swiftLanguageModes: [.v6]
 )

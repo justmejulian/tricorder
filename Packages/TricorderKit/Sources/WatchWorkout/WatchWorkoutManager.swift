@@ -7,8 +7,8 @@
 //     when the session ends.
 //
 // Future seams:
-//   • workoutBuilder(_:didCollectDataOf:) — process HR, cadence, or custom quantities
-//   • workoutBuilderDidCollectEvent(_:) — log workout events (sets, reps, laps)
+//   • builderDidCollectData(of:) — process HR, cadence, or custom quantities
+//   • builderDidCollectEvent() — log workout events (sets, reps, laps)
 //   • sendToRemoteWorkoutSession(_:data:) — stream motion data to iPhone at 100 Hz
 //   • Replace HKLiveWorkoutDataSource with a custom source for CMMotionManager data
 
@@ -24,16 +24,22 @@ private let logger = Logger(subsystem: Logger.subsystem, category: "WatchWorkout
 
 @Observable
 @MainActor
-public final class WatchWorkoutManager: NSObject, WorkoutManaging {
+public final class WatchWorkoutManager: WorkoutManaging {
 
     public private(set) var state: WorkoutState = .idle
 
-    private let healthStore = HKHealthStore()
-    private var session: HKWorkoutSession?
-    private var builder: HKLiveWorkoutBuilder?
+    private let store: any HealthStoreProtocol
+    private var session: (any WorkoutSessionProtocol)?
+    private var builder: (any WorkoutBuilderProtocol)?
 
-    public override init() {
-        super.init()
+    #if os(watchOS)
+    public convenience init() {
+        self.init(store: HealthKitStore())
+    }
+    #endif
+
+    init(store: any HealthStoreProtocol) {
+        self.store = store
     }
 
     // MARK: - Authorization
@@ -46,7 +52,7 @@ public final class WatchWorkoutManager: NSObject, WorkoutManaging {
         ]
         logger.info("Requesting HealthKit authorization")
         do {
-            try await healthStore.requestAuthorization(toShare: share, read: read)
+            try await store.requestAuthorization(toShare: share, read: read)
             logger.info("HealthKit authorization granted")
         } catch {
             logger.error("HealthKit authorization failed: \(error.localizedDescription)")
@@ -72,11 +78,11 @@ public final class WatchWorkoutManager: NSObject, WorkoutManaging {
         }
 
         logger.info("Starting workout session (activityType: \(configuration.activityType.rawValue))")
-        let newSession = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
-        let newBuilder = newSession.associatedWorkoutBuilder()
+        let newSession = try store.makeWorkoutSession(configuration: configuration)
+        let newBuilder = newSession.makeBuilder()
 
-        newSession.delegate = self
-        newBuilder.delegate = self
+        newSession.setObserver(self)
+        newBuilder.setObserver(self)
 
         session = newSession
         builder = newBuilder
@@ -89,7 +95,7 @@ public final class WatchWorkoutManager: NSObject, WorkoutManaging {
         newSession.startActivity(with: Date())
     }
 
-    /// Signals the session to stop; finalization happens in the delegate callback.
+    /// Signals the session to stop; finalization happens in the observer callback.
     public func stopWorkout() {
         logger.info("Stop requested — ending session activity")
         session?.stopActivity(with: Date())
@@ -122,10 +128,9 @@ public final class WatchWorkoutManager: NSObject, WorkoutManaging {
             session = nil
             return
         }
-        defer {
-            session = nil
-            builder = nil
-        }
+        // Clear references before any await so a new workout can start immediately.
+        session = nil
+        builder = nil
         // beginCollection may have failed (e.g. due to a builder state-machine error),
         // in which case startDate is nil and endCollection would throw
         // "cannot set endDate without a startDate".
@@ -143,72 +148,46 @@ public final class WatchWorkoutManager: NSObject, WorkoutManaging {
     }
 }
 
-// MARK: - HKWorkoutSessionDelegate
+// MARK: - WorkoutSessionObserver
 
-extension WatchWorkoutManager: HKWorkoutSessionDelegate {
+extension WatchWorkoutManager: WorkoutSessionObserver {
 
-    nonisolated public func workoutSession(
-        _ workoutSession: HKWorkoutSession,
-        didChangeTo toState: HKWorkoutSessionState,
+    func sessionDidChangeState(
+        to toState: HKWorkoutSessionState,
         from fromState: HKWorkoutSessionState,
         date: Date
     ) {
-        // Logger is Sendable — call directly from nonisolated context, before the
-        // actor hop, so the log line timestamps the actual HealthKit event.
         logger.info("Session state: \(fromState.rawValue) → \(toState.rawValue)")
-        Task { @MainActor [weak self] in
-            switch toState {
-            case .running:
-                self?.state = .active(startDate: date)
-                await self?.beginCollection(at: date)
-            case .stopped:
-                self?.state = .idle
-                self?.session?.end()
-            case .ended:
-                await self?.finalizeWorkout(endDate: date)
-            default:
-                break
-            }
+        switch toState {
+        case .running:
+            state = .active(startDate: date)
+            Task { await self.beginCollection(at: date) }
+        case .stopped:
+            state = .idle
+            session?.end()
+        case .ended:
+            Task { await self.finalizeWorkout(endDate: date) }
+        default:
+            break
         }
     }
 
-    nonisolated public func workoutSession(
-        _ workoutSession: HKWorkoutSession,
-        didFailWithError error: Error
-    ) {
+    func sessionDidFail(error: Error) {
         logger.error("Workout session failed: \(error.localizedDescription)")
-        Task { @MainActor [weak self] in
-            self?.state = .idle
-            self?.session = nil
-            self?.builder = nil
-        }
+        state = .idle
+        session = nil
+        builder = nil
     }
 }
 
-// MARK: - HKLiveWorkoutBuilderDelegate
+// MARK: - WorkoutBuilderObserver
 
-extension WatchWorkoutManager: HKLiveWorkoutBuilderDelegate {
+extension WatchWorkoutManager: WorkoutBuilderObserver {
 
     // Seam: workout events (sets, laps, markers) — process or relay to iPhone here.
-    nonisolated public func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {}
+    func builderDidCollectEvent() {}
 
-    // Seam: new quantity samples (HR, cadence, calories) — forward to iPhone or
-    // store locally. When motion capture is added, custom HKQuantityType samples
-    // from CMMotionManager will arrive here.
-    //
+    // Seam: new quantity samples (HR, cadence, calories) — forward to iPhone or store locally.
     // ⚠️ HOT PATH — do NOT add Logger calls here.
-    // At 100 Hz this fires ~100 times/second. Logger persists to disk and will
-    // become a bottleneck. For profiling, use OSSignposter instead:
-    //
-    //   private let signposter = OSSignposter(logger: logger)
-    //   let id = signposter.makeSignpostID()
-    //   let state = signposter.beginInterval("collectData", id: id)
-    //   defer { signposter.endInterval("collectData", state) }
-    //
-    // Only log errors, or aggregate metrics at a throttled rate (e.g. every Nth call).
-    // Never log HKQuantitySample values — that is health data.
-    nonisolated public func workoutBuilder(
-        _ workoutBuilder: HKLiveWorkoutBuilder,
-        didCollectDataOf collectedTypes: Set<HKSampleType>
-    ) {}
+    func builderDidCollectData(of types: Set<HKSampleType>) {}
 }

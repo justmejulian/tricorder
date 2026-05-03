@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WorkoutCore
 import PhoneWorkout
 
 @main
@@ -15,7 +16,7 @@ struct TricorderApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(workoutManager)
+                .environment(\.workoutManager, workoutManager)
                 .task { try? await workoutManager.requestAuthorization() }
         }
     }

@@ -8,6 +8,7 @@
 import SwiftUI
 import HealthKit
 import OSLog
+import WorkoutCore
 import WatchWorkout
 
 private let watchAppLogger = Logger(subsystem: "com.julianvisser.tricorder", category: "WatchApp")
@@ -19,7 +20,7 @@ struct TricorderWatchApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(appDelegate.workoutManager)
+                .environment(\.workoutManager, appDelegate.workoutManager)
                 .task { try? await appDelegate.workoutManager.requestAuthorization() }
         }
     }

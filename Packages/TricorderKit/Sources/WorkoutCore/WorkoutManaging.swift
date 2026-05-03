@@ -1,3 +1,4 @@
+@MainActor
 public protocol WorkoutManaging: AnyObject {
     var state: WorkoutState { get }
     func requestAuthorization() async throws

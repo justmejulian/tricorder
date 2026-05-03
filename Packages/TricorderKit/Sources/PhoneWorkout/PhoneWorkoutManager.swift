@@ -23,7 +23,7 @@ private let logger = Logger(subsystem: Logger.subsystem, category: "PhoneWorkout
 
 @Observable
 @MainActor
-public final class PhoneWorkoutManager: NSObject {
+public final class PhoneWorkoutManager: NSObject, WorkoutManaging {
 
     public private(set) var state: WorkoutState = .idle
 

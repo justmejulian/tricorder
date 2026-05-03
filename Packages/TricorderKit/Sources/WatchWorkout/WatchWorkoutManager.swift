@@ -24,7 +24,7 @@ private let logger = Logger(subsystem: Logger.subsystem, category: "WatchWorkout
 
 @Observable
 @MainActor
-public final class WatchWorkoutManager: NSObject {
+public final class WatchWorkoutManager: NSObject, WorkoutManaging {
 
     public private(set) var state: WorkoutState = .idle
 

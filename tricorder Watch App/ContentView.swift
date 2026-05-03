@@ -7,27 +7,28 @@
 
 import SwiftUI
 import WorkoutCore
-import WatchWorkout
 
 struct ContentView: View {
-    @Environment(WatchWorkoutManager.self) private var workoutManager
+    @Environment(\.workoutManager) private var workoutManager
 
     var body: some View {
         VStack(spacing: 16) {
             statusView
             Button(action: handleButton) {
-                Text(workoutManager.state == .idle ? "Start" : "Stop")
+                Text(state == .idle ? "Start" : "Stop")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .tint(workoutManager.state == .idle ? .green : .red)
+            .tint(state == .idle ? .green : .red)
         }
         .padding()
     }
 
+    private var state: WorkoutState { workoutManager?.state ?? .idle }
+
     @ViewBuilder
     private var statusView: some View {
-        switch workoutManager.state {
+        switch state {
         case .idle:
             Text("Ready")
                 .foregroundStyle(.secondary)
@@ -41,11 +42,11 @@ struct ContentView: View {
     }
 
     private func handleButton() {
-        switch workoutManager.state {
+        switch state {
         case .idle:
-            Task { try? await workoutManager.startWorkout() }
+            Task { try? await workoutManager?.startWorkout() }
         case .active:
-            workoutManager.stopWorkout()
+            workoutManager?.stopWorkout()
         }
     }
 
@@ -53,5 +54,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environment(WatchWorkoutManager())
+        .environment(\.workoutManager, MockWorkoutManager())
 }

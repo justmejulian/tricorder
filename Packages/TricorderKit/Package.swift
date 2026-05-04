@@ -17,6 +17,7 @@ let package = Package(
         .target(name: "WatchWorkout", dependencies: ["WorkoutCore", "Util"]),
         .testTarget(name: "WorkoutCoreTests", dependencies: ["WorkoutCore"]),
         .testTarget(name: "WatchWorkoutTests", dependencies: ["WatchWorkout", "WorkoutCore"]),
+        .testTarget(name: "PhoneWorkoutTests", dependencies: ["PhoneWorkout", "WorkoutCore"]),
     ],
     swiftLanguageModes: [.v6]
 )

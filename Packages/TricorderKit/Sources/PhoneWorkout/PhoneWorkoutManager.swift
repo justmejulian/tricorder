@@ -27,13 +27,21 @@ public final class PhoneWorkoutManager: NSObject, WorkoutManaging {
 
     public private(set) var state: WorkoutState = .idle
 
-    private let healthStore = HKHealthStore()
+    private let healthStore: any PhoneHealthStoreProtocol
     private var mirroredSession: HKWorkoutSession?
 
     public override init() {
+        self.healthStore = PhoneHealthStore()
         super.init()
         // Register immediately so watch-initiated workouts are received even when
         // the user never taps Start on the phone first.
+        registerMirroringHandler()
+    }
+
+    /// For testing — inject a fake store.
+    init(store: any PhoneHealthStoreProtocol) {
+        self.healthStore = store
+        super.init()
         registerMirroringHandler()
     }
 
@@ -48,6 +56,7 @@ public final class PhoneWorkoutManager: NSObject, WorkoutManaging {
         do {
             try await healthStore.requestAuthorization(toShare: [], read: read)
             logger.info("HealthKit authorization granted")
+            registerMirroringHandler()
         } catch {
             logger.error("HealthKit authorization failed: \(error.localizedDescription)")
             throw error
@@ -85,11 +94,11 @@ public final class PhoneWorkoutManager: NSObject, WorkoutManaging {
     // MARK: - Private
 
     private func registerMirroringHandler() {
-        // HealthKit delivers workoutSessionMirroringStartHandler only once per
-        // registration (catch-up delivery of an ended session consumes it). Re-register
+        // HealthKit delivers the mirroring handler only once per registration
+        // (catch-up delivery of an ended session consumes it). Re-register
         // after each session ends so the next workout is covered regardless of whether
         // it was initiated from the phone or the watch.
-        healthStore.workoutSessionMirroringStartHandler = { [weak self] mirrored in
+        healthStore.setMirroringHandler { [weak self] mirrored in
             logger.info("Mirrored session received from watch")
             Task { @MainActor [weak self] in
                 self?.attach(to: mirrored)

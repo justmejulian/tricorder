@@ -9,7 +9,7 @@ protocol PhoneHealthStoreProtocol: Sendable {
     func requestAuthorization(toShare: Set<HKSampleType>, read: Set<HKObjectType>) async throws
     /// Assigns the handler HealthKit calls when a mirrored Watch session arrives.
     /// Called on @MainActor — mirrors the isolation of PhoneWorkoutManager.
-    @MainActor func setMirroringHandler(_ handler: (@Sendable (HKWorkoutSession) -> Void)?)
+    @MainActor func setMirroringHandler(_ handler: (@Sendable (any MirroredSessionProtocol) -> Void)?)
     func startWatchApp(toHandle configuration: HKWorkoutConfiguration) async throws
 }
 
@@ -23,8 +23,14 @@ final class PhoneHealthStore: PhoneHealthStoreProtocol, @unchecked Sendable {
         try await store.requestAuthorization(toShare: toShare, read: read)
     }
 
-    @MainActor func setMirroringHandler(_ handler: (@Sendable (HKWorkoutSession) -> Void)?) {
-        store.workoutSessionMirroringStartHandler = handler
+    @MainActor func setMirroringHandler(_ handler: (@Sendable (any MirroredSessionProtocol) -> Void)?) {
+        guard let handler else {
+            store.workoutSessionMirroringStartHandler = nil
+            return
+        }
+        store.workoutSessionMirroringStartHandler = { session in
+            handler(PhoneMirroredSession(session: session))
+        }
     }
 
     func startWatchApp(toHandle configuration: HKWorkoutConfiguration) async throws {

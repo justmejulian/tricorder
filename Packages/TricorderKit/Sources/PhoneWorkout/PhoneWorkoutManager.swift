@@ -28,7 +28,7 @@ public final class PhoneWorkoutManager: NSObject, WorkoutManaging {
     public private(set) var state: WorkoutState = .idle
 
     private let healthStore: any PhoneHealthStoreProtocol
-    private var mirroredSession: HKWorkoutSession?
+    private var mirroredSession: (any MirroredSessionProtocol)?
 
     public override init() {
         self.healthStore = PhoneHealthStore()
@@ -106,7 +106,7 @@ public final class PhoneWorkoutManager: NSObject, WorkoutManaging {
         }
     }
 
-    private func attach(to session: HKWorkoutSession) {
+    private func attach(to session: any MirroredSessionProtocol) {
         // When the handler is re-registered, HealthKit delivers the previous
         // workout's ended session as "catch-up". Ignore any session that is
         // already in a terminal state so we don't briefly replace mirroredSession
@@ -117,7 +117,7 @@ public final class PhoneWorkoutManager: NSObject, WorkoutManaging {
         }
         logger.info("Attaching to mirrored session (state: \(session.state.rawValue))")
         mirroredSession = session
-        session.delegate = self
+        session.setObserver(self)
         // The session may already be .running when the handler fires.
         if session.state == .running {
             state = .active(startDate: session.startDate ?? Date())
@@ -125,52 +125,39 @@ public final class PhoneWorkoutManager: NSObject, WorkoutManaging {
     }
 }
 
-// MARK: - HKWorkoutSessionDelegate
+// MARK: - MirroredSessionObserver
 
-extension PhoneWorkoutManager: HKWorkoutSessionDelegate {
+extension PhoneWorkoutManager: MirroredSessionObserver {
 
-    nonisolated public func workoutSession(
-        _ workoutSession: HKWorkoutSession,
-        didChangeTo toState: HKWorkoutSessionState,
+    func mirroredSessionDidChangeState(
+        to toState: HKWorkoutSessionState,
         from fromState: HKWorkoutSessionState,
         date: Date
     ) {
-        // Logger is Sendable — call directly from nonisolated context.
         logger.info("Mirrored session state: \(fromState.rawValue) → \(toState.rawValue)")
-        Task { @MainActor [weak self] in
-            switch toState {
-            case .running:
-                self?.state = .active(startDate: date)
-            case .stopped:
-                self?.state = .idle
-                self?.mirroredSession = nil
-                self?.registerMirroringHandler()
-            default:
-                break
-            }
+        switch toState {
+        case .running:
+            state = .active(startDate: date)
+        case .stopped:
+            mirroredSession?.setObserver(nil)
+            state = .idle
+            mirroredSession = nil
+            registerMirroringHandler()
+        default:
+            break
         }
     }
 
-    nonisolated public func workoutSession(
-        _ workoutSession: HKWorkoutSession,
-        didFailWithError error: Error
-    ) {
+    func mirroredSessionDidFail(error: Error) {
         logger.error("Mirrored session failed: \(error.localizedDescription)")
-        Task { @MainActor [weak self] in
-            self?.state = .idle
-            self?.mirroredSession = nil
-        }
+        mirroredSession?.setObserver(nil)
+        state = .idle
+        mirroredSession = nil
     }
 
-    // Seam: high-frequency data sent from the watch lands here.
-    // Plug in motion streaming / analytics processing when ready.
-    //
     // ⚠️ HOT PATH — do NOT add Logger calls here.
     // When motion streaming is active (100 Hz from the watch), this fires
     // continuously. Use OSSignposter for tracing, and log only on errors or
     // at a coarse aggregate rate outside this callback.
-    nonisolated public func workoutSession(
-        _ workoutSession: HKWorkoutSession,
-        didReceiveDataFromRemoteWorkoutSession data: [Data]
-    ) {}
+    func mirroredSessionDidReceiveData(_ data: [Data]) {}
 }

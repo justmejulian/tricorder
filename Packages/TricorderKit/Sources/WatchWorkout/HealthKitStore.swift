@@ -1,6 +1,11 @@
-#if os(watchOS)
 @preconcurrency import HealthKit
 
+protocol HealthStoreProtocol: Sendable {
+    func requestAuthorization(toShare: Set<HKSampleType>, read: Set<HKObjectType>) async throws
+    func makeWorkoutSession(configuration: HKWorkoutConfiguration) throws -> any WorkoutSessionProtocol
+}
+
+#if os(watchOS)
 // @unchecked Sendable: HKHealthStore is documented as thread-safe by Apple;
 // stored immutably after init.
 final class HealthKitStore: HealthStoreProtocol, @unchecked Sendable {
@@ -16,7 +21,4 @@ final class HealthKitStore: HealthStoreProtocol, @unchecked Sendable {
         return HealthKitWorkoutSession(session: session, healthStore: store)
     }
 }
-#else
-// HealthKitStore is unavailable on macOS — watchOS-only HealthKit APIs.
-private enum _HealthKitStoreUnavailable {}
 #endif
